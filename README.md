@@ -54,6 +54,23 @@ TBD
 - mvn install
 - mvn spring-boot:run
 
+### Database
+
+#### Manual
+
+- install mysql server
+- set the root password
+- create a database called `legalconsultation`
+
+### With docker-compose
+
+- install [Docker](https://docs.docker.com/install/)
+- install `docker-compose`
+-- with [pip](https://packaging.python.org/tutorials/installing-packages/): `pip install docker-compose`
+- go to `etc/docker`
+- run `docker-compose up`
+To connect to the dockerized server with the `mysql` client run: `docker-compose exec db mysql -u root -p`
+
 ## Feedback
 
 * Request a new feature on GitHub.
@@ -61,7 +78,7 @@ TBD
 * File a bug in GitHub Issues.
 * Email us with other feedback contact@code4.ro
 
-## License 
+## License
 
 This project is licensed under the MPL 2.0 License - see the [LICENSE](LICENSE) file for details
 
