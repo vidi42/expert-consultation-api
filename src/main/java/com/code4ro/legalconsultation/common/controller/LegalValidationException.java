@@ -9,10 +9,16 @@ public class LegalValidationException extends RuntimeException {
     private final List<String> i8nArguments;
     private final HttpStatus httpStatus;
 
-    public LegalValidationException(final String i18nKey, final List<String> i8nArguments, HttpStatus httpStatus) {
+    public LegalValidationException(final String i18nKey, final List<String> i8nArguments, final HttpStatus httpStatus) {
         this.i18nKey = i18nKey;
         this.i8nArguments = i8nArguments;
         this.httpStatus = httpStatus;
+    }
+
+    public LegalValidationException(final String i18nKey, final HttpStatus httpStatus) {
+        this.i18nKey = i18nKey;
+        this.httpStatus = httpStatus;
+        this.i8nArguments = null;
     }
 
     public String getI18nKey() {
