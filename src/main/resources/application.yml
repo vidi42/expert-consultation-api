@@ -4,8 +4,11 @@ spring:
     username: root
     password: root
   jpa:
+    show-sql: true
     hibernate.ddl-auto: update
     generate-ddl: true
+    properties.hibernate.dialect.storage_engine: innodb
+    properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 app:
   jwtSecret: ORy9HWgKoZPAs50ECKw0
   jwtExpirationInMs: 172800000   # two days expiration time, can be extended
