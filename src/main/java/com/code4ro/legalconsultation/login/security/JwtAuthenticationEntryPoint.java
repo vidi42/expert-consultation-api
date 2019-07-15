@@ -1,5 +1,6 @@
 package com.code4ro.legalconsultation.login.security;
 
+import com.code4ro.legalconsultation.common.controller.ExceptionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,10 +12,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -31,9 +28,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         LOGGER.error("Responding with unauthorized error. Message - {}", e.getMessage());
         httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        Map<String, Object> responseData = new HashMap<>();
-        responseData.put("timestamp", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        responseData.put("exception", e.getMessage());
-        httpServletResponse.getOutputStream().println(MAPPER.writeValueAsString(responseData));
+        final ExceptionResponse exceptionResponse = new ExceptionResponse();
+        exceptionResponse.setAdditionalInfo(e.getMessage());
+        httpServletResponse.getOutputStream().println(MAPPER.writeValueAsString(exceptionResponse));
     }
 }

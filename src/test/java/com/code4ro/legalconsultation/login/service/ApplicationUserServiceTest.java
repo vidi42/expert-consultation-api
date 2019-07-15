@@ -3,7 +3,7 @@ package com.code4ro.legalconsultation.login.service;
 import com.code4ro.legalconsultation.common.controller.LegalValidationException;
 import com.code4ro.legalconsultation.login.model.ApplicationUser;
 import com.code4ro.legalconsultation.login.payload.SignUpRequest;
-import com.code4ro.legalconsultation.login.repository.UserRepository;
+import com.code4ro.legalconsultation.login.repository.ApplicationUserRepository;
 import com.code4ro.legalconsultation.util.RandomObjectFiller;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,33 +19,33 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationUserServiceTest {
     @Mock
-    private UserRepository userRepository;
+    private ApplicationUserRepository applicationUserRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
     @InjectMocks
-    private UserService userService;
+    private ApplicationUserService applicationUserService;
 
     private final SignUpRequest signUpRequest = RandomObjectFiller.createAndFill(SignUpRequest.class);
 
     @Test
     public void save() {
-        userService.save(signUpRequest);
+        applicationUserService.save(signUpRequest);
 
         verify(passwordEncoder).encode(signUpRequest.getPassword());
-        verify(userRepository).save(any(ApplicationUser.class));
+        verify(applicationUserRepository).save(any(ApplicationUser.class));
     }
 
     @Test(expected = LegalValidationException.class)
     public void saveDuplicateUser() {
-        when(userRepository.existsByUsername(signUpRequest.getUsername())).thenReturn(true);
+        when(applicationUserRepository.existsByUsername(signUpRequest.getUsername())).thenReturn(true);
 
-        userService.save(signUpRequest);
+        applicationUserService.save(signUpRequest);
     }
 
     @Test(expected = LegalValidationException.class)
     public void saveDuplicateEmail() {
-        when(userRepository.existsByEmail(signUpRequest.getEmail())).thenReturn(true);
+        when(applicationUserRepository.existsByEmail(signUpRequest.getEmail())).thenReturn(true);
 
-        userService.save(signUpRequest);
+        applicationUserService.save(signUpRequest);
     }
 }

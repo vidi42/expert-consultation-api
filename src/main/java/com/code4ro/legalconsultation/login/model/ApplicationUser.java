@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "users")
+@Table(name = "applicationusers")
 public class ApplicationUser extends BaseEntity {
 
     @NotBlank
