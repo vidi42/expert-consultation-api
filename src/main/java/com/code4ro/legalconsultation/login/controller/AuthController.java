@@ -7,7 +7,7 @@ import com.code4ro.legalconsultation.login.payload.JwtAuthenticationResponse;
 import com.code4ro.legalconsultation.login.payload.LoginRequest;
 import com.code4ro.legalconsultation.login.payload.SignUpRequest;
 import com.code4ro.legalconsultation.login.security.JwtTokenProvider;
-import com.code4ro.legalconsultation.login.service.UserService;
+import com.code4ro.legalconsultation.login.service.ApplicationUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,12 +29,12 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
-    private final UserService userService;
+    private final ApplicationUserService userService;
 
     @Autowired
     public AuthController(final AuthenticationManager authenticationManager,
                           final JwtTokenProvider tokenProvider,
-                          final UserService userService) {
+                          final ApplicationUserService userService) {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
         this.userService = userService;
