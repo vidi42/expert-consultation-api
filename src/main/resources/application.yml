@@ -7,6 +7,9 @@ spring:
     show-sql: true
     hibernate.ddl-auto: update
     generate-ddl: true
+  multipart:
+    maxFileSize: 20MB
+    maxRequestSize: 30MB
     properties.hibernate.dialect.storage_engine: innodb
     properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
 app:
