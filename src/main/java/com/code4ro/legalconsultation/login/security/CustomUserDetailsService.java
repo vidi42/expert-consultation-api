@@ -2,7 +2,7 @@ package com.code4ro.legalconsultation.login.security;
 
 
 import com.code4ro.legalconsultation.login.model.ApplicationUser;
-import com.code4ro.legalconsultation.login.repository.UserRepository;
+import com.code4ro.legalconsultation.login.repository.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,18 +15,18 @@ import java.util.UUID;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private UserRepository userRepository;
+    private ApplicationUserRepository applicationUserRepository;
 
     @Autowired
-    public CustomUserDetailsService(final UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public CustomUserDetailsService(final ApplicationUserRepository applicationUserRepository) {
+        this.applicationUserRepository = applicationUserRepository;
     }
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
         // let people login with either username or email
-        ApplicationUser applicationUser = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+        ApplicationUser applicationUser = applicationUserRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("ApplicationUser not found with username or email : " + usernameOrEmail)
                 );
@@ -37,7 +37,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     // used by JWTAuthenticationFilter
     @Transactional
     public UserDetails loadUserById(UUID id) throws UsernameNotFoundException {
-        ApplicationUser applicationUser = userRepository.findById(id).orElseThrow(
+        ApplicationUser applicationUser = applicationUserRepository.findById(id).orElseThrow(
                 () -> new UsernameNotFoundException("ApplicationUser not found with id : " + id)
         );
 

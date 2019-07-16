@@ -3,7 +3,7 @@ package com.code4ro.legalconsultation.login.controller;
 
 import com.code4ro.legalconsultation.login.payload.LoginRequest;
 import com.code4ro.legalconsultation.login.payload.SignUpRequest;
-import com.code4ro.legalconsultation.login.repository.UserRepository;
+import com.code4ro.legalconsultation.login.repository.ApplicationUserRepository;
 import com.code4ro.legalconsultation.util.RandomObjectFiller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class AuthControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private UserRepository userRepository;
+    private ApplicationUserRepository applicationUserRepository;
 
     @Test
     public void signUp() throws Exception {
@@ -44,7 +44,7 @@ public class AuthControllerIntegrationTest {
                 .content(json)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
-        assertThat(userRepository.existsByUsername(signUpRequest.getUsername())).isNotNull();
+        assertThat(applicationUserRepository.existsByUsername(signUpRequest.getUsername())).isNotNull();
 
         // fail to register with same username
         mvc.perform(post("/api/auth/signup")
