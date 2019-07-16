@@ -3,6 +3,8 @@ package com.code4ro.legalconsultation.user.controller;
 import com.code4ro.legalconsultation.user.model.User;
 import com.code4ro.legalconsultation.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,8 +23,29 @@ public class UserController {
     }
 
     @PostMapping
+    public User save(@Valid @RequestBody final User user) {
+        return userService.save(user);
+    }
+
+    @PutMapping
     public List<User> saveAll(@Valid @RequestBody final List<User> users) {
-        return userService.save(users);
+        return userService.saveAll(users);
+    }
+
+
+    @GetMapping(value = "/{id}")
+    public User getOne(@PathVariable final String id) {
+        return userService.getOne(id);
+    }
+
+    @GetMapping
+    public Page<User> findAll(final Pageable pageable) {
+        return userService.findAll(pageable);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public void deleteById(@PathVariable final String id) {
+        userService.deleteById(id);
     }
 
     @PostMapping(value = "/extract", consumes = "multipart/form-data")

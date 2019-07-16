@@ -9,13 +9,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -30,13 +30,46 @@ public class UserServiceTest {
     private UserService userService;
 
     @Test
+    public void saveUser() {
+        final User user = RandomObjectFiller.createAndFill(User.class);
+
+        userService.save(user);
+
+        verify(userRepository).save(user);
+    }
+
+    @Test
     public void saveUsers() {
         final List<User> users = Arrays.asList(
                 RandomObjectFiller.createAndFill(User.class), RandomObjectFiller.createAndFill(User.class));
 
-        userService.save(users);
+        userService.saveAll(users);
 
         verify(userRepository).saveAll(users);
+    }
+
+    @Test
+    public void getUser() {
+        final String id = UUID.randomUUID().toString();
+        when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(new User()));
+        userService.getOne(id);
+
+        verify(userRepository).findById(UUID.fromString(id));
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void getUserNotFound() {
+        final String id = UUID.randomUUID().toString();
+        userService.getOne(id);
+    }
+
+    @Test
+    public void findAll() {
+        final Pageable pageable = mock(Pageable.class);
+
+        userService.findAll(pageable);
+
+        verify(userRepository).findAll(pageable);
     }
 
     @Test

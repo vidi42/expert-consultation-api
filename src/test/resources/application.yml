@@ -7,6 +7,12 @@ spring:
   jpa:
     hibernate.ddl-auto: update
     generate-ddl: true
+  data:
+    web:
+      pageable:
+        size-parameter: size
+        page-parameter: page
+        default-page-size: 2
 app:
   jwtSecret: ORy9HWgKoZPAs50ECKw0
   jwtExpirationInMs: 172800000   # two days expiration time, can be extended

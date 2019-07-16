@@ -12,6 +12,12 @@ spring:
     maxRequestSize: 30MB
     properties.hibernate.dialect.storage_engine: innodb
     properties.hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+  data:
+    web:
+      pageable:
+        size-parameter: size
+        page-parameter: page
+        default-page-size: 20
 app:
   jwtSecret: ORy9HWgKoZPAs50ECKw0
   jwtExpirationInMs: 172800000   # two days expiration time, can be extended

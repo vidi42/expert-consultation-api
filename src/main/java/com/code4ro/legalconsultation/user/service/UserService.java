@@ -9,14 +9,18 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,8 +35,24 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> save(final List<User> users) {
+    public User save(final User user) {
+        return userRepository.save(user);
+    }
+
+    public List<User> saveAll(final List<User> users) {
         return userRepository.saveAll(users);
+    }
+
+    public User getOne(final String id) {
+        return userRepository.findById(UUID.fromString(id)).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public Page<User> findAll(final Pageable pageable) {
+        return userRepository.findAll(pageable);
+    }
+
+    public void deleteById(final String id) {
+        userRepository.deleteById(UUID.fromString(id));
     }
 
     public List<User> extract(final MultipartFile csvFile) throws LegalValidationException {
