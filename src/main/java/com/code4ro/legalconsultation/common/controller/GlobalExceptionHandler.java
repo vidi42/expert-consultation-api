@@ -3,6 +3,7 @@ package com.code4ro.legalconsultation.common.controller;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import javax.persistence.EntityNotFoundException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -34,9 +36,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   final HttpHeaders headers,
                                                                   final HttpStatus status,
                                                                   final WebRequest request) {
-        final List<I18nFieldError> violations = ex.getBindingResult().getFieldErrors().stream()
-                .map(violation -> new I18nFieldError(violation.getField(), violation.getDefaultMessage(), null))
-                .collect(Collectors.toList());
+        final Map<String, I18nError> violations = ex.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.toMap(FieldError::getField,
+                        err -> new I18nError(err.getDefaultMessage(), null)));
         return buildResponseEntity(HttpStatus.BAD_REQUEST, null, violations, ex.getLocalizedMessage());
     }
 
@@ -47,7 +49,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> buildResponseEntity(final HttpStatus httpStatus,
                                                        final List<I18nError> errors,
-                                                       final List<I18nFieldError> fieldErrors,
+                                                       final Map<String, I18nError> fieldErrors,
                                                        final String additionalInfo) {
         final ExceptionResponse exceptionResponse = new ExceptionResponse();
         exceptionResponse.setI18nErrors(errors);

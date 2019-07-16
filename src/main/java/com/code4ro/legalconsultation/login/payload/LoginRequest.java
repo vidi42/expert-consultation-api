@@ -3,10 +3,10 @@ package com.code4ro.legalconsultation.login.payload;
 import javax.validation.constraints.NotBlank;
 
 public class LoginRequest {
-    @NotBlank
+    @NotBlank(message = "login.UsernameOrEmail.not.empty")
     private String usernameOrEmail;
 
-    @NotBlank
+    @NotBlank(message = "login.Password.not.empty")
     private String password;
 
     public String getUsernameOrEmail() {

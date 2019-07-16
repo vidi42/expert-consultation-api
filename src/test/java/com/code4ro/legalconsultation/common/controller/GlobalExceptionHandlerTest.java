@@ -77,9 +77,8 @@ public class GlobalExceptionHandlerTest {
 
         mockMvc.perform(get("/testException"))
                 .andDo(print()).andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.i18nFieldErrors[0].i18nErrorKey").value("i18nKey"))
-                .andExpect(jsonPath("$.i18nFieldErrors[0].fieldName").value("fieldName"))
-                .andExpect(jsonPath("$.i18nFieldErrors[0].i18nErrorArguments").isEmpty());
+                .andExpect(jsonPath("$.i18nFieldErrors['fieldName'].i18nErrorKey").value("i18nKey"))
+                .andExpect(jsonPath("$.i18nFieldErrors['fieldName'].i18nErrorArguments").isEmpty());
     }
 
     @Test

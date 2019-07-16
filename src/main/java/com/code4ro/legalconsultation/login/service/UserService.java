@@ -23,10 +23,10 @@ public class UserService {
 
     public ApplicationUser save(SignUpRequest signUpRequest) throws LegalValidationException {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            throw new LegalValidationException("validation.user.Duplicate.username", HttpStatus.CONFLICT);
+            throw new LegalValidationException("register.Duplicate.username", HttpStatus.CONFLICT);
         }
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            throw new LegalValidationException("validation.user.Duplicate.email", HttpStatus.CONFLICT);
+            throw new LegalValidationException("register.Duplicate.email", HttpStatus.CONFLICT);
         }
         ApplicationUser applicationUser = new ApplicationUser(signUpRequest.getName(), signUpRequest.getUsername(),
                 signUpRequest.getEmail(), signUpRequest.getPassword());

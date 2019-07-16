@@ -52,7 +52,7 @@ public class AuthControllerIntegrationTest {
                 .content(json)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.i18nErrors[0].i18nErrorKey")
-                        .value("validation.user.Duplicate.username"))
+                        .value("register.Duplicate.username"))
                 .andExpect(status().isConflict());
 
         // fail to register with same email
@@ -63,7 +63,7 @@ public class AuthControllerIntegrationTest {
                 .content(json)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.i18nErrors[0].i18nErrorKey")
-                        .value("validation.user.Duplicate.email"))
+                        .value("register.Duplicate.email"))
                 .andExpect(status().isConflict());
     }
 
@@ -98,7 +98,7 @@ public class AuthControllerIntegrationTest {
                 .content(json)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.i18nErrors[0].i18nErrorKey")
-                        .value("login.user.Bad.credentials"))
+                        .value("login.Bad.credentials"))
                 .andExpect(status().isUnauthorized());
     }
 }
