@@ -16,10 +16,12 @@ import java.util.List;
 @RequestMapping(value = "/api/v1/document")
 public class DocumentController {
 
-    @Autowired
+    //TODO Create implementation for the service first
+    //@Autowired
     private DocumentService documentService;
 
-    @Autowired
+    //TODO Create implementation for the service first
+    //@Autowired
     private DocumentStorageService documentStorageService;
 
     @GetMapping("")
