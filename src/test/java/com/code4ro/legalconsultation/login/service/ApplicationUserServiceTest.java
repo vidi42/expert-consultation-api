@@ -1,9 +1,10 @@
 package com.code4ro.legalconsultation.login.service;
 
-import com.code4ro.legalconsultation.common.controller.LegalValidationException;
-import com.code4ro.legalconsultation.login.model.ApplicationUser;
-import com.code4ro.legalconsultation.login.payload.SignUpRequest;
-import com.code4ro.legalconsultation.login.repository.ApplicationUserRepository;
+import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
+import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
+import com.code4ro.legalconsultation.model.dto.SignUpRequest;
+import com.code4ro.legalconsultation.repository.ApplicationUserRepository;
+import com.code4ro.legalconsultation.service.impl.ApplicationUserService;
 import com.code4ro.legalconsultation.util.RandomObjectFiller;
 import org.junit.Test;
 import org.junit.runner.RunWith;

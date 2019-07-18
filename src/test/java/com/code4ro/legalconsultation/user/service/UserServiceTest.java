@@ -1,8 +1,9 @@
 package com.code4ro.legalconsultation.user.service;
 
-import com.code4ro.legalconsultation.common.controller.LegalValidationException;
-import com.code4ro.legalconsultation.user.model.User;
-import com.code4ro.legalconsultation.user.repository.UserRepository;
+import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
+import com.code4ro.legalconsultation.model.persistence.User;
+import com.code4ro.legalconsultation.repository.UserRepository;
+import com.code4ro.legalconsultation.service.impl.UserService;
 import com.code4ro.legalconsultation.util.RandomObjectFiller;
 import org.junit.Test;
 import org.junit.runner.RunWith;

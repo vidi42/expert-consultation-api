@@ -2,9 +2,9 @@ package com.code4ro.legalconsultation.login.controller;
 
 
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
-import com.code4ro.legalconsultation.login.payload.LoginRequest;
-import com.code4ro.legalconsultation.login.payload.SignUpRequest;
-import com.code4ro.legalconsultation.login.repository.ApplicationUserRepository;
+import com.code4ro.legalconsultation.model.dto.LoginRequest;
+import com.code4ro.legalconsultation.model.dto.SignUpRequest;
+import com.code4ro.legalconsultation.repository.ApplicationUserRepository;
 import com.code4ro.legalconsultation.util.RandomObjectFiller;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,5 +1,6 @@
 package com.code4ro.legalconsultation.common.i18n;
 
+import com.code4ro.legalconsultation.service.impl.I18nService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -7,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,13 +31,15 @@ public class I18nServiceTest {
         final List<Object> args = Collections.singletonList("i18nArg");
         i18nService.translate("i18nKey", args);
 
-        verify(messageSource).getMessage("i18nKey", args.toArray(), Locale.US);
+        Locale locale = LocaleContextHolder.getLocale();
+        verify(messageSource).getMessage("i18nKey", args.toArray(), locale);
     }
 
     @Test
     public void translateMessageNotFound() {
+        Locale locale = LocaleContextHolder.getLocale();
         final List<Object> args = Collections.singletonList("i18nArg");
-        when(messageSource.getMessage("i18nKey", args.toArray(), Locale.US))
+        when(messageSource.getMessage("i18nKey", args.toArray(), locale))
                 .thenThrow(new NoSuchMessageException("No message!"));
 
         final String translation = i18nService.translate("i18nKey", args);

@@ -1,5 +1,6 @@
 package com.code4ro.legalconsultation.common.controller;
 
+import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
