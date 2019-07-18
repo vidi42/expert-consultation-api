@@ -1,39 +1,16 @@
 package com.code4ro.legalconsultation.model.persistence;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import java.math.BigInteger;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "document_chapters")
 public class DocumentBreakdown extends BaseEntity {
 
-    @Column(name = "document_number", unique=true, nullable=false)
-    private BigInteger documentNumber;
-
-    @Column(name = "document_title", nullable=false)
-    private String documentTitle;
-
     @OneToMany
+    @JoinColumn(name = "chapter_id", referencedColumnName = "id")
     private List<Chapter> chapters = new ArrayList<>();
-
-    public BigInteger getDocumentNumber() {
-        return documentNumber;
-    }
-
-    public void setDocumentNumber(BigInteger documentNumber) {
-        this.documentNumber = documentNumber;
-    }
-
-    public String getDocumentTitle() {
-        return documentTitle;
-    }
-
-    public void setDocumentTitle(String documentTitle) {
-        this.documentTitle = documentTitle;
-    }
 
     public List<Chapter> getChapters() {
         return chapters;
