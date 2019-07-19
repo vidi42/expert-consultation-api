@@ -1,13 +1,12 @@
 package com.code4ro.legalconsultation.model.persistence;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "chapters")
 public class Chapter extends BaseEntity {
 
     @Column(name = "chapter_number",unique=true, nullable=false)
@@ -16,7 +15,8 @@ public class Chapter extends BaseEntity {
     @Column(name = "chapter_title", nullable=false)
     private String chapterTitle;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name = "article_id", referencedColumnName = "id")
     private List<Article> articles = new ArrayList<>();
 
     public BigInteger getChapterNumber() {
