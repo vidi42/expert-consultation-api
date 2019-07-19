@@ -6,6 +6,7 @@ import com.code4ro.legalconsultation.repository.DocumentBreakdownRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,7 +29,7 @@ public class DocumentBreakdownService {
         return documentBreakdownRepository.findById(UUID.fromString(id));
     }
 
-    public DocumentBreakdown create(final DocumentView documentView){
+    public DocumentBreakdown create(final Path documentPath){
         // (1)
         //TODO - decide what is the input for creating the document breakdown
         //TODO - implement the parsing logic for the document

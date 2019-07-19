@@ -25,9 +25,12 @@ public class DocumentMetadata extends BaseEntity {
     @Temporal(TemporalType.DATE)
     private Date dateOfDevelopment;
 
-    @Column(name ="date_of_receipt", nullable=false)
+    @Column(name = "date_of_receipt", nullable=false)
     @Temporal(TemporalType.DATE)
     private Date dateOfReceipt;
+
+    @Column(name = "file_path", unique = true, nullable = false)
+    private String filePath;
 
     public BigInteger getDocumentNumber() {
         return documentNumber;
@@ -75,5 +78,13 @@ public class DocumentMetadata extends BaseEntity {
 
     public void setDateOfReceipt(Date dateOfReceipt) {
         this.dateOfReceipt = dateOfReceipt;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

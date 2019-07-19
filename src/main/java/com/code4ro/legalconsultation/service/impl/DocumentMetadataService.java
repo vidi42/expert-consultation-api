@@ -7,6 +7,7 @@ import com.code4ro.legalconsultation.repository.DocumentMetadataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,12 +22,20 @@ public class DocumentMetadataService {
         this.documentMetadataRepository = documentMetadataRepository;
     }
 
+    public DocumentMetadata save(final DocumentMetadata documentMetadata){
+        return documentMetadataRepository.save(documentMetadata);
+    }
+
     public List<DocumentMetadata> fetchAll() {
         return documentMetadataRepository.findAll();
     }
 
     public Optional<DocumentMetadata> fetchOne(final String id) {
         return documentMetadataRepository.findById(UUID.fromString(id));
+    }
+
+    public DocumentMetadata build(final DocumentView document){
+        return DocumentMetadataBuilder.buildFromDocumentView(document);
     }
 
     public DocumentMetadata create(final DocumentView document) {
