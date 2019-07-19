@@ -69,9 +69,6 @@ public class UserService {
                     user.setId(alreadySaved.get(user.getEmail()).getId());
                 }
             });
-            users.stream()
-                    .filter(user -> !Objects.nonNull(user.getId()))
-                    .forEach(userRepository::save);
             return users;
         } catch (Exception e) {
             LOG.error("Exception while parsing the csv file", e);
