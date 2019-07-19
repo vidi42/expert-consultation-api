@@ -1,6 +1,7 @@
 package com.code4ro.legalconsultation.model.dto;
 
 import com.code4ro.legalconsultation.common.exceptions.InvalidDocumentException;
+import com.code4ro.legalconsultation.model.persistence.DocumentType;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -9,6 +10,7 @@ public class DocumentView {
     private String title;
     private String documentNumber;
     private String initiator;
+    private DocumentType type;
     private Date elaborationDate;
     private Date receivedDate;
     private String documentURI;
@@ -80,5 +82,13 @@ public class DocumentView {
 
     private String computeExtension(String path) {
         return path.substring(path.lastIndexOf(".") + 1).toLowerCase();
+    }
+
+    public DocumentType getType() {
+        return type;
+    }
+
+    public void setType(DocumentType type) {
+        this.type = type;
     }
 }
