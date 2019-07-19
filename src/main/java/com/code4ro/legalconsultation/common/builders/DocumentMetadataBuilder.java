@@ -49,7 +49,7 @@ public class DocumentMetadataBuilder implements GenericBuilder<DocumentMetadata>
     public static DocumentMetadata buildFromDocumentView(final DocumentView documentView){
         DocumentMetadataBuilder builder = new DocumentMetadataBuilder();
 
-        return builder.withDocumentNumber(new BigInteger(documentView.getDocumentNumber()))
+        return builder.withDocumentNumber(documentView.getDocumentNumber())
                 .withDocumentTitle(documentView.getTitle())
                 .withDocumentInitializer(documentView.getInitiator())
                 .withDocumentType(documentView.getType())

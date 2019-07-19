@@ -1,30 +1,30 @@
 package com.code4ro.legalconsultation.model.dto;
 
-import com.code4ro.legalconsultation.common.exceptions.InvalidDocumentException;
 import com.code4ro.legalconsultation.model.persistence.DocumentType;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
 
 public class DocumentView {
     private String title;
-    private String documentNumber;
+    private BigInteger documentNumber;
     private String initiator;
     private DocumentType type;
     private Date elaborationDate;
     private Date receivedDate;
-    private String documentURI;
-    private String documentUploadPath;
     private final String[] extensions = {"xls", "xlsx", "doc", "docx"};
 
-    public String getDocumentUploadPath() {
-        return documentUploadPath;
+    public DocumentView(String title, BigInteger documentNumber, String initiator, DocumentType type, Date elaborationDate, Date receivedDate) {
+        this.title = title;
+        this.documentNumber = documentNumber;
+        this.initiator = initiator;
+        this.type = type;
+        this.elaborationDate = elaborationDate;
+        this.receivedDate = receivedDate;
     }
 
-    public void setDocumentUploadPath(String documentUploadPath) {
-        if (isValidUploadPath(documentUploadPath))
-            this.documentUploadPath = documentUploadPath;
-        else throw new InvalidDocumentException();
+    public DocumentView() {
     }
 
     public String getTitle() {
@@ -35,11 +35,11 @@ public class DocumentView {
         this.title = title;
     }
 
-    public String getDocumentNumber() {
+    public BigInteger getDocumentNumber() {
         return documentNumber;
     }
 
-    public void setDocumentNumber(String documentNumber) {
+    public void setDocumentNumber(BigInteger documentNumber) {
         this.documentNumber = documentNumber;
     }
 
@@ -65,14 +65,6 @@ public class DocumentView {
 
     public void setReceivedDate(Date receivedDate) {
         this.receivedDate = receivedDate;
-    }
-
-    public String getDocumentURI() {
-        return documentURI;
-    }
-
-    public void setDocumentURI(String documentURI) {
-        this.documentURI = documentURI;
     }
 
     private boolean isValidUploadPath(String path) {

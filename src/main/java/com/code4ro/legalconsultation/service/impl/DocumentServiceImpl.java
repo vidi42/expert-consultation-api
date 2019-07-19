@@ -59,7 +59,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public DocumentConsolidated create(final DocumentView document, final MultipartFile file) {
 
-        DocumentMetadata metadata = documentMetadataService.create(document);
+        DocumentMetadata metadata = documentMetadataService.build(document);
         String filePath  = documentStorageService.storeFile(file);
         metadata.setFilePath(filePath);
         metadata = documentMetadataService.save(metadata);

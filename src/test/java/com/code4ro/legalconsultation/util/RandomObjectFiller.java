@@ -58,6 +58,6 @@ public class RandomObjectFiller {
         if (size != null) {
             return RandomStringUtils.randomAlphabetic(size.min(), size.max());
         }
-        return RandomStringUtils.random(10);
+        return RandomStringUtils.randomAlphabetic(10);
     }
 }

@@ -3,21 +3,24 @@ package com.code4ro.legalconsultation.controller;
 import com.code4ro.legalconsultation.model.dto.DocumentView;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
+import com.code4ro.legalconsultation.model.persistence.DocumentType;
 import com.code4ro.legalconsultation.service.api.DocumentService;
 import com.code4ro.legalconsultation.service.api.DocumentStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/v1/document")
+@RequestMapping(value = "/api/document")
 public class DocumentController {
 
     @Autowired
@@ -48,8 +51,16 @@ public class DocumentController {
     }
 
     @PostMapping("")
-    public ResponseEntity<UUID> createDocument(@RequestParam("file") MultipartFile documentFile, @RequestBody DocumentView doc) {
-        DocumentConsolidated consolidated = documentService.create(doc, documentFile);
+    public ResponseEntity<UUID> createDocument(@RequestParam("title") String documentTitle,
+            @RequestParam("number") BigInteger documentNumber,
+            @RequestParam("initiator") String initiator,
+            @RequestParam("type") DocumentType type,
+            @DateTimeFormat(pattern = "dd/MM/yyyy") Date creationDate,
+            @DateTimeFormat(pattern = "dd/MM/yyyy") Date receiveDate,
+            @RequestParam("file") MultipartFile documentFile) {
+
+        DocumentView documentView = new DocumentView(documentTitle, documentNumber, initiator, type, creationDate, receiveDate);
+        DocumentConsolidated consolidated = documentService.create(documentView, documentFile);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(consolidated.getId());
