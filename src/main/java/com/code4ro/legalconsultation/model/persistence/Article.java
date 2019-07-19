@@ -2,9 +2,11 @@ package com.code4ro.legalconsultation.model.persistence;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.math.BigInteger;
 
 @Entity
+@Table(name = "articles")
 public class Article extends BaseEntity {
 
     @Column(name = "article_number", unique=true, nullable=false)

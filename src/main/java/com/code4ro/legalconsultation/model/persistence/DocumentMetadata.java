@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.util.Date;
 
 @Entity
+@Table(name = "document_description")
 public class DocumentMetadata extends BaseEntity {
 
     @Column(name = "document_number", unique=true, nullable=false)
