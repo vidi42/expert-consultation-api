@@ -3,11 +3,10 @@ package com.code4ro.legalconsultation.service.impl;
 
 import com.code4ro.legalconsultation.common.security.UserPrincipal;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
-import com.code4ro.legalconsultation.model.persistence.User;
-import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.ApplicationUserRepository;
 import com.code4ro.legalconsultation.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -33,27 +32,22 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
         // let people login with either username or email
-        ApplicationUser applicationUser = applicationUserRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+        final ApplicationUser applicationUser = applicationUserRepository.findByUsernameOrEmail(usernameOrEmail)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("ApplicationUser not found with username or email : " + usernameOrEmail)
                 );
 
-        // TODO: remove this call and get the role directly via the 1-1 mapping between ApplicationUser and User
-        final User user = userRepository.findByEmail(applicationUser.getEmail());
-        final UserRole role = user != null ? user.getRole() : UserRole.CONTRIBUTOR;
-        return UserPrincipal.create(applicationUser, role);
+        return UserPrincipal.create(applicationUser);
     }
 
     // used by JWTAuthenticationFilter
     @Transactional
+    @Cacheable(cacheNames = "users")
     public UserDetails loadUserById(UUID id) throws UsernameNotFoundException {
         ApplicationUser applicationUser = applicationUserRepository.findById(id).orElseThrow(
                 () -> new UsernameNotFoundException("ApplicationUser not found with id : " + id)
         );
 
-        // TODO: remove this call and get the role directly via the 1-1 mapping between ApplicationUser and User
-        final User user = userRepository.findByEmail(applicationUser.getEmail());
-        final UserRole role = user != null ? user.getRole() : UserRole.CONTRIBUTOR;
-        return UserPrincipal.create(applicationUser, role);
+        return UserPrincipal.create(applicationUser);
     }
 }

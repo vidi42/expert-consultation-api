@@ -1,10 +1,11 @@
-package com.code4ro.legalconsultation.user.controller;
+package com.code4ro.legalconsultation.controller;
 
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
 import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.UserRepository;
 import com.code4ro.legalconsultation.util.RandomObjectFiller;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -12,11 +13,14 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import javax.mail.internet.MimeMessage;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,6 +29,11 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
 
     @Autowired
     private UserRepository userRepository;
+
+    @Before
+    public void before() {
+        when(mailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
+    }
 
     @Test
     @WithMockUser

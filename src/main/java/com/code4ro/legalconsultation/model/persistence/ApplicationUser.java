@@ -1,11 +1,6 @@
 package com.code4ro.legalconsultation.model.persistence;
 
-import org.hibernate.annotations.NaturalId;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.validation.constraints.Email;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -23,24 +18,22 @@ public class ApplicationUser extends BaseEntity {
     @Column(unique = true)
     private String username;
 
-    @NaturalId
-    @NotBlank
-    @Size(max = 40)
-    @Email
-    private String email;
-
     @NotBlank
     @Size(max = 100)
     private String password;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @PrimaryKeyJoinColumn
+    @MapsId
+    private User user;
 
     public ApplicationUser() {
 
     }
 
-    public ApplicationUser(String name, String username, String email, String password) {
+    public ApplicationUser(String name, String username, String password) {
         this.name = name;
         this.username = username;
-        this.email = email;
         this.password = password;
     }
 
@@ -60,19 +53,19 @@ public class ApplicationUser extends BaseEntity {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

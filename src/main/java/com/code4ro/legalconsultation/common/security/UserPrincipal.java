@@ -37,15 +37,15 @@ public class UserPrincipal implements UserDetails {
         this.role = role;
     }
 
-    public static UserPrincipal create(ApplicationUser applicationUser, UserRole role) {
+    public static UserPrincipal create(ApplicationUser applicationUser) {
 
         return new UserPrincipal(
                 applicationUser.getId(),
                 applicationUser.getName(),
                 applicationUser.getUsername(),
-                applicationUser.getEmail(),
+                applicationUser.getUser().getEmail(),
                 applicationUser.getPassword(),
-                role
+                applicationUser.getUser().getRole()
         );
     }
 

@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -30,18 +31,37 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final CsvMapper csvMapper = new CsvMapper();
+    private final MailService mailService;
 
     @Autowired
-    public UserService(final UserRepository userRepository) {
+    public UserService(final UserRepository userRepository,
+                       final MailService mailService) {
         this.userRepository = userRepository;
+        this.mailService = mailService;
     }
 
     public User save(final User user) {
         return userRepository.save(user);
     }
 
-    public List<User> saveAll(final List<User> users) {
-        return userRepository.saveAll(users);
+    public User saveAndSendRegistrationMail(final User user) throws LegalValidationException {
+        final boolean newUser = user.getId() == null;
+        final User savedUser =  userRepository.save(user);
+        if (newUser) {
+            mailService.sendRegisterMail(Collections.singletonList(user));
+        }
+        return savedUser;
+    }
+
+    public List<User> saveAndSendRegistrationMail(final List<User> users) throws LegalValidationException {
+        final List<User> newUsers = users.stream()
+                .filter(user -> user.getId() == null)
+                .collect(Collectors.toList());
+        final List<User> savedUsers = userRepository.saveAll(users);
+        if (!newUsers.isEmpty()) {
+            mailService.sendRegisterMail(newUsers);
+        }
+        return savedUsers;
     }
 
     public User getOne(final String id) {
@@ -50,6 +70,10 @@ public class UserService {
 
     public Page<User> findAll(final Pageable pageable) {
         return userRepository.findAll(pageable);
+    }
+
+    public User findByEmail(final String email) {
+        return userRepository.findByEmail(email);
     }
 
     public void deleteById(final String id) {

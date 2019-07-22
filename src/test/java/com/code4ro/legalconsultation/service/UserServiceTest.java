@@ -1,9 +1,10 @@
-package com.code4ro.legalconsultation.user.service;
+package com.code4ro.legalconsultation.service;
 
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.UserRepository;
+import com.code4ro.legalconsultation.service.impl.MailService;
 import com.code4ro.legalconsultation.service.impl.UserService;
 import com.code4ro.legalconsultation.util.RandomObjectFiller;
 import org.junit.Test;
@@ -27,33 +28,38 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private MailService mailService;
 
     @InjectMocks
     private UserService userService;
 
     @Test
-    public void saveUser() {
+    public void saveUserAndSendRegistrationMail() {
         final User user = RandomObjectFiller.createAndFill(User.class);
 
-        userService.save(user);
+        userService.saveAndSendRegistrationMail(user);
 
+        verify(mailService).sendRegisterMail(Collections.singletonList(user));
         verify(userRepository).save(user);
     }
 
     @Test
-    public void saveUsers() {
+    public void saveUsersAndSendRegistrationMail() {
         final List<User> users = Arrays.asList(
                 RandomObjectFiller.createAndFill(User.class), RandomObjectFiller.createAndFill(User.class));
 
-        userService.saveAll(users);
+        userService.saveAndSendRegistrationMail(users);
 
+        verify(mailService).sendRegisterMail(users);
         verify(userRepository).saveAll(users);
     }
 
     @Test
     public void getUser() {
         final String id = UUID.randomUUID().toString();
-        when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(new User()));
+        when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(new User
+                ("email@email.com", UserRole.CONTRIBUTOR)));
         userService.getOne(id);
 
         verify(userRepository).findById(UUID.fromString(id));

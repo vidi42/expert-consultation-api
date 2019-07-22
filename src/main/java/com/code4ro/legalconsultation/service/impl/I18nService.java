@@ -21,13 +21,13 @@ public class I18nService {
         this.messageSource = messageSource;
     }
 
-    public String translate(final String i18nKey, final List<Object> i18nArguments) {
+    public String translate(final String i18nKey, Object... i18nArguments) {
         if (i18nKey == null) {
             return null;
         }
         final Locale locale = LocaleContextHolder.getLocale();
         try {
-            return messageSource.getMessage(i18nKey, i18nArguments != null ? i18nArguments.toArray() : null, locale);
+            return messageSource.getMessage(i18nKey, i18nArguments, locale);
         } catch (final NoSuchMessageException exception) {
             log.error(exception.getLocalizedMessage(), exception);
             return i18nKey;

@@ -1,4 +1,4 @@
-package com.code4ro.legalconsultation.common.i18n;
+package com.code4ro.legalconsultation.service;
 
 import com.code4ro.legalconsultation.service.impl.I18nService;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,22 +28,22 @@ public class I18nServiceTest {
 
     @Test
     public void translate() {
-        final List<Object> args = Collections.singletonList("i18nArg");
+        final Object[] args = new Object[]{"i18nArg"};
         i18nService.translate("i18nKey", args);
 
-        Locale locale = LocaleContextHolder.getLocale();
-        verify(messageSource).getMessage("i18nKey", args.toArray(), locale);
+        final Locale locale = LocaleContextHolder.getLocale();
+        verify(messageSource).getMessage("i18nKey", args, locale);
     }
 
     @Test
     public void translateMessageNotFound() {
-        Locale locale = LocaleContextHolder.getLocale();
-        final List<Object> args = Collections.singletonList("i18nArg");
-        when(messageSource.getMessage("i18nKey", args.toArray(), locale))
+        final Locale locale = LocaleContextHolder.getLocale();
+        final Object[] args = new Object[]{"i18nArg"};
+        when(messageSource.getMessage("i18nKey", args, locale))
                 .thenThrow(new NoSuchMessageException("No message!"));
 
         final String translation = i18nService.translate("i18nKey", args);
-        assertEquals(translation, "i18nKey");
+        assertThat(translation).isEqualTo( "i18nKey");
 
     }
 }

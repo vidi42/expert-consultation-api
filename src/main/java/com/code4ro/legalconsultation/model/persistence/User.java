@@ -38,6 +38,14 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
+    public User() {
+    }
+
+    public User(final String email, final UserRole role) {
+        this.email = email;
+        this.role= role;
+    }
+
     public String getFirstName() {
         return firstName;
     }

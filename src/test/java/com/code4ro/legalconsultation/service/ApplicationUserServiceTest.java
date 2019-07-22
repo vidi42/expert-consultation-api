@@ -1,10 +1,12 @@
-package com.code4ro.legalconsultation.login.service;
+package com.code4ro.legalconsultation.service;
 
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.dto.SignUpRequest;
+import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.repository.ApplicationUserRepository;
 import com.code4ro.legalconsultation.service.impl.ApplicationUserService;
+import com.code4ro.legalconsultation.service.impl.UserService;
 import com.code4ro.legalconsultation.util.RandomObjectFiller;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -23,6 +27,8 @@ public class ApplicationUserServiceTest {
     private ApplicationUserRepository applicationUserRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private UserService userService;
     @InjectMocks
     private ApplicationUserService applicationUserService;
 
@@ -45,7 +51,9 @@ public class ApplicationUserServiceTest {
 
     @Test(expected = LegalValidationException.class)
     public void saveDuplicateEmail() {
-        when(applicationUserRepository.existsByEmail(signUpRequest.getEmail())).thenReturn(true);
+        final User user = RandomObjectFiller.createAndFill(User.class);
+        when(userService.findByEmail(signUpRequest.getEmail())).thenReturn(user);
+        when(applicationUserRepository.findById(user.getId())).thenReturn(Optional.of(new ApplicationUser()));
 
         applicationUserService.save(signUpRequest);
     }
