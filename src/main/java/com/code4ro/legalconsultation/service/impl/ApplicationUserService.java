@@ -28,6 +28,7 @@ public class ApplicationUserService {
         if (applicationUserRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new LegalValidationException("register.Duplicate.email", HttpStatus.CONFLICT);
         }
+
         ApplicationUser applicationUser = new ApplicationUser(signUpRequest.getName(), signUpRequest.getUsername(),
                 signUpRequest.getEmail(), signUpRequest.getPassword());
         applicationUser.setPassword(passwordEncoder.encode(applicationUser.getPassword()));

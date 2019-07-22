@@ -2,6 +2,7 @@ package com.code4ro.legalconsultation.user.controller;
 
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
 import com.code4ro.legalconsultation.model.persistence.User;
+import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.UserRepository;
 import com.code4ro.legalconsultation.util.RandomObjectFiller;
 import org.junit.Test;
@@ -37,6 +38,7 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.firstName").value(user.getFirstName()))
                 .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.role").value(user.getRole().toString()))
                 .andExpect(status().isOk());
 
         assertThat(userRepository.count()).isEqualTo(1);
@@ -129,6 +131,7 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
                 .andExpect(jsonPath("$[0].email").value("john@email.com"))
                 .andExpect(jsonPath("$[0].phoneNumber").value("42345"))
                 .andExpect(jsonPath("$[0].district").value("district"))
-                .andExpect(jsonPath("$[0].organisation").value("org"));
+                .andExpect(jsonPath("$[0].organisation").value("org"))
+                .andExpect(jsonPath("$[0].role").value(UserRole.CONTRIBUTOR.toString()));
     }
 }

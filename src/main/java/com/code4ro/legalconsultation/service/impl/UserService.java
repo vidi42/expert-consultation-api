@@ -2,6 +2,7 @@ package com.code4ro.legalconsultation.service.impl;
 
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.model.persistence.User;
+import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -20,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -67,6 +67,9 @@ public class UserService {
             users.forEach(user -> {
                 if (alreadySaved.containsKey(user.getEmail())) {
                     user.setId(alreadySaved.get(user.getEmail()).getId());
+                    user.setRole(alreadySaved.get(user.getEmail()).getRole());
+                } else {
+                    user.setRole(UserRole.CONTRIBUTOR);
                 }
             });
             return users;

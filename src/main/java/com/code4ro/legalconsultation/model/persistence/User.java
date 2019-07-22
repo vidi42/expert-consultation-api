@@ -2,11 +2,10 @@ package com.code4ro.legalconsultation.model.persistence;
 
 import org.hibernate.annotations.NaturalId;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
@@ -34,6 +33,10 @@ public class User extends BaseEntity {
 
     @Size(max = 100)
     private String organisation;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
     public String getFirstName() {
         return firstName;
@@ -81,5 +84,13 @@ public class User extends BaseEntity {
 
     public void setOrganisation(String organisation) {
         this.organisation = organisation;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(final UserRole role) {
+        this.role = role;
     }
 }

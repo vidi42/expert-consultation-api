@@ -2,6 +2,7 @@ package com.code4ro.legalconsultation.user.service;
 
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.model.persistence.User;
+import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.UserRepository;
 import com.code4ro.legalconsultation.service.impl.UserService;
 import com.code4ro.legalconsultation.util.RandomObjectFiller;
@@ -74,7 +75,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void extractUsersFromCsv() throws IOException {
+    public void extractExistingUsersFromCsv() throws IOException {
         final User user = RandomObjectFiller.createAndFill(User.class);
         user.setEmail("john@email.com");
 
@@ -88,6 +89,24 @@ public class UserServiceTest {
 
         assertThat(results.size()).isEqualTo(1);
         assertThat(results.get(0).getId()).isEqualTo(user.getId());
+        assertThat(results.get(0).getRole()).isEqualTo(user.getRole());
+    }
+
+    @Test
+    public void extractNewUsersFromCsv() throws IOException {
+        final User user = RandomObjectFiller.createAndFill(User.class);
+        user.setEmail("john@email.com");
+        user.setId(null);
+
+        final MultipartFile file = mock(MultipartFile.class);
+        when(file.getInputStream()).thenReturn(
+                new ByteArrayInputStream("john,doe,john@email.com,42345,district,org".getBytes()));
+
+        final List<User> results = userService.extract(file);
+
+        assertThat(results.size()).isEqualTo(1);
+        assertThat(results.get(0).getId()).isNull();
+        assertThat(results.get(0).getRole()).isEqualTo(UserRole.CONTRIBUTOR);
     }
 
     @Test(expected = LegalValidationException.class)

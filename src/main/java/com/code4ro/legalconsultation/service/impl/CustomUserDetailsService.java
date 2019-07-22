@@ -3,7 +3,10 @@ package com.code4ro.legalconsultation.service.impl;
 
 import com.code4ro.legalconsultation.common.security.UserPrincipal;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
+import com.code4ro.legalconsultation.model.persistence.User;
+import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.ApplicationUserRepository;
+import com.code4ro.legalconsultation.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,10 +20,13 @@ import java.util.UUID;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private ApplicationUserRepository applicationUserRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    public CustomUserDetailsService(final ApplicationUserRepository applicationUserRepository) {
+    public CustomUserDetailsService(final ApplicationUserRepository applicationUserRepository,
+                                    final UserRepository userRepository) {
         this.applicationUserRepository = applicationUserRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -32,7 +38,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                         new UsernameNotFoundException("ApplicationUser not found with username or email : " + usernameOrEmail)
                 );
 
-        return UserPrincipal.create(applicationUser);
+        // TODO: remove this call and get the role directly via the 1-1 mapping between ApplicationUser and User
+        final User user = userRepository.findByEmail(applicationUser.getEmail());
+        final UserRole role = user != null ? user.getRole() : UserRole.CONTRIBUTOR;
+        return UserPrincipal.create(applicationUser, role);
     }
 
     // used by JWTAuthenticationFilter
@@ -42,6 +51,9 @@ public class CustomUserDetailsService implements UserDetailsService {
                 () -> new UsernameNotFoundException("ApplicationUser not found with id : " + id)
         );
 
-        return UserPrincipal.create(applicationUser);
+        // TODO: remove this call and get the role directly via the 1-1 mapping between ApplicationUser and User
+        final User user = userRepository.findByEmail(applicationUser.getEmail());
+        final UserRole role = user != null ? user.getRole() : UserRole.CONTRIBUTOR;
+        return UserPrincipal.create(applicationUser, role);
     }
 }
