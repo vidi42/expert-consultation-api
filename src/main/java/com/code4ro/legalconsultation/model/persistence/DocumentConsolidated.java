@@ -1,9 +1,14 @@
 package com.code4ro.legalconsultation.model.persistence;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "consolidated_document")
+@Getter
+@Setter
 public class DocumentConsolidated extends BaseEntity {
 
     @OneToOne(fetch = FetchType.EAGER, optional = false)
@@ -20,21 +25,5 @@ public class DocumentConsolidated extends BaseEntity {
     }
 
     public DocumentConsolidated() {
-    }
-
-    public DocumentMetadata getDocumentMetadata() {
-        return documentMetadata;
-    }
-
-    public void setDocumentMetadata(DocumentMetadata documentMetadata) {
-        this.documentMetadata = documentMetadata;
-    }
-
-    public DocumentBreakdown getDocumentBreakdown() {
-        return documentBreakdown;
-    }
-
-    public void setDocumentBreakdown(DocumentBreakdown documentBreakdown) {
-        this.documentBreakdown = documentBreakdown;
     }
 }

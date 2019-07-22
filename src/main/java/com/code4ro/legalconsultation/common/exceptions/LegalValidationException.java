@@ -1,9 +1,11 @@
 package com.code4ro.legalconsultation.common.exceptions;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
+@Getter
 public class LegalValidationException extends RuntimeException {
     private final String i18nKey;
     private final List<String> i8nArguments;
@@ -19,17 +21,5 @@ public class LegalValidationException extends RuntimeException {
         this.i18nKey = i18nKey;
         this.httpStatus = httpStatus;
         this.i8nArguments = null;
-    }
-
-    public String getI18nKey() {
-        return i18nKey;
-    }
-
-    public List<String> getI8nArguments() {
-        return i8nArguments;
-    }
-
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
     }
 }

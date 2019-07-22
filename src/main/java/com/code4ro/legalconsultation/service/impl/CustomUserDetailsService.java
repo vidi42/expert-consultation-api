@@ -1,10 +1,8 @@
 package com.code4ro.legalconsultation.service.impl;
 
-
 import com.code4ro.legalconsultation.common.security.UserPrincipal;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.repository.ApplicationUserRepository;
-import com.code4ro.legalconsultation.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,13 +17,10 @@ import java.util.UUID;
 public class CustomUserDetailsService implements UserDetailsService {
 
     private ApplicationUserRepository applicationUserRepository;
-    private UserRepository userRepository;
 
     @Autowired
-    public CustomUserDetailsService(final ApplicationUserRepository applicationUserRepository,
-                                    final UserRepository userRepository) {
+    public CustomUserDetailsService(final ApplicationUserRepository applicationUserRepository) {
         this.applicationUserRepository = applicationUserRepository;
-        this.userRepository = userRepository;
     }
 
     @Override

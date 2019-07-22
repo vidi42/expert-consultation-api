@@ -3,6 +3,7 @@ package com.code4ro.legalconsultation.common.security;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
 public class UserPrincipal implements UserDetails {
     private UUID id;
 
@@ -38,7 +40,6 @@ public class UserPrincipal implements UserDetails {
     }
 
     public static UserPrincipal create(ApplicationUser applicationUser) {
-
         return new UserPrincipal(
                 applicationUser.getId(),
                 applicationUser.getName(),
@@ -47,18 +48,6 @@ public class UserPrincipal implements UserDetails {
                 applicationUser.getPassword(),
                 applicationUser.getUser().getRole()
         );
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     @Override
@@ -96,10 +85,6 @@ public class UserPrincipal implements UserDetails {
         return true;
     }
 
-    public UserRole getRole() {
-        return role;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -110,7 +95,6 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(id);
     }
 }
