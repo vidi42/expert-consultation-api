@@ -54,22 +54,32 @@ TBD
 - mvn install
 - mvn spring-boot:run
 
-### Database
+### Server dependencies
 
 #### Manual
 
-- install mysql server
-- set the root password
-- create a database called `legalconsultation`
+##### Database
 
-### With docker-compose
+* install mysql server
+* set the root password
+* create a database called `legalconsultation`
 
-- install [Docker](https://docs.docker.com/install/)
-- install `docker-compose`
--- with [pip](https://packaging.python.org/tutorials/installing-packages/): `pip install docker-compose`
-- go to `etc/docker`
-- run `docker-compose up`
-To connect to the dockerized server with the `mysql` client run: `docker-compose exec db mysql -u root -p`
+#### With docker-compose
+
+* install [Docker](https://docs.docker.com/install/)
+* install `docker-compose`
+  * with [pip](https://packaging.python.org/tutorials/installing-packages/): `pip install docker-compose`
+* go to `etc/docker`
+* run `docker-compose up`
+
+##### Database
+
+* to connect to the dockerized server with the `mysql` client run: `docker-compose exec db mysql -u root -p`
+
+##### Mailhog
+
+* you can use [Mailhog](https://hub.docker.com/u/mailhog) to test email sending/receiving:
+  * to check all sent emails from the server go to `http://localhost:8025`.
 
 ## Feedback
 

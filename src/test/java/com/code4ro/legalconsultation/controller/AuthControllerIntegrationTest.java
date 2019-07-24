@@ -1,4 +1,4 @@
-package com.code4ro.legalconsultation.login.controller;
+package com.code4ro.legalconsultation.controller;
 
 
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;

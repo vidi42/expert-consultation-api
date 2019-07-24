@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   datasource:
     url: jdbc:mysql://localhost:3306/legalconsultation?serverTimezone=Europe/Bucharest
     username: root
@@ -18,6 +20,24 @@ spring:
         size-parameter: size
         page-parameter: page
         default-page-size: 20
+  mvc:
+    locale: ro
+  mail:
+    host: '127.0.0.1'
+    port: 1025
+    username: ""
+    password: ""
+    properties:
+      transport:
+        protocol: 'smtp'
+      mail:
+        smtp:
+          auth: false # set the access user/password and change this to true
+          starttls:
+            enable: true
+  cache:
+    cache-names: users
 app:
   jwtSecret: ORy9HWgKoZPAs50ECKw0
-  jwtExpirationInMs: 172800000   # two days expiration time, can be extended
+  jwtExpirationInMs: 1728000000   # two days expiration time, can be extended
+  signupurl: 'http://localhost:4200/authentication/sign-up'

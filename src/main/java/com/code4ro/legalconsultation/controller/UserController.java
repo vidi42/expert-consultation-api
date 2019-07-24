@@ -24,12 +24,12 @@ public class UserController {
 
     @PostMapping
     public User save(@Valid @RequestBody final User user) {
-        return userService.save(user);
+        return userService.saveAndSendRegistrationMail(user);
     }
 
     @PutMapping
     public List<User> saveAll(@Valid @RequestBody final List<User> users) {
-        return userService.saveAll(users);
+        return userService.saveAndSendRegistrationMail(users);
     }
 
 

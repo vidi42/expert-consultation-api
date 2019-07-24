@@ -13,6 +13,9 @@ spring:
         size-parameter: size
         page-parameter: page
         default-page-size: 2
+  mvc:
+    locale: ro
 app:
   jwtSecret: ORy9HWgKoZPAs50ECKw0
   jwtExpirationInMs: 172800000   # two days expiration time, can be extended
+  signupurl: 'http://localhost:4200/authentication/sign-up'

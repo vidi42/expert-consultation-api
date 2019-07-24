@@ -1,21 +1,27 @@
 package com.code4ro.legalconsultation.common.security;
 
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
+import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
 public class UserPrincipal implements UserDetails {
     private UUID id;
 
     private String name;
 
     private String username;
+
+    private UserRole role;
 
     @JsonIgnore
     private String email;
@@ -24,35 +30,24 @@ public class UserPrincipal implements UserDetails {
     private String password;
 
 
-    public UserPrincipal(UUID id, String name, String username, String email, String password) {
+    public UserPrincipal(UUID id, String name, String username, String email, String password, UserRole role) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
     public static UserPrincipal create(ApplicationUser applicationUser) {
-
         return new UserPrincipal(
                 applicationUser.getId(),
                 applicationUser.getName(),
                 applicationUser.getUsername(),
-                applicationUser.getEmail(),
-                applicationUser.getPassword()
+                applicationUser.getUser().getEmail(),
+                applicationUser.getPassword(),
+                applicationUser.getUser().getRole()
         );
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     @Override
@@ -62,8 +57,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // todo change when implementing roles
-        return new ArrayList<>();
+        return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
@@ -101,7 +95,6 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(id);
     }
 }
