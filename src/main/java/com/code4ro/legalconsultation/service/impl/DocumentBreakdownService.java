@@ -36,6 +36,10 @@ public class DocumentBreakdownService {
         return documentBreakdownRepository.save(new DocumentBreakdown());
     }
 
+    public DocumentBreakdown build(final Path documentPath){
+        return new DocumentBreakdown();
+    }
+
     public DocumentBreakdown update(final String id, final DocumentView documentView){
         //TODO - same as (1)
         DocumentBreakdown documentBreakdown = new DocumentBreakdown();

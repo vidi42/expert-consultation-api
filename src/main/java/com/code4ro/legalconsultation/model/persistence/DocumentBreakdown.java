@@ -8,7 +8,7 @@ import java.util.List;
 @Table(name = "document_chapters")
 public class DocumentBreakdown extends BaseEntity {
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "chapter_id", referencedColumnName = "id")
     private List<Chapter> chapters = new ArrayList<>();
 

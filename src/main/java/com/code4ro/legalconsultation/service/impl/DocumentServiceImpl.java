@@ -5,9 +5,12 @@ import com.code4ro.legalconsultation.model.dto.DocumentView;
 import com.code4ro.legalconsultation.model.persistence.DocumentBreakdown;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
+import com.code4ro.legalconsultation.repository.DocumentConsolidatedRepository;
 import com.code4ro.legalconsultation.service.api.DocumentService;
 import com.code4ro.legalconsultation.service.api.DocumentStorageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,18 +23,22 @@ import java.util.stream.Collectors;
 public class DocumentServiceImpl implements DocumentService {
 
     private DocumentConsolidatedService documentConsolidatedService;
+    private DocumentConsolidatedRepository documentConsolidatedRepository;
     private DocumentBreakdownService documentBreakdownService;
     private DocumentMetadataService documentMetadataService;
     private DocumentStorageService documentStorageService;
 
+    @Autowired
     public DocumentServiceImpl(DocumentConsolidatedService documentConsolidatedService,
                                DocumentBreakdownService documentBreakdownService,
                                DocumentMetadataService documentMetadataService,
-                               DocumentStorageService documentStorageService) {
+                               DocumentStorageService documentStorageService,
+                               DocumentConsolidatedRepository documentConsolidatedRepository) {
         this.documentConsolidatedService = documentConsolidatedService;
         this.documentBreakdownService = documentBreakdownService;
         this.documentMetadataService = documentMetadataService;
         this.documentStorageService = documentStorageService;
+        this.documentConsolidatedRepository = documentConsolidatedRepository;
     }
 
     @Override
@@ -50,21 +57,20 @@ public class DocumentServiceImpl implements DocumentService {
                 .orElse(null));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<DocumentConsolidated> fetchOneConsolidated(final String id) {
         return documentConsolidatedService.findOne(id);
     }
 
-    @Transactional
     @Override
     public DocumentConsolidated create(final DocumentView document, final MultipartFile file) {
 
         DocumentMetadata metadata = documentMetadataService.build(document);
         String filePath  = documentStorageService.storeFile(file);
         metadata.setFilePath(filePath);
-        metadata = documentMetadataService.save(metadata);
 
-        DocumentBreakdown breakdown = documentBreakdownService.create(Paths.get(filePath));
+        DocumentBreakdown breakdown = documentBreakdownService.build(Paths.get(filePath));
 
         return documentConsolidatedService.saveOne(new DocumentConsolidated(metadata, breakdown));
     }
@@ -76,17 +82,17 @@ public class DocumentServiceImpl implements DocumentService {
         if(consolidated.isPresent()){
 
             DocumentConsolidated documentConsolidated = consolidated.get();
-            //update the metadata
 
+            //update the metadata
             DocumentMetadata metadata = documentMetadataService.build(document);
             String filePath  = documentStorageService.storeFile(file);
             metadata.setFilePath(filePath);
             metadata.setId(documentConsolidated.getDocumentMetadata().getId());
-            documentMetadataService.save(metadata);
 
             //update the breakdown
-            DocumentBreakdown breakdown = documentBreakdownService.create(Paths.get(filePath));
+            DocumentBreakdown breakdown = documentBreakdownService.build(Paths.get(filePath));
 
+            documentConsolidated.setDocumentMetadata(metadata);
             documentConsolidated.setDocumentBreakdown(breakdown);
             return Optional.of(documentConsolidatedService.saveOne(documentConsolidated));
         }
@@ -95,7 +101,10 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void deleteById(final String id) {
+    @Transactional
+    public void deleteById(final String id) throws ResourceNotFoundException {
+        DocumentConsolidated consolidated = documentConsolidatedService.findOne(id)
+                .orElseThrow(ResourceNotFoundException::new);
         documentConsolidatedService.deleteById(id);
     }
 }

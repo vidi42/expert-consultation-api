@@ -1,5 +1,6 @@
 package com.code4ro.legalconsultation.util;
 
+import com.code4ro.legalconsultation.model.persistence.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 
@@ -7,6 +8,9 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class RandomObjectFiller {
@@ -45,6 +49,13 @@ public class RandomObjectFiller {
             return BigInteger.valueOf(RandomUtils.nextInt());
         } else if(type.equals(String.class)) {
             return getFieldWithContraint(field);
+        } else if(type.equals(Date.class)) {
+            int randomYear = RandomUtils.nextInt(1990, 2020);
+            int randomDay = RandomUtils.nextInt(1, 366);
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.YEAR, randomYear);
+            calendar.set(Calendar.DAY_OF_YEAR, randomDay);
+            return calendar.getTime();
         }
         return createAndFill(type);
     }
@@ -59,5 +70,20 @@ public class RandomObjectFiller {
             return RandomStringUtils.randomAlphabetic(size.min(), size.max());
         }
         return RandomStringUtils.randomAlphabetic(10);
+    }
+
+    public static DocumentConsolidated buildRandomDocumentConsolidated(){
+        DocumentMetadata metadata = RandomObjectFiller.createAndFill(DocumentMetadata.class);
+
+        Article article1 = RandomObjectFiller.createAndFill(Article.class);
+        Article article2 = RandomObjectFiller.createAndFill(Article.class);
+        Chapter chapter1 = RandomObjectFiller.createAndFill(Chapter.class);
+        chapter1.setArticles(List.of(article1, article2));
+        DocumentBreakdown breakdown = new DocumentBreakdown();
+        breakdown.setChapters(List.of(chapter1));
+
+        DocumentConsolidated consolidated = new DocumentConsolidated(metadata, breakdown);
+
+        return consolidated;
     }
 }

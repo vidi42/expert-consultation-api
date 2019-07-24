@@ -6,6 +6,8 @@ import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.model.persistence.DocumentType;
 import com.code4ro.legalconsultation.service.api.DocumentService;
 import com.code4ro.legalconsultation.service.api.DocumentStorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import java.util.UUID;
 @RequestMapping(value = "/api/document")
 public class DocumentController {
 
+    private static Logger logger = LoggerFactory.getLogger(DocumentController.class);
     @Autowired
     private DocumentService documentService;
 
@@ -41,6 +44,15 @@ public class DocumentController {
         if(optDocument.isPresent())
             return ResponseEntity.ok(optDocument.get());
         else
+            return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/consolidated")
+    public ResponseEntity getDocumentConsolidatedById(@PathVariable String id){
+        Optional<DocumentConsolidated> consolidatedDocumentOpt = documentService.fetchOneConsolidated(id);
+        if (consolidatedDocumentOpt.isPresent()) {
+            return ResponseEntity.ok(consolidatedDocumentOpt.get());
+        } else
             return ResponseEntity.notFound().build();
     }
 

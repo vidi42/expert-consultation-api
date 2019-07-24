@@ -7,7 +7,6 @@ import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,5 +29,5 @@ public interface DocumentService {
     Optional<DocumentConsolidated> update(final String id, final DocumentView document, final MultipartFile multipartFile);
 
     //delete a document based on id
-    void deleteById(final String id);
+    void deleteById(final String id) throws ResourceNotFoundException;
 }

@@ -6,11 +6,11 @@ import javax.persistence.*;
 @Table(name = "consolidated_document")
 public class DocumentConsolidated extends BaseEntity {
 
-    @OneToOne(fetch = FetchType.EAGER, optional = false)
+    @OneToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "metadata_id", referencedColumnName = "id")
     private DocumentMetadata documentMetadata;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "breakdown_id", referencedColumnName = "id")
     private DocumentBreakdown documentBreakdown;
 

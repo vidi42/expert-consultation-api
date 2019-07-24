@@ -15,7 +15,7 @@ public class Chapter extends BaseEntity {
     @Column(name = "chapter_title", nullable=false)
     private String chapterTitle;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "article_id", referencedColumnName = "id")
     private List<Article> articles = new ArrayList<>();
 
