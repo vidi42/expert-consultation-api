@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class DocumentServiceImpl implements DocumentService {
 
     private DocumentConsolidatedService documentConsolidatedService;
-    private DocumentConsolidatedRepository documentConsolidatedRepository;
     private DocumentBreakdownService documentBreakdownService;
     private DocumentMetadataService documentMetadataService;
     private DocumentStorageService documentStorageService;
@@ -32,13 +31,11 @@ public class DocumentServiceImpl implements DocumentService {
     public DocumentServiceImpl(DocumentConsolidatedService documentConsolidatedService,
                                DocumentBreakdownService documentBreakdownService,
                                DocumentMetadataService documentMetadataService,
-                               DocumentStorageService documentStorageService,
-                               DocumentConsolidatedRepository documentConsolidatedRepository) {
+                               DocumentStorageService documentStorageService) {
         this.documentConsolidatedService = documentConsolidatedService;
         this.documentBreakdownService = documentBreakdownService;
         this.documentMetadataService = documentMetadataService;
         this.documentStorageService = documentStorageService;
-        this.documentConsolidatedRepository = documentConsolidatedRepository;
     }
 
     @Override
