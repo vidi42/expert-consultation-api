@@ -1,13 +1,12 @@
 package com.code4ro.legalconsultation.service.impl;
 
-import com.code4ro.legalconsultation.common.builders.DocumentMetadataBuilder;
-import com.code4ro.legalconsultation.model.dto.DocumentView;
+import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.repository.DocumentMetadataRepository;
+import com.code4ro.legalconsultation.service.api.MapperService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.print.Doc;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,10 +15,13 @@ import java.util.UUID;
 public class DocumentMetadataService {
 
     private final DocumentMetadataRepository documentMetadataRepository;
+    private final MapperService mapperService;
 
     @Autowired
-    public DocumentMetadataService(DocumentMetadataRepository documentMetadataRepository) {
+    public DocumentMetadataService(DocumentMetadataRepository documentMetadataRepository,
+                                   MapperService mapperService) {
         this.documentMetadataRepository = documentMetadataRepository;
+        this.mapperService = mapperService;
     }
 
     public DocumentMetadata save(final DocumentMetadata documentMetadata){
@@ -34,16 +36,16 @@ public class DocumentMetadataService {
         return documentMetadataRepository.findById(UUID.fromString(id));
     }
 
-    public DocumentMetadata build(final DocumentView document){
-        return DocumentMetadataBuilder.buildFromDocumentView(document);
+    public DocumentMetadata build(final DocumentViewDto document){
+        return mapperService.map(document, DocumentMetadata.class);
     }
 
-    public DocumentMetadata create(final DocumentView document) {
-        return documentMetadataRepository.save(DocumentMetadataBuilder.buildFromDocumentView(document));
+    public DocumentMetadata create(final DocumentViewDto document) {
+        return documentMetadataRepository.save(mapperService.map(document, DocumentMetadata.class));
     }
 
-    public DocumentMetadata update(final String id, final DocumentView document) {
-        DocumentMetadata metadata = DocumentMetadataBuilder.buildFromDocumentView(document);
+    public DocumentMetadata update(final String id, final DocumentViewDto document) {
+        DocumentMetadata metadata = mapperService.map(document, DocumentMetadata.class);
         metadata.setId(UUID.fromString(id));
         return documentMetadataRepository.save(metadata);
     }

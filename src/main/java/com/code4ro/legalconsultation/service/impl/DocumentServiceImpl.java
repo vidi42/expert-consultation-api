@@ -1,7 +1,7 @@
 package com.code4ro.legalconsultation.service.impl;
 
 import com.code4ro.legalconsultation.common.exceptions.ResourceNotFoundException;
-import com.code4ro.legalconsultation.model.dto.DocumentView;
+import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentBreakdown;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
@@ -60,7 +60,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public DocumentConsolidated create(final DocumentView document, final MultipartFile file) {
+    public DocumentConsolidated create(final DocumentViewDto document, final MultipartFile file) {
 
         DocumentMetadata metadata = documentMetadataService.build(document);
         String filePath  = documentStorageService.storeFile(file);
@@ -72,7 +72,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public Optional<DocumentConsolidated> update(final String id, final DocumentView document, final MultipartFile file) {
+    public Optional<DocumentConsolidated> update(final String id, final DocumentViewDto document, final MultipartFile file) {
         Optional<DocumentConsolidated> consolidated = documentConsolidatedService.findOne(id);
 
         if(!consolidated.isPresent())

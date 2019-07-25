@@ -1,6 +1,6 @@
 package com.code4ro.legalconsultation.service.impl;
 
-import com.code4ro.legalconsultation.model.dto.DocumentView;
+import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentBreakdown;
 import com.code4ro.legalconsultation.repository.DocumentBreakdownRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class DocumentBreakdownService {
         return new DocumentBreakdown();
     }
 
-    public DocumentBreakdown update(final String id, final DocumentView documentView){
+    public DocumentBreakdown update(final String id, final DocumentViewDto documentViewDto){
         //TODO - same as (1)
         DocumentBreakdown documentBreakdown = new DocumentBreakdown();
         documentBreakdown.setId(UUID.fromString(id));

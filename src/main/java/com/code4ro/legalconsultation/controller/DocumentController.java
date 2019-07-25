@@ -1,6 +1,7 @@
 package com.code4ro.legalconsultation.controller;
 
-import com.code4ro.legalconsultation.model.dto.DocumentView;
+import com.code4ro.legalconsultation.common.exceptions.ResourceNotFoundException;
+import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.model.persistence.DocumentType;
@@ -41,19 +42,21 @@ public class DocumentController {
     @GetMapping("/{id}")
     public ResponseEntity getDocumentById(@PathVariable String id) {
         Optional<DocumentMetadata> optDocument = documentService.fetchOne(id);
-        if(optDocument.isPresent())
-            return ResponseEntity.ok(optDocument.get());
-        else
-            return ResponseEntity.notFound().build();
+
+        if(!optDocument.isPresent())
+            throw new ResourceNotFoundException();
+
+        return ResponseEntity.ok(optDocument.get());
     }
 
     @GetMapping("/{id}/consolidated")
     public ResponseEntity getDocumentConsolidatedById(@PathVariable String id){
         Optional<DocumentConsolidated> consolidatedDocumentOpt = documentService.fetchOneConsolidated(id);
-        if (consolidatedDocumentOpt.isPresent()) {
-            return ResponseEntity.ok(consolidatedDocumentOpt.get());
-        } else
-            return ResponseEntity.notFound().build();
+
+        if(!consolidatedDocumentOpt.isPresent())
+            throw new ResourceNotFoundException();
+
+        return ResponseEntity.ok(consolidatedDocumentOpt.get());
     }
 
     @DeleteMapping("/{id}")
@@ -65,25 +68,25 @@ public class DocumentController {
     @PostMapping("")
     public ResponseEntity<UUID> createDocument(@RequestParam("title") String documentTitle,
             @RequestParam("number") BigInteger documentNumber,
-            @RequestParam("initiator") String initiator,
+            @RequestParam("documentInitializer") String initiator,
             @RequestParam("type") DocumentType type,
             @DateTimeFormat(pattern = "dd/MM/yyyy") Date creationDate,
             @DateTimeFormat(pattern = "dd/MM/yyyy") Date receiveDate,
             @RequestParam("file") MultipartFile documentFile) {
 
-        DocumentView documentView = new DocumentView(documentTitle, documentNumber, initiator, type, creationDate, receiveDate);
-        DocumentConsolidated consolidated = documentService.create(documentView, documentFile);
+        DocumentViewDto documentViewDto = new DocumentViewDto(documentTitle, documentNumber, initiator, type, creationDate, receiveDate);
+        DocumentConsolidated consolidated = documentService.create(documentViewDto, documentFile);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(consolidated.getId());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UUID> modifyDocument(@PathVariable String id, @RequestParam("file") MultipartFile documentFile, @RequestBody DocumentView doc) {
+    public ResponseEntity<UUID> modifyDocument(@PathVariable String id, @RequestParam("file") MultipartFile documentFile, @RequestBody DocumentViewDto doc) {
         Optional<DocumentConsolidated> consolidated = documentService.update(id, doc, documentFile);
-        if(consolidated.isPresent())
-            return ResponseEntity.ok(consolidated.get().getId());
-        else
-            return ResponseEntity.notFound().build();
+        if(!consolidated.isPresent())
+            throw new ResourceNotFoundException();
+
+        return ResponseEntity.ok(consolidated.get().getId());
     }
 }

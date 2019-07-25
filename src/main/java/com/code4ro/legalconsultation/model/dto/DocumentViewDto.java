@@ -11,28 +11,28 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class DocumentView {
+public class DocumentViewDto {
     private String title;
     private BigInteger documentNumber;
-    private String initiator;
-    private DocumentType type;
-    private Date elaborationDate;
-    private Date receivedDate;
+    private String documentInitializer;
+    private DocumentType documentType;
+    private Date dateOfDevelopment;
+    private Date dateOfReceipt;
     private String documentURI;
     private String documentUploadPath;
     private final String[] extensions = {"xls", "xlsx", "doc", "docx"};
 
 
-    public DocumentView(String title, BigInteger documentNumber, String initiator, DocumentType type, Date elaborationDate, Date receivedDate) {
+    public DocumentViewDto(String title, BigInteger documentNumber, String documentInitializer, DocumentType documentType, Date dateOfDevelopment, Date dateOfReceipt) {
         this.title = title;
         this.documentNumber = documentNumber;
-        this.initiator = initiator;
-        this.type = type;
-        this.elaborationDate = elaborationDate;
-        this.receivedDate = receivedDate;
+        this.documentInitializer = documentInitializer;
+        this.documentType = documentType;
+        this.dateOfDevelopment = dateOfDevelopment;
+        this.dateOfReceipt = dateOfReceipt;
     }
 
-    public DocumentView() {
+    public DocumentViewDto() {
     }
 
     public void setDocumentUploadPath(String documentUploadPath) {

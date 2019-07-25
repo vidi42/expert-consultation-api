@@ -1,7 +1,7 @@
 package com.code4ro.legalconsultation.document.controller;
 
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
-import com.code4ro.legalconsultation.model.dto.DocumentView;
+import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.model.persistence.*;
 import com.code4ro.legalconsultation.repository.DocumentBreakdownRepository;
 import com.code4ro.legalconsultation.repository.DocumentConsolidatedRepository;
@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,15 +36,15 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     @WithMockUser
     public void saveDocument() throws Exception{
 
-        final DocumentView randomView = RandomObjectFiller.createAndFill(DocumentView.class);
+        final DocumentViewDto randomView = RandomObjectFiller.createAndFill(DocumentViewDto.class);
         final MockMultipartFile randomFile = new MockMultipartFile("file", "file.doc", "text/plain", "text".getBytes());
 
         mvc.perform(MockMvcRequestBuilders.multipart("/api/document")
                 .file(randomFile)
                 .param("title", randomView.getTitle())
                 .param("number", randomView.getDocumentNumber().toString())
-                .param("initiator", randomView.getInitiator())
-                .param("type", randomView.getType().toString())
+                .param("documentInitializer", randomView.getDocumentInitializer())
+                .param("type", randomView.getDocumentType().toString())
                 .param("creationDate", "09/09/2018")
                 .param("receiveDate", "10/09/2018"))
                 .andExpect(status().isCreated());
@@ -103,6 +105,33 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         assertThat(documentMetadataRepository.count()).isEqualTo(0);
         assertThat(documentBreakdownRepository.count()).isEqualTo(0);
         assertThat(documentConsolidatedRepository.count()).isEqualTo(0);
+    }
+
+    @Test
+    @WithMockUser
+    public void testGetDocumentNotFound() throws Exception{
+        UUID uuid = UUID.randomUUID();
+
+        mvc.perform(MockMvcRequestBuilders.get("/api/document/" + uuid.toString()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser
+    public void testGetDocumentConsolidatedNotFound() throws Exception{
+        UUID uuid = UUID.randomUUID();
+
+        mvc.perform(MockMvcRequestBuilders.get("/api/document/" + uuid.toString() + "/consolidated"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser
+    public void deleteDocumentNotFound() throws Exception{
+        UUID uuid = UUID.randomUUID();
+
+        mvc.perform(MockMvcRequestBuilders.delete("/api/document" + uuid.toString()))
+                .andExpect(status().isNotFound());
     }
 
     private DocumentConsolidated saveSingleConsolidated(){

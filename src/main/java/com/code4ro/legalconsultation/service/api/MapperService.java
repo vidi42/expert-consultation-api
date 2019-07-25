@@ -1,4 +1,4 @@
-package com.code4ro.legalconsultation.service;
+package com.code4ro.legalconsultation.service.api;
 
 import org.springframework.data.domain.Page;
 
