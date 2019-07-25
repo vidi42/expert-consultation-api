@@ -1,6 +1,7 @@
 package com.code4ro.legalconsultation.controller;
 
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
+import com.code4ro.legalconsultation.model.dto.UserDto;
 import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.UserRepository;
@@ -38,16 +39,16 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
     @Test
     @WithMockUser
     public void saveUser() throws Exception {
-        final User user = RandomObjectFiller.createAndFill(User.class);
-        user.setId(null);
+        final UserDto userDto = RandomObjectFiller.createAndFill(UserDto.class);
+        userDto.setId(null);
 
         mvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user))
+                .content(objectMapper.writeValueAsString(userDto))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.firstName").value(user.getFirstName()))
+                .andExpect(jsonPath("$.firstName").value(userDto.getFirstName()))
                 .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.role").value(user.getRole().toString()))
+                .andExpect(jsonPath("$.role").value(userDto.getRole().toString()))
                 .andExpect(status().isOk());
 
         assertThat(userRepository.count()).isEqualTo(1);

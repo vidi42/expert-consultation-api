@@ -43,7 +43,7 @@ public class ApplicationUserService {
     private User getUser(final String email) {
         final User user = userService.findByEmail(email);
         if (user == null) {
-            return userService.save(new User(email, UserRole.CONTRIBUTOR));
+            return userService.saveEntity(new User(email, UserRole.CONTRIBUTOR));
         }
         if (applicationUserRepository.findById(user.getId()).isPresent()) {
             // there's already an application user linked to the user with the provided email

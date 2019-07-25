@@ -1,6 +1,6 @@
 package com.code4ro.legalconsultation.controller;
 
-import com.code4ro.legalconsultation.model.persistence.User;
+import com.code4ro.legalconsultation.model.dto.UserDto;
 import com.code4ro.legalconsultation.service.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,23 +23,22 @@ public class UserController {
     }
 
     @PostMapping
-    public User save(@Valid @RequestBody final User user) {
-        return userService.saveAndSendRegistrationMail(user);
+    public UserDto save(@RequestBody @Valid final UserDto userDto) {
+        return userService.saveAndSendRegistrationMail(userDto);
     }
 
     @PutMapping
-    public List<User> saveAll(@Valid @RequestBody final List<User> users) {
-        return userService.saveAndSendRegistrationMail(users);
+    public List<UserDto> saveAll(@Valid @RequestBody final List<UserDto> userDtos) {
+        return userService.saveAndSendRegistrationMail(userDtos);
     }
 
-
     @GetMapping(value = "/{id}")
-    public User getOne(@PathVariable final String id) {
+    public UserDto getOne(@PathVariable final String id) {
         return userService.getOne(id);
     }
 
     @GetMapping
-    public Page<User> findAll(final Pageable pageable) {
+    public Page<UserDto> findAll(final Pageable pageable) {
         return userService.findAll(pageable);
     }
 
@@ -49,7 +48,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/extract", consumes = "multipart/form-data")
-    public List<User> extractFromCsv(@RequestParam("csvFile") final MultipartFile file) {
+    public List<UserDto> extractFromCsv(@RequestParam("csvFile") final MultipartFile file) {
         return userService.extract(file);
     }
 }

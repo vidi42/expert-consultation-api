@@ -1,9 +1,11 @@
 package com.code4ro.legalconsultation.service.impl;
 
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
+import com.code4ro.legalconsultation.model.dto.UserDto;
 import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.UserRepository;
+import com.code4ro.legalconsultation.service.MapperService;
 import com.code4ro.legalconsultation.service.api.MailApi;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -33,44 +35,51 @@ public class UserService {
     private final UserRepository userRepository;
     private final CsvMapper csvMapper = new CsvMapper();
     private final MailApi mailApi;
+    private final MapperService mapperService;
 
     @Autowired
     public UserService(final UserRepository userRepository,
-                       final MailApi mailApi) {
+                       final MailApi mailApi,
+                       final MapperService mapperService) {
         this.userRepository = userRepository;
         this.mailApi = mailApi;
+        this.mapperService = mapperService;
     }
 
-    public User save(final User user) {
+    public User saveEntity(final User user) {
         return userRepository.save(user);
     }
 
-    public User saveAndSendRegistrationMail(final User user) throws LegalValidationException {
-        final boolean newUser = user.getId() == null;
-        final User savedUser =  userRepository.save(user);
-        if (newUser) {
+    public UserDto saveAndSendRegistrationMail(final UserDto userDto) throws LegalValidationException {
+        final User user = mapperService.map(userDto, User.class);
+        final User savedUser = userRepository.save(user);
+        if (user.isNew()) {
             mailApi.sendRegisterMail(Collections.singletonList(user));
         }
-        return savedUser;
+        return mapperService.map(savedUser, UserDto.class);
     }
 
-    public List<User> saveAndSendRegistrationMail(final List<User> users) throws LegalValidationException {
+    public List<UserDto> saveAndSendRegistrationMail(final List<UserDto> userDtos) throws LegalValidationException {
+        final List<User> users = mapperService.mapList(userDtos, User.class);
         final List<User> newUsers = users.stream()
-                .filter(user -> user.getId() == null)
+                .filter(User::isNew)
                 .collect(Collectors.toList());
         final List<User> savedUsers = userRepository.saveAll(users);
         if (!newUsers.isEmpty()) {
             mailApi.sendRegisterMail(newUsers);
         }
-        return savedUsers;
+
+        return mapperService.mapList(savedUsers, UserDto.class);
     }
 
-    public User getOne(final String id) {
-        return userRepository.findById(UUID.fromString(id)).orElseThrow(EntityNotFoundException::new);
+    public UserDto getOne(final String id) {
+        final User user = userRepository.findById(UUID.fromString(id)).orElseThrow(EntityNotFoundException::new);
+        return mapperService.map(user, UserDto.class);
     }
 
-    public Page<User> findAll(final Pageable pageable) {
-        return userRepository.findAll(pageable);
+    public Page<UserDto> findAll(final Pageable pageable) {
+        final Page<User> userPage = userRepository.findAll(pageable);
+        return mapperService.mapPage(userPage, UserDto.class);
     }
 
     public User findByEmail(final String email) {
@@ -81,7 +90,7 @@ public class UserService {
         userRepository.deleteById(UUID.fromString(id));
     }
 
-    public List<User> extract(final MultipartFile csvFile) throws LegalValidationException {
+    public List<UserDto> extract(final MultipartFile csvFile) throws LegalValidationException {
         try {
             final List<User> users = read(csvFile.getInputStream());
             final List<String> userEmails = users.stream()
@@ -89,6 +98,7 @@ public class UserService {
                     .collect(Collectors.toList());
             final Map<String, User> alreadySaved = userRepository.findAllByEmailIn(userEmails).stream()
                     .collect(Collectors.toMap(User::getEmail, user -> user));
+
             users.forEach(user -> {
                 if (alreadySaved.containsKey(user.getEmail())) {
                     user.setId(alreadySaved.get(user.getEmail()).getId());
@@ -97,7 +107,8 @@ public class UserService {
                     user.setRole(UserRole.CONTRIBUTOR);
                 }
             });
-            return users;
+
+            return mapperService.mapList(users, UserDto.class);
         } catch (Exception e) {
             LOG.error("Exception while parsing the csv file", e);
             throw new LegalValidationException("user.Extract.csv.failed", HttpStatus.BAD_REQUEST);
