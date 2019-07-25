@@ -1,15 +1,17 @@
 package com.code4ro.legalconsultation.service;
 
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
+import com.code4ro.legalconsultation.model.dto.UserDto;
 import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.UserRepository;
 import com.code4ro.legalconsultation.service.impl.MailService;
+import com.code4ro.legalconsultation.service.impl.MapperServiceImpl;
 import com.code4ro.legalconsultation.service.impl.UserService;
 import com.code4ro.legalconsultation.util.RandomObjectFiller;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Pageable;
@@ -31,28 +33,33 @@ public class UserServiceTest {
     @Mock
     private MailService mailService;
 
-    @InjectMocks
+    private MapperService mapperService = new MapperServiceImpl();
     private UserService userService;
+
+    @Before
+    public void before() {
+        this.userService = new UserService(userRepository, mailService, mapperService);
+    }
 
     @Test
     public void saveUserAndSendRegistrationMail() {
-        final User user = RandomObjectFiller.createAndFill(User.class);
+        final UserDto userDto = RandomObjectFiller.createAndFill(UserDto.class);
 
-        userService.saveAndSendRegistrationMail(user);
+        userService.saveAndSendRegistrationMail(userDto);
 
-        verify(mailService).sendRegisterMail(Collections.singletonList(user));
-        verify(userRepository).save(user);
+        verify(mailService).sendRegisterMail(anyList());
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
     public void saveUsersAndSendRegistrationMail() {
-        final List<User> users = Arrays.asList(
-                RandomObjectFiller.createAndFill(User.class), RandomObjectFiller.createAndFill(User.class));
+        final List<UserDto> userDtos = Arrays.asList(
+                RandomObjectFiller.createAndFill(UserDto.class), RandomObjectFiller.createAndFill(UserDto.class));
 
-        userService.saveAndSendRegistrationMail(users);
+        userService.saveAndSendRegistrationMail(userDtos);
 
-        verify(mailService).sendRegisterMail(users);
-        verify(userRepository).saveAll(users);
+        verify(mailService).sendRegisterMail(anyList());
+        verify(userRepository).saveAll(anyList());
     }
 
     @Test
@@ -91,7 +98,7 @@ public class UserServiceTest {
         when(userRepository.findAllByEmailIn(Collections.singletonList("john@email.com")))
                 .thenReturn(Collections.singletonList(user));
 
-        final List<User> results = userService.extract(file);
+        final List<UserDto> results = userService.extract(file);
 
         assertThat(results.size()).isEqualTo(1);
         assertThat(results.get(0).getId()).isEqualTo(user.getId());
@@ -108,7 +115,7 @@ public class UserServiceTest {
         when(file.getInputStream()).thenReturn(
                 new ByteArrayInputStream("john,doe,john@email.com,42345,district,org".getBytes()));
 
-        final List<User> results = userService.extract(file);
+        final List<UserDto> results = userService.extract(file);
 
         assertThat(results.size()).isEqualTo(1);
         assertThat(results.get(0).getId()).isNull();

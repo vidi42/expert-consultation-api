@@ -19,4 +19,8 @@ public abstract class BaseEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Type(type = "uuid-char")
     private UUID id;
+
+    public boolean isNew() {
+        return getId() == null;
+    }
 }
