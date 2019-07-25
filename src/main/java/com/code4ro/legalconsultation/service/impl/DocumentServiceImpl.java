@@ -5,7 +5,6 @@ import com.code4ro.legalconsultation.model.dto.DocumentView;
 import com.code4ro.legalconsultation.model.persistence.DocumentBreakdown;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
-import com.code4ro.legalconsultation.repository.DocumentConsolidatedRepository;
 import com.code4ro.legalconsultation.service.api.DocumentService;
 import com.code4ro.legalconsultation.service.api.DocumentStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,25 +75,23 @@ public class DocumentServiceImpl implements DocumentService {
     public Optional<DocumentConsolidated> update(final String id, final DocumentView document, final MultipartFile file) {
         Optional<DocumentConsolidated> consolidated = documentConsolidatedService.findOne(id);
 
-        if(consolidated.isPresent()){
+        if(!consolidated.isPresent())
+            return Optional.empty();
 
-            DocumentConsolidated documentConsolidated = consolidated.get();
+        DocumentConsolidated documentConsolidated = consolidated.get();
 
-            //update the metadata
-            DocumentMetadata metadata = documentMetadataService.build(document);
-            String filePath  = documentStorageService.storeFile(file);
-            metadata.setFilePath(filePath);
-            metadata.setId(documentConsolidated.getDocumentMetadata().getId());
+        //update the metadata
+        DocumentMetadata metadata = documentMetadataService.build(document);
+        String filePath  = documentStorageService.storeFile(file);
+        metadata.setFilePath(filePath);
+        metadata.setId(documentConsolidated.getDocumentMetadata().getId());
 
-            //update the breakdown
-            DocumentBreakdown breakdown = documentBreakdownService.build(Paths.get(filePath));
+        //update the breakdown
+        DocumentBreakdown breakdown = documentBreakdownService.build(Paths.get(filePath));
 
-            documentConsolidated.setDocumentMetadata(metadata);
-            documentConsolidated.setDocumentBreakdown(breakdown);
-            return Optional.of(documentConsolidatedService.saveOne(documentConsolidated));
-        }
-
-        return Optional.empty();
+        documentConsolidated.setDocumentMetadata(metadata);
+        documentConsolidated.setDocumentBreakdown(breakdown);
+        return Optional.of(documentConsolidatedService.saveOne(documentConsolidated));
     }
 
     @Override
