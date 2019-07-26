@@ -5,7 +5,7 @@ import com.code4ro.legalconsultation.model.dto.UserDto;
 import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.UserRepository;
-import com.code4ro.legalconsultation.service.MapperService;
+import com.code4ro.legalconsultation.service.api.MapperService;
 import com.code4ro.legalconsultation.service.api.MailApi;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;

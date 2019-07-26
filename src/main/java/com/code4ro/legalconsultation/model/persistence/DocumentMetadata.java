@@ -30,7 +30,10 @@ public class DocumentMetadata extends BaseEntity {
     @Temporal(TemporalType.DATE)
     private Date dateOfDevelopment;
 
-    @Column(name ="date_of_receipt", nullable=false)
+    @Column(name = "date_of_receipt", nullable=false)
     @Temporal(TemporalType.DATE)
     private Date dateOfReceipt;
+
+    @Column(name = "file_path", unique = true, nullable = false)
+    private String filePath;
 }

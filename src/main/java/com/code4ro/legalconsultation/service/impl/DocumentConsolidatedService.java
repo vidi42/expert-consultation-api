@@ -1,6 +1,8 @@
 package com.code4ro.legalconsultation.service.impl;
 
+import com.code4ro.legalconsultation.model.persistence.DocumentBreakdown;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
+import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.repository.DocumentConsolidatedRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,5 +43,12 @@ public class DocumentConsolidatedService {
 
     public void deleteById(final String uuid){
         documentConsolidatedRepository.deleteById(UUID.fromString(uuid));
+    }
+
+    public DocumentConsolidated update(final String id, final DocumentMetadata metadata, final DocumentBreakdown breakdown){
+        DocumentConsolidated consolidated = documentConsolidatedRepository.getOne(UUID.fromString(id));
+        consolidated.setDocumentMetadata(metadata);
+        consolidated.setDocumentBreakdown(breakdown);
+        return documentConsolidatedRepository.save(consolidated);
     }
 }

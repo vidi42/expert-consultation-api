@@ -1,10 +1,12 @@
 package com.code4ro.legalconsultation.service.impl;
 
 import com.code4ro.legalconsultation.model.dto.BaseEntityDto;
+import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.model.dto.UserDto;
 import com.code4ro.legalconsultation.model.persistence.BaseEntity;
+import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.model.persistence.User;
-import com.code4ro.legalconsultation.service.MapperService;
+import com.code4ro.legalconsultation.service.api.MapperService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,8 @@ public class MapperServiceImpl implements MapperService {
                 .includeBase(BaseEntity.class, BaseEntityDto.class);
         modelMapper.createTypeMap(UserDto.class, User.class)
                 .includeBase(BaseEntityDto.class, BaseEntity.class);
+        modelMapper.createTypeMap(DocumentMetadata.class, DocumentViewDto.class);
+        modelMapper.createTypeMap(DocumentViewDto.class, DocumentMetadata.class);
     }
 
     @Override

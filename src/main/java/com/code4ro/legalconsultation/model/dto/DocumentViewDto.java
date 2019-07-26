@@ -1,23 +1,39 @@
 package com.code4ro.legalconsultation.model.dto;
 
 import com.code4ro.legalconsultation.common.exceptions.InvalidDocumentException;
+import com.code4ro.legalconsultation.model.persistence.DocumentType;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Date;
 
 @Getter
 @Setter
-public class DocumentView {
+public class DocumentViewDto {
     private String title;
-    private String documentNumber;
-    private String initiator;
-    private Date elaborationDate;
-    private Date receivedDate;
+    private BigInteger documentNumber;
+    private String documentInitializer;
+    private DocumentType documentType;
+    private Date dateOfDevelopment;
+    private Date dateOfReceipt;
     private String documentURI;
     private String documentUploadPath;
     private final String[] extensions = {"xls", "xlsx", "doc", "docx"};
+
+
+    public DocumentViewDto(String title, BigInteger documentNumber, String documentInitializer, DocumentType documentType, Date dateOfDevelopment, Date dateOfReceipt) {
+        this.title = title;
+        this.documentNumber = documentNumber;
+        this.documentInitializer = documentInitializer;
+        this.documentType = documentType;
+        this.dateOfDevelopment = dateOfDevelopment;
+        this.dateOfReceipt = dateOfReceipt;
+    }
+
+    public DocumentViewDto() {
+    }
 
     public void setDocumentUploadPath(String documentUploadPath) {
         if (isValidUploadPath(documentUploadPath))
