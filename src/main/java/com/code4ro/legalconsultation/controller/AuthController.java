@@ -8,7 +8,10 @@ import com.code4ro.legalconsultation.model.dto.LoginRequest;
 import com.code4ro.legalconsultation.model.dto.SignUpRequest;
 import com.code4ro.legalconsultation.config.security.JwtTokenProvider;
 import com.code4ro.legalconsultation.service.impl.ApplicationUserService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,8 +43,13 @@ public class AuthController {
         this.userService = userService;
     }
 
+    @ApiOperation(value = "Call for retrieving a JWT Token using username and password",
+            response = JwtAuthenticationResponse.class,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping("/signin")
-    public ResponseEntity<JwtAuthenticationResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtAuthenticationResponse> authenticateUser(
+            @ApiParam("Object containing the login request DTO") @Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -56,8 +64,13 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
+    @ApiOperation(value = "Saving the sign in information for a user",
+            response = ApiResponse.class,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody SignUpRequest signUpRequest)
+    public ResponseEntity<ApiResponse> registerUser(
+            @ApiParam("Object containing the sign-up request DTO") @Valid @RequestBody SignUpRequest signUpRequest)
             throws LegalValidationException {
         final ApplicationUser result = userService.save(signUpRequest);
 
