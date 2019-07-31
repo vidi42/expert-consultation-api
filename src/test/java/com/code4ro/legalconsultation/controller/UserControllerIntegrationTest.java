@@ -60,7 +60,7 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
         final List<User> users = Arrays.asList(
                 RandomObjectFiller.createAndFill(User.class), RandomObjectFiller.createAndFill(User.class));
 
-        mvc.perform(put("/api/users")
+        mvc.perform(post("/api/users/bulk")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(users))
                 .accept(MediaType.APPLICATION_JSON))
