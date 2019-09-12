@@ -20,7 +20,10 @@ public class Chapter extends BaseEntity {
     @Column(name = "chapter_title", nullable = false)
     private String chapterTitle;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "article_id", referencedColumnName = "id")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "articleChapter")
     private List<Article> articles = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "document_id")
+    private DocumentBreakdown chapterDocument;
 }
