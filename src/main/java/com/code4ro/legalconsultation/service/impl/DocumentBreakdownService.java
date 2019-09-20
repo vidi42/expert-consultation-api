@@ -38,13 +38,16 @@ public class DocumentBreakdownService {
     }
 
     public DocumentBreakdown build(final MultipartFile documentPath){
-        return new DocumentBreakdown();
+        DocumentBreakdown documentBreakdown = new DocumentBreakdown();
+        documentBreakdown.setTitle(documentPath.getOriginalFilename());
+        return documentBreakdown;
     }
 
     public DocumentBreakdown update(final String id, final DocumentViewDto documentViewDto){
         //TODO - same as (1)
         DocumentBreakdown documentBreakdown = new DocumentBreakdown();
         documentBreakdown.setId(UUID.fromString(id));
+        documentBreakdown.setTitle(documentViewDto.getTitle());
         return documentBreakdownRepository.save(documentBreakdown);
     }
 

@@ -79,11 +79,13 @@ public class RandomObjectFiller {
         Article article2 = RandomObjectFiller.createAndFill(Article.class);
         Chapter chapter1 = RandomObjectFiller.createAndFill(Chapter.class);
         chapter1.setArticles(List.of(article1, article2));
-        DocumentBreakdown breakdown = new DocumentBreakdown();
+        article1.setArticleChapter(chapter1);
+        article2.setArticleChapter(chapter1);
+
+        DocumentBreakdown breakdown = RandomObjectFiller.createAndFill(DocumentBreakdown.class);
         breakdown.setChapters(List.of(chapter1));
+        chapter1.setChapterDocument(breakdown);
 
-        DocumentConsolidated consolidated = new DocumentConsolidated(metadata, breakdown);
-
-        return consolidated;
+        return new DocumentConsolidated(metadata, breakdown);
     }
 }
