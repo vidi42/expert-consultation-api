@@ -8,10 +8,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class RandomObjectFiller {
 
@@ -27,6 +24,18 @@ public class RandomObjectFiller {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static <T> T createAndFillWithBaseEntity(Class<? extends BaseEntity> clazz){
+        final T instance = (T) createAndFill(clazz);
+        ((BaseEntity) instance).setId(UUID.randomUUID());
+        return instance;
+    }
+
+    public static <T> T createAndFillWithBaseEntityAndDifferentId(Class<? extends BaseEntity> clazz, UUID id){
+        final T instance = (T) createAndFill(clazz);
+        ((BaseEntity) instance).setId(generateDifferentUUID(id));
+        return instance;
     }
 
     private static Object getRandomValueForField(Field field) {
@@ -87,5 +96,13 @@ public class RandomObjectFiller {
         chapter1.setChapterDocument(breakdown);
 
         return new DocumentConsolidated(metadata, breakdown);
+    }
+
+    public static UUID generateDifferentUUID(UUID uuid){
+        UUID generatedUUID;
+        do{
+            generatedUUID = UUID.randomUUID();
+        } while (Objects.equals(uuid, generatedUUID));
+        return generatedUUID;
     }
 }

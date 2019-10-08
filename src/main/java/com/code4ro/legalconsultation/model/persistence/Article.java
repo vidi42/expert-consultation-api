@@ -8,6 +8,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.math.BigInteger;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,4 +31,15 @@ public class Article extends BaseEntity {
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "chapter_id")
     private Chapter articleChapter;
+  
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Article)) return false;
+        if (!super.equals(o)) return false;
+        Article article = (Article) o;
+        return super.equals(article) && Objects.equals(articleNumber, article.articleNumber) &&
+                Objects.equals(articleTitle, article.articleTitle) &&
+                Objects.equals(articleContent, article.articleContent);
+    }
 }
