@@ -31,4 +31,6 @@ public class UserDto extends BaseEntityDto {
     private String organisation;
     @NotNull
     private UserRole role;
+
+    public UserDto(){ }
 }
