@@ -22,10 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,7 +79,7 @@ public class UserService {
         return mapperService.mapPage(userPage, UserDto.class);
     }
 
-    public User findByEmail(final String email) {
+    public Optional<User> findByEmail(final String email) {
         return userRepository.findByEmail(email);
     }
 

@@ -56,6 +56,33 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
 
     @Test
     @WithMockUser
+    public void saveUserEmailException() throws Exception {
+        final UserDto userDto = RandomObjectFiller.createAndFill(UserDto.class);
+        userDto.setId(null);
+
+        mvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.firstName").value(userDto.getFirstName()))
+                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.role").value(userDto.getRole().toString()))
+                .andExpect(status().isOk());
+
+
+        mvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userDto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.i18nFieldErrors.email.i18nErrorKey")
+                        .value("user.save.duplicatedEmail"));
+
+        assertThat(userRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    @WithMockUser
     public void saveUsers() throws Exception {
         final List<User> users = Arrays.asList(
                 RandomObjectFiller.createAndFill(User.class), RandomObjectFiller.createAndFill(User.class));
