@@ -1,12 +1,15 @@
 package com.code4ro.legalconsultation.service.impl.pdf.reader;
 
+import com.code4ro.legalconsultation.service.impl.pdf.BoldAreasRepository;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.text.PDFTextStripperByArea;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 
+@Component
 public class BasicOARPdfReader implements PDFReader {
     private static final double FIRST_PAGE_REGION_X_POSITION = 0;
     private static final double FIRST_PAGE_REGION_Y_POSITION = 200;
@@ -22,13 +25,24 @@ public class BasicOARPdfReader implements PDFReader {
     private final Rectangle2D firstPageRegion = new Rectangle2D.Double(FIRST_PAGE_REGION_X_POSITION, FIRST_PAGE_REGION_Y_POSITION, FIRST_PAGE_REGION_WIDTH, FIRST_PAGE_REGION_HEIGHT);
     private final Rectangle2D regularPageRegion = new Rectangle2D.Double(REGULAR_PAGE_REGION_X_POSITION, REGULAR_PAGE_REGION_Y_POSITION, REGULAR_PAGE_REGION_WIDTH, REGULAR_PAGE_REGION_HEIGHT);
 
+    private final BoldAreasRepository boldAreasRepository;
+    private final PDFBoldTextStripperByArea boldTextStripperByArea;
+
+    @Autowired
+    public BasicOARPdfReader(final BoldAreasRepository boldAreasRepository,
+                             final PDFBoldTextStripperByArea boldTextStripperByArea) {
+        this.boldAreasRepository = boldAreasRepository;
+        this.boldTextStripperByArea = boldTextStripperByArea;
+    }
+
     public String getContent(PDDocument document) throws IOException {
-        final PDFTextStripperByArea stripper = getInitializedPDFTextStripperByArea();
-        return getContentAsString(document, stripper);
+        final String result = getContentAsString(document, boldTextStripperByArea);
+        boldAreasRepository.setBoldAreas(boldTextStripperByArea.getBoldAreas());
+        return result;
     }
 
     private String getContentAsString(final PDDocument document,
-                                      final PDFTextStripperByArea stripper) throws IOException {
+                                      final PDFBoldTextStripperByArea stripper) throws IOException {
         final int numberOfPages = document.getNumberOfPages();
         final StringBuilder resultBuilder = new StringBuilder();
         for (int i = 0; i < numberOfPages; i++) {
@@ -40,7 +54,7 @@ public class BasicOARPdfReader implements PDFReader {
     }
 
     private String getContentAsStringForPage(final PDDocument document,
-                                             final PDFTextStripperByArea stripper,
+                                             final PDFBoldTextStripperByArea stripper,
                                              final int pageNumber) throws IOException {
         final PDPage page = document.getPage(pageNumber);
         if (pageNumber == 0) {
@@ -51,19 +65,13 @@ public class BasicOARPdfReader implements PDFReader {
             return result;
         }
 
+        stripper.addRegion(REGULAR_PAGE_REGION_NAME, regularPageRegion);
         stripper.extractRegions(page);
         return getContentAsStringForRegion(stripper, REGULAR_PAGE_REGION_NAME);
     }
 
-    private String getContentAsStringForRegion(final PDFTextStripperByArea stripper, final String regionName) {
+    private String getContentAsStringForRegion(final PDFBoldTextStripperByArea stripper, final String regionName) {
         final String textForRegion = stripper.getTextForRegion(regionName);
         return textForRegion.trim();
-    }
-
-    private PDFTextStripperByArea getInitializedPDFTextStripperByArea() throws IOException {
-        final PDFTextStripperByArea stripper = new PDFTextStripperByArea();
-        stripper.addRegion(REGULAR_PAGE_REGION_NAME, regularPageRegion);
-
-        return stripper;
     }
 }

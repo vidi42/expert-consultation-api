@@ -25,6 +25,7 @@ import org.springframework.util.FileSystemUtils;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,7 +53,8 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
 
     @Test
     @WithMockUser
-    public void saveDocument() throws Exception{
+    @Transactional
+    public void saveDocument() throws Exception {
         final DocumentViewDto randomView = RandomObjectFiller.createAndFill(DocumentViewDto.class);
 
         final MockMultipartFile randomFile = PdfFileFactory.getAsMultipart(getClass().getClassLoader());
@@ -68,10 +70,92 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
 
         assertThat(documentMetadataRepository.count()).isEqualTo(1);
         assertThat(documentConsolidatedRepository.count()).isEqualTo(1);
-        assertThat(documentNodeRepository.count()).isEqualTo(1);
+        assertThat(documentNodeRepository.count()).isEqualTo(14);
 
         final String soredFilePath = documentMetadataRepository.findAll().get(0).getFilePath();
         assertThatDocumentIsStored(soredFilePath);
+
+        final List<DocumentConsolidated> documents = documentConsolidatedRepository.findAll();
+        final DocumentConsolidated document = documents.iterator().next();
+        assertThatDocumentNodeTreeIsGeneratedCorrectly(document.getDocumentNode());
+    }
+
+    private void assertThatDocumentNodeTreeIsGeneratedCorrectly(final DocumentNode document) {
+        final DocumentNode expectedDocument = documentNodeFactory.createDocument(null, "Document title  on multiple lines", "Sample document introduction that can be on one line or on multiplelines");
+        assertThat(document.getChildren()).hasSize(2);
+        assertDocumentNodeContent(expectedDocument, document);
+
+        final DocumentNode expectedChapter1 = documentNodeFactory.createChapter("I", "Chapter title on multiple lines  ", null);
+        final DocumentNode chapter1 = document.getChildren().get(0);
+        assertThat(chapter1.getChildren()).hasSize(2);
+        assertDocumentNodeContent(expectedChapter1, chapter1);
+
+        final DocumentNode expectedChapter2 = documentNodeFactory.createChapter("II", "Chapter title on single line", null);
+        final DocumentNode chapter2 = document.getChildren().get(1);
+        assertThat(chapter1.getChildren()).hasSize(2);
+        assertDocumentNodeContent(expectedChapter2, chapter2);
+
+        final DocumentNode expectedArticle4 = documentNodeFactory.createArticle("4", null, "Article without children");
+        final DocumentNode article4 = chapter2.getChildren().get(0);
+        assertThat(article4.getChildren()).isEmpty();
+        assertDocumentNodeContent(expectedArticle4, article4);
+
+        final DocumentNode expectedSection1 = documentNodeFactory.createSection("1", "Section with title", null);
+        final DocumentNode section1 = chapter1.getChildren().get(0);
+        assertThat(section1.getChildren()).hasSize(2);
+        assertDocumentNodeContent(expectedSection1, section1);
+
+        final DocumentNode expectedSection2 = documentNodeFactory.createSection("2", null, null);
+        final DocumentNode section2 = chapter1.getChildren().get(1);
+        assertThat(section1.getChildren()).hasSize(2);
+        assertDocumentNodeContent(expectedSection2, section2);
+
+        final DocumentNode expectedArticle1 = documentNodeFactory.createArticle("1", null, null);
+        final DocumentNode article1 = section1.getChildren().get(0);
+        assertThat(article1.getChildren()).hasSize(1);
+        assertDocumentNodeContent(expectedArticle1, article1);
+
+        final DocumentNode expectedArticle2 = documentNodeFactory.createArticle("2", "Article with title on one line", null);
+        final DocumentNode article2 = section1.getChildren().get(1);
+        assertThat(article2.getChildren()).hasSize(1);
+        assertDocumentNodeContent(expectedArticle2, article2);
+
+        final DocumentNode expectedArticle3 = documentNodeFactory.createArticle("3", "Article with title on multiple lines", null);
+        final DocumentNode article3 = section2.getChildren().get(0);
+        assertThat(article2.getChildren()).hasSize(1);
+        assertDocumentNodeContent(expectedArticle3, article3);
+
+        final DocumentNode expectedParagraph11 = documentNodeFactory.createParagraph("1", null, "Paragraph content on a single line");
+        final DocumentNode paragraph11 = article1.getChildren().get(0);
+        assertThat(paragraph11.getChildren()).isEmpty();
+        assertDocumentNodeContent(expectedParagraph11, paragraph11);
+
+        final DocumentNode expectedParagraph21 = documentNodeFactory.createParagraph("1", null, "Paragraph content on multiple lines");
+        final DocumentNode paragraph21 = article2.getChildren().get(0);
+        assertThat(paragraph21.getChildren()).isEmpty();
+        assertDocumentNodeContent(expectedParagraph21, paragraph21);
+
+        final DocumentNode expectedParagraph35 = documentNodeFactory.createParagraph("5", null, "Paragraph with multiple letters");
+        final DocumentNode paragraph35 = article3.getChildren().get(0);
+        assertThat(paragraph35.getChildren()).hasSize(2);
+        assertDocumentNodeContent(expectedParagraph35, paragraph35);
+
+        final DocumentNode expectedAlignmentA = documentNodeFactory.createAlignment("a", null, "Sample letter content 1");
+        final DocumentNode alignmentA = paragraph35.getChildren().get(0);
+        assertThat(alignmentA.getChildren()).isEmpty();
+        assertDocumentNodeContent(expectedAlignmentA, alignmentA);
+
+        final DocumentNode expectedAlignmentB = documentNodeFactory.createAlignment("b", null, "Sample letter content 2");
+        final DocumentNode alignmentB = paragraph35.getChildren().get(1);
+        assertThat(alignmentA.getChildren()).isEmpty();
+        assertDocumentNodeContent(expectedAlignmentB, alignmentB);
+    }
+
+    private void assertDocumentNodeContent(final DocumentNode expected, final DocumentNode actual) {
+        assertThat(expected.getIdentifier()).isEqualToIgnoringWhitespace(actual.getIdentifier());
+        assertThat(expected.getTitle()).isEqualToIgnoringWhitespace(actual.getTitle());
+        assertThat(expected.getContent()).isEqualToIgnoringWhitespace(actual.getContent());
+        assertThat(expected.getDocumentNodeType()).isEqualByComparingTo(actual.getDocumentNodeType());
     }
 
     private void assertThatDocumentIsStored(String soredFilePath) {
@@ -123,7 +207,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     @Test
     @WithMockUser
     @Transactional
-    public void listDocuments() throws Exception{
+    public void listDocuments() throws Exception {
         DocumentConsolidated consolidated1 = saveSingleConsolidated();
         DocumentConsolidated consolidated2 = saveSingleConsolidated();
 
@@ -141,7 +225,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     @Test
     @WithMockUser
     @Transactional
-    public void deleteDocument() throws Exception{
+    public void deleteDocument() throws Exception {
         DocumentConsolidated consolidated = saveSingleConsolidated();
 
         mvc.perform(delete("/api/document/" + consolidated.getId().toString())
@@ -154,7 +238,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
 
     @Test
     @WithMockUser
-    public void testGetDocumentNotFound() throws Exception{
+    public void testGetDocumentNotFound() throws Exception {
         UUID uuid = UUID.randomUUID();
 
         mvc.perform(get("/api/document/" + uuid.toString()))
@@ -163,7 +247,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
 
     @Test
     @WithMockUser
-    public void testGetDocumentConsolidatedNotFound() throws Exception{
+    public void testGetDocumentConsolidatedNotFound() throws Exception {
         UUID uuid = UUID.randomUUID();
 
         mvc.perform(get("/api/document/" + uuid.toString() + "/consolidated"))
@@ -172,7 +256,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
 
     @Test
     @WithMockUser
-    public void deleteDocumentNotFound() throws Exception{
+    public void deleteDocumentNotFound() throws Exception {
         UUID uuid = UUID.randomUUID();
 
         mvc.perform(delete("/api/document/" + uuid.toString()))

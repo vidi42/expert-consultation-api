@@ -27,4 +27,51 @@ public class DocumentNodeFactory {
         child.setParent(root);
         return root;
     }
+
+    public DocumentNode createChapter(final String identifier, final String title, final String content) {
+        final DocumentNode documentNode = new DocumentNode();
+        documentNode.setDocumentNodeType(DocumentNodeType.CHAPTER);
+        return createDocumentNode(documentNode, identifier, title, content);
+    }
+
+    public DocumentNode createDocument(final String identifier, final String title, final String content) {
+        final DocumentNode documentNode = new DocumentNode();
+        documentNode.setDocumentNodeType(DocumentNodeType.DOCUMENT);
+        return createDocumentNode(documentNode, identifier, title, content);
+    }
+
+    public DocumentNode createArticle(final String identifier, final String title, final String content) {
+        final DocumentNode documentNode = new DocumentNode();
+        documentNode.setDocumentNodeType(DocumentNodeType.ARTICLE);
+        return createDocumentNode(documentNode, identifier, title, content);
+    }
+
+    public DocumentNode createParagraph(final String identifier, final String title, final String content) {
+        final DocumentNode documentNode = new DocumentNode();
+        documentNode.setDocumentNodeType(DocumentNodeType.PARAGRAPH);
+        return createDocumentNode(documentNode, identifier, title, content);
+    }
+
+    public DocumentNode createAlignment(final String identifier, final String title, final String content) {
+        final DocumentNode documentNode = new DocumentNode();
+        documentNode.setDocumentNodeType(DocumentNodeType.ALIGNMENT);
+        return createDocumentNode(documentNode, identifier, title, content);
+    }
+
+    public DocumentNode createSection(final String identifier, final String title, final String content) {
+        final DocumentNode documentNode = new DocumentNode();
+        documentNode.setDocumentNodeType(DocumentNodeType.SECTION);
+        return createDocumentNode(documentNode, identifier, title, content);
+    }
+
+    public DocumentNode createDocumentNode(final DocumentNode documentNode,
+                                           final String identifier,
+                                           final String title,
+                                           final String content) {
+        documentNode.setIdentifier(identifier);
+        documentNode.setTitle(title);
+        documentNode.setContent(content);
+
+        return documentNode;
+    }
 }

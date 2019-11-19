@@ -5,5 +5,6 @@ public enum DocumentNodeType {
     ARTICLE,
     CHAPTER,
     SECTION,
-    PARAGRAPH
+    PARAGRAPH,
+    ALIGNMENT,
 }

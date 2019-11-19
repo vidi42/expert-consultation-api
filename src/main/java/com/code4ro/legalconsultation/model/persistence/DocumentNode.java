@@ -25,6 +25,9 @@ public class DocumentNode extends BaseEntity {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "content")
+    @Column(columnDefinition="TEXT")
     private String content;
+
+    @Column(name = "identifier")
+    private String identifier;
 }

@@ -60,4 +60,5 @@ public class DocumentServiceTest {
 
         verify(documentConsolidatedService).deleteById(uuid);
     }
+
 }

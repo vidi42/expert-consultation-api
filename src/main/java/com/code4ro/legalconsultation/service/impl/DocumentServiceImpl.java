@@ -70,7 +70,7 @@ public class DocumentServiceImpl implements DocumentService {
     public DocumentConsolidated create(final DocumentViewDto document, final MultipartFile file) {
 
         DocumentMetadata metadata = documentMetadataService.build(document);
-        final String filePath  = storeFile(file);
+        final String filePath = storeFile(file);
         metadata.setFilePath(filePath);
 
         final String pdfContent = pdfService.readAsString(file);
@@ -82,15 +82,15 @@ public class DocumentServiceImpl implements DocumentService {
     @Transactional
     @Override
     public DocumentConsolidated update(final UUID id,
-                                                 final DocumentViewDto document,
-                                                 final MultipartFile file) {
+                                       final DocumentViewDto document,
+                                       final MultipartFile file) {
         final DocumentConsolidated consolidated = documentConsolidatedService.getEntity(id);
 
         // TODO delete current file from storage and the document node
 
         //update the metadata
         DocumentMetadata metadata = documentMetadataService.build(document);
-        final String filePath  = storeFile(file);
+        final String filePath = storeFile(file);
         metadata.setFilePath(filePath);
         metadata.setId(consolidated.getDocumentMetadata().getId());
 
