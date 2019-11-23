@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+import static com.code4ro.legalconsultation.model.persistence.CommentStatus.APPROVED;
+import static com.code4ro.legalconsultation.model.persistence.CommentStatus.REJECTED;
+
 @Controller
 @RequestMapping("/api/documentnodes/{nodeId}/comments")
 @AllArgsConstructor
@@ -44,5 +47,15 @@ public class CommentController {
     public ResponseEntity<Page<CommentIdentificationDto>> findAll(@PathVariable UUID nodeId,
                                                                   final Pageable pageable) {
         return ResponseEntity.ok(commentService.findAll(nodeId, pageable));
+    }
+
+    @GetMapping("/{id}/approve")
+    public ResponseEntity<CommentDto> approve(@PathVariable UUID commentId){
+        return ResponseEntity.ok(commentService.setStatus(commentId, APPROVED));
+    }
+
+    @GetMapping("/{id}/reject")
+    public ResponseEntity<CommentDto> reject(@PathVariable UUID commentId){
+        return ResponseEntity.ok(commentService.setStatus(commentId, REJECTED));
     }
 }
