@@ -96,6 +96,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDto setStatus(UUID commentId, CommentStatus status) {
         final Comment comment = commentRepository.getOne(commentId);
+        if (comment == null) throw new EntityNotFoundException();
         comment.setStatus(status);
         commentRepository.save(comment);
         return mapperService.map(comment, CommentDto.class);
