@@ -4,17 +4,18 @@ import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
 import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
 import java.util.UUID;
 
 @Service
 public interface DocumentService {
     //return all metadata for documents
-    List<DocumentMetadata> fetchAll();
+    Page<DocumentMetadata> fetchAll(Pageable pageable);
 
     //return document metadata for a single document
     DocumentMetadata fetchOne(final UUID id);

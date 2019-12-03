@@ -5,9 +5,10 @@ import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.repository.DocumentMetadataRepository;
 import com.code4ro.legalconsultation.service.api.MapperService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,8 +29,8 @@ public class DocumentMetadataService {
         return documentMetadataRepository.save(documentMetadata);
     }
 
-    public List<DocumentMetadata> fetchAll() {
-        return documentMetadataRepository.findAll();
+    public Page<DocumentMetadata> fetchAll(Pageable pageable) {
+        return documentMetadataRepository.findAll(pageable);
     }
 
     public Optional<DocumentMetadata> fetchOne(final String id) {

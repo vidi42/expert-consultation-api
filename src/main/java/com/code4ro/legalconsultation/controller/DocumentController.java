@@ -8,6 +8,10 @@ import com.code4ro.legalconsultation.service.api.DocumentService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,8 +39,9 @@ public class DocumentController {
             response = List.class,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping("")
-    public ResponseEntity<List<DocumentMetadata>> getAllDocuments() {
-        List<DocumentMetadata> documents = documentService.fetchAll();
+    public ResponseEntity<Page<DocumentMetadata>> getAllDocuments(@ApiParam("Page object information being requested") Pageable pageable) {
+        Page<DocumentMetadata> documents = documentService.fetchAll(pageable);
+
         return new ResponseEntity<>(documents, HttpStatus.OK);
     }
 
@@ -52,7 +57,7 @@ public class DocumentController {
             response = DocumentConsolidated.class,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping("/{id}/consolidated")
-    public ResponseEntity getDocumentConsolidatedById(@ApiParam("Id of the document object being requested") @PathVariable UUID id){
+    public ResponseEntity getDocumentConsolidatedById(@ApiParam("Id of the document object being requested") @PathVariable UUID id) {
         return ResponseEntity.ok(documentService.fetchOneConsolidated(id));
     }
 

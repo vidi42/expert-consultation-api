@@ -12,14 +12,14 @@ import com.code4ro.legalconsultation.service.api.StorageApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
@@ -46,11 +46,8 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<DocumentMetadata> fetchAll() {
-        return documentConsolidatedService.findAll()
-                .stream()
-                .map(DocumentConsolidated::getDocumentMetadata)
-                .collect(Collectors.toList());
+    public Page<DocumentMetadata> fetchAll(Pageable pageable) {
+        return documentMetadataService.fetchAll(pageable);
     }
 
     @Transactional(readOnly = true)

@@ -3,12 +3,14 @@ package com.code4ro.legalconsultation.service;
 import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.service.impl.DocumentConsolidatedService;
+import com.code4ro.legalconsultation.service.impl.DocumentMetadataService;
 import com.code4ro.legalconsultation.service.impl.DocumentServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.Pageable;
 
 import java.util.UUID;
 
@@ -21,6 +23,9 @@ public class DocumentServiceTest {
 
     @Mock
     private DocumentConsolidatedService documentConsolidatedService;
+
+    @Mock
+    private DocumentMetadataService documentMetadataService;
 
     @InjectMocks
     private DocumentServiceImpl documentService;
@@ -47,9 +52,9 @@ public class DocumentServiceTest {
 
     @Test
     public void getAllDocuments(){
-        documentService.fetchAll();
+        documentService.fetchAll(Pageable.unpaged());
 
-        verify(documentConsolidatedService).findAll();
+        verify(documentMetadataService).fetchAll(Pageable.unpaged());
     }
 
     @Test

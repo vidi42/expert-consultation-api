@@ -25,6 +25,8 @@ import org.springframework.util.FileSystemUtils;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -208,18 +210,145 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     @WithMockUser
     @Transactional
     public void listDocuments() throws Exception {
-        DocumentConsolidated consolidated1 = saveSingleConsolidated();
-        DocumentConsolidated consolidated2 = saveSingleConsolidated();
+        List<DocumentConsolidated> documentsConsolidated = new ArrayList<>();
+
+        documentsConsolidated.add(saveSingleConsolidated());
+        documentsConsolidated.add(saveSingleConsolidated());
 
         mvc.perform(get("/api/document/")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.size()").value(2))
-                .andExpect(jsonPath("$[0].id").value(consolidated1.getDocumentMetadata().getId().toString()))
-                .andExpect(jsonPath("$[1].id").value(consolidated2.getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(jsonPath("$.content[0].id").value(documentsConsolidated.get(0).getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.content[1].id").value(documentsConsolidated.get(1).getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.totalElements").value(2))
                 .andExpect(status().isOk());
 
         assertThat(documentMetadataRepository.count()).isEqualTo(2);
         assertThat(documentConsolidatedRepository.count()).isEqualTo(2);
+    }
+
+    @Test
+    @WithMockUser
+    @Transactional
+    public void testGetDocumentsPagination() throws Exception {
+        List<DocumentConsolidated> documentsConsolidated = new ArrayList<>();
+
+        documentsConsolidated.add(saveSingleConsolidated());
+        documentsConsolidated.add(saveSingleConsolidated());
+        documentsConsolidated.add(saveSingleConsolidated());
+
+        mvc.perform(get("/api/document/")
+                .accept(MediaType.APPLICATION_JSON)
+                .param("page", "0")
+                .param("size", "2"))
+                .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(jsonPath("$.content[0].id").value(documentsConsolidated.get(0).getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.content[1].id").value(documentsConsolidated.get(1).getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(status().isOk());
+
+        mvc.perform(get("/api/document/")
+                .accept(MediaType.APPLICATION_JSON)
+                .param("page", "1")
+                .param("size", "2"))
+                .andExpect(jsonPath("$.content.size()").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(documentsConsolidated.get(2).getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(status().isOk());
+
+        assertThat(documentMetadataRepository.count()).isEqualTo(3);
+        assertThat(documentConsolidatedRepository.count()).isEqualTo(3);
+    }
+
+    @Test
+    @WithMockUser
+    @Transactional
+    public void testGetDocumentsSorting() throws Exception {
+        List<DocumentConsolidated> documentsConsolidated = new ArrayList<>();
+
+        documentsConsolidated.add(saveSingleConsolidated());
+        documentsConsolidated.add(saveSingleConsolidated());
+
+        documentsConsolidated.sort(Comparator.comparing(d -> d.getDocumentMetadata().getDateOfDevelopment()));
+
+        mvc.perform(get("/api/document/")
+                .accept(MediaType.APPLICATION_JSON)
+                .param("sort", "dateOfDevelopment"))
+                .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(jsonPath("$.content[0].id").value(documentsConsolidated.get(0).getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.content[1].id").value(documentsConsolidated.get(1).getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(status().isOk());
+
+        documentsConsolidated.sort(Comparator.comparing(d -> d.getDocumentMetadata().getDocumentInitializer()));
+
+        mvc.perform(get("/api/document/")
+                .accept(MediaType.APPLICATION_JSON)
+                .param("sort", "documentInitializer"))
+                .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(jsonPath("$.content[0].id").value(documentsConsolidated.get(0).getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.content[1].id").value(documentsConsolidated.get(1).getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(status().isOk());
+
+        assertThat(documentMetadataRepository.count()).isEqualTo(2);
+        assertThat(documentConsolidatedRepository.count()).isEqualTo(2);
+    }
+
+    @Test
+    @WithMockUser
+    @Transactional
+    public void testGetDocumentsPaginationForNonExistingPage() throws Exception {
+        saveSingleConsolidated();
+
+        mvc.perform(get("/api/document/")
+                .accept(MediaType.APPLICATION_JSON)
+                .param("page", "10"))
+                .andExpect(jsonPath("$.content.size()").value(0))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    @Transactional
+    public void testGetDocumentsSortingByNonExistentField() throws Exception {
+        mvc.perform(get("/api/document/")
+                .accept(MediaType.APPLICATION_JSON)
+                .param("sort", "nonExistentField"))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    @WithMockUser
+    @Transactional
+    public void testGetDocumentsPaginationAndSorting() throws Exception {
+        List<DocumentConsolidated> documentsConsolidated = new ArrayList<>();
+
+        for(int i = 0; i < 10; i++) {
+            documentsConsolidated.add(saveSingleConsolidated());
+        }
+
+        documentsConsolidated.sort(Comparator.comparing(d -> d.getDocumentMetadata().getDocumentInitializer()));
+
+        mvc.perform(get("/api/document/")
+                .accept(MediaType.APPLICATION_JSON)
+                .param("sort", "documentInitializer")
+                .param("page", "2")
+                .param("size", "3"))
+                .andExpect(jsonPath("$.content.size()").value(3))
+                .andExpect(jsonPath("$.content[0].id").value(documentsConsolidated.get(6).getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.content[1].id").value(documentsConsolidated.get(7).getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.content[2].id").value(documentsConsolidated.get(8).getDocumentMetadata().getId().toString()))
+                .andExpect(jsonPath("$.totalPages").value(4))
+                .andExpect(jsonPath("$.totalElements").value(10))
+                .andExpect(status().isOk());
     }
 
     @Test
