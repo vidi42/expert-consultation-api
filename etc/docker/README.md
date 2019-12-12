@@ -5,13 +5,13 @@
   * with [pip](https://packaging.python.org/tutorials/installing-packages/): `pip install docker-compose`
 # Docker-compose scenarios
 
-* create and run the docker image for the server (copies the local version):
-``` shell
-docker-compose -f etc/docker/docker-compose-dev.yml up
-```
 * create and run docker images for all server dependencies (mysql, mailhog):
 ``` shell
 docker-compose -f etc/docker/docker-compose.yml up
+```
+* create and run the docker image for the server (copies the local version):
+``` shell
+docker-compose -f etc/docker/docker-compose-dev.yml up
 ```
 * create and run docker images for the server (clones the latest version) and all its dependencies:
 ``` shell
