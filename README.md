@@ -16,6 +16,8 @@ A big problem is also the legislative hat and the fact that when feedback is nee
 
 The tool also contributes to the transparency of the consultation process, which will now be open to everyone, where everyone can see the comments of others and the end product.
 
+To find out more about this project, [check it out on Civic Labs](https://civiclabs.ro/ro/solutions/expert-consultation), the Code for Romanian research and prototyping program.
+
 [Contributing](#contributing) | [Built with](#built-with) | [Repos and projects](#repos-and-projects) | [Deployment](#deployment) | [Feedback](#feedback) | [License](#license) | [About Code4Ro](#about-code4ro)
 
 ## Contributing
