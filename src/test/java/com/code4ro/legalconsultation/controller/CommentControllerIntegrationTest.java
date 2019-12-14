@@ -152,7 +152,7 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
     public void reject() throws Exception{
         final DocumentNode node = documentNodeFactory.save();
         final CommentDto commentDto = commentService.create(node.getId(), commentFactory.create());
-        mvc.perform(put(endpoint("/api/documentnodes/", node.getId(), "/comments/", commentDto.getId()), "/approve/")
+        mvc.perform(put(endpoint("/api/documentnodes/", node.getId(), "/comments/", commentDto.getId()), "/reject/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(commentDto))
                 .accept(MediaType.APPLICATION_JSON))
