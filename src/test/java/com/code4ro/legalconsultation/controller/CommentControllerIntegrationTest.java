@@ -20,6 +20,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.code4ro.legalconsultation.model.persistence.CommentStatus.APPROVED;
+import static com.code4ro.legalconsultation.model.persistence.CommentStatus.REJECTED;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -137,12 +139,10 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
     @Transactional
     public void approve() throws Exception{
         final DocumentNode node = documentNodeFactory.save();
-        final CommentDto commentDto = commentService.create(node.getId(), commentFactory.create());
-        mvc.perform(put(endpoint("/api/documentnodes/", node.getId(), "/comments/", commentDto.getId()), "/approve")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(commentDto))
+        CommentDto commentDto = commentService.create(node.getId(), commentFactory.create());
+        mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments/", commentDto.getId(), "/approve"))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value("APPROVED"))
+                .andExpect(jsonPath("$.status").value(APPROVED.toString()))
                 .andExpect(status().isOk());
     }
 
@@ -151,12 +151,10 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
     @Transactional
     public void reject() throws Exception{
         final DocumentNode node = documentNodeFactory.save();
-        final CommentDto commentDto = commentService.create(node.getId(), commentFactory.create());
-        mvc.perform(put(endpoint("/api/documentnodes/", node.getId(), "/comments/", commentDto.getId()), "/reject")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(commentDto))
+        CommentDto commentDto = commentService.create(node.getId(), commentFactory.create());
+        mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments/", commentDto.getId(), "/reject"))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.status").value("REJECTED"))
+                .andExpect(jsonPath("$.status").value(REJECTED.toString()))
                 .andExpect(status().isOk());
     }
 }

@@ -49,12 +49,12 @@ public class CommentController {
         return ResponseEntity.ok(commentService.findAll(nodeId, pageable));
     }
 
-    @GetMapping("/{id}/approve")
+    @GetMapping("/{commentId}/approve")
     public ResponseEntity<CommentDto> approve(@PathVariable UUID commentId){
         return ResponseEntity.ok(commentService.setStatus(commentId, APPROVED));
     }
 
-    @GetMapping("/{id}/reject")
+    @GetMapping("/{commentId}/reject")
     public ResponseEntity<CommentDto> reject(@PathVariable UUID commentId){
         return ResponseEntity.ok(commentService.setStatus(commentId, REJECTED));
     }
