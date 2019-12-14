@@ -23,6 +23,7 @@ import javax.persistence.EntityNotFoundException;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -95,8 +96,8 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public CommentDto setStatus(UUID commentId, CommentStatus status) {
-        final Comment comment = commentRepository.getOne(commentId);
-        if (comment == null) throw new EntityNotFoundException();
+        final Comment comment = commentRepository.findById(commentId).orElseThrow(EntityNotFoundException::new);
+        if (comment.getStatus() != null) throw new RuntimeException("The comment status is already set!");
         comment.setStatus(status);
         commentRepository.save(comment);
         return mapperService.map(comment, CommentDto.class);

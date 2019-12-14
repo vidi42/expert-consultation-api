@@ -3,11 +3,9 @@ package com.code4ro.legalconsultation.service;
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.config.security.CurrentUserService;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
-import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
-import com.code4ro.legalconsultation.model.persistence.Comment;
-import com.code4ro.legalconsultation.model.persistence.DocumentNode;
-import com.code4ro.legalconsultation.model.persistence.UserRole;
+import com.code4ro.legalconsultation.model.persistence.*;
 import com.code4ro.legalconsultation.repository.CommentRepository;
+import com.code4ro.legalconsultation.service.api.CommentService;
 import com.code4ro.legalconsultation.service.api.DocumentNodeService;
 import com.code4ro.legalconsultation.service.api.MapperService;
 import com.code4ro.legalconsultation.service.impl.CommentServiceImpl;
@@ -24,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Pageable;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,6 +33,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class CommentServiceTest {
 
+    public static final CommentStatus NEW_STATUS = CommentStatus.APPROVED;
     @Mock
     private CommentRepository commentRepository;
     @Mock
@@ -129,5 +129,34 @@ public class CommentServiceTest {
         commentService.findAll(nodeId, pageable);
 
         verify(commentRepository).findByDocumentNodeId(nodeId, pageable);
+    }
+
+    @Test
+    public  void updateCommentStatus(){
+        final UUID id = UUID.randomUUID();
+        final Comment comment = new Comment();
+        comment.setStatus(null);
+        when(commentRepository.findById(id)).thenReturn(Optional.of(comment));
+        commentService.setStatus(id, NEW_STATUS);
+        verify(commentRepository).save(commentArgumentCaptor.capture());
+        assertThat(commentArgumentCaptor.getValue().getStatus()).isEqualTo(NEW_STATUS);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public  void failUpdateCommentStatus(){
+        final UUID id = UUID.randomUUID();
+        final Comment comment = new Comment();
+        comment.setStatus(CommentStatus.REJECTED);
+        when(commentRepository.findById(id)).thenReturn(Optional.of(comment));
+        commentService.setStatus(id, NEW_STATUS);
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public  void attemptToUpdateNonExistingComment(){
+        final UUID id = UUID.randomUUID();
+        final Comment comment = new Comment();
+        comment.setStatus(CommentStatus.REJECTED);
+        when(commentRepository.findById(id)).thenReturn(Optional.empty());
+        commentService.setStatus(id, NEW_STATUS);
     }
 }

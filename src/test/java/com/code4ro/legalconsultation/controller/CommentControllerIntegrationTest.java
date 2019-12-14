@@ -5,6 +5,7 @@ import com.code4ro.legalconsultation.config.security.CurrentUserService;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
+import com.code4ro.legalconsultation.model.persistence.CommentStatus;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.repository.CommentRepository;
 import com.code4ro.legalconsultation.service.api.CommentService;
@@ -128,6 +129,34 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
         mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments?page=1"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.content.size()").value(1))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    @Transactional
+    public void approve() throws Exception{
+        final DocumentNode node = documentNodeFactory.save();
+        final CommentDto commentDto = commentService.create(node.getId(), commentFactory.create());
+        mvc.perform(put(endpoint("/api/documentnodes/", node.getId(), "/comments/", commentDto.getId()), "/approve/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(commentDto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value("APPROVED"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    @Transactional
+    public void reject() throws Exception{
+        final DocumentNode node = documentNodeFactory.save();
+        final CommentDto commentDto = commentService.create(node.getId(), commentFactory.create());
+        mvc.perform(put(endpoint("/api/documentnodes/", node.getId(), "/comments/", commentDto.getId()), "/approve/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(commentDto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value("REJECTED"))
                 .andExpect(status().isOk());
     }
 }
