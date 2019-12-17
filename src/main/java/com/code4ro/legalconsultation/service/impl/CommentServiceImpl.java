@@ -3,6 +3,7 @@ package com.code4ro.legalconsultation.service.impl;
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.config.security.CurrentUserService;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
+import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -61,6 +63,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = mapperService.map(commentDto, Comment.class);
         comment.setDocumentNode(node);
         comment.setOwner(currentUser);
+        comment.setLastEditDateTime(new Date());
         comment = commentRepository.save(comment);
 
         return mapperService.map(comment, CommentDto.class);
@@ -77,9 +80,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CommentDto> findAll(final UUID documentNodeId, final Pageable pageable) {
+    public Page<CommentIdentificationDto> findAll(final UUID documentNodeId, final Pageable pageable) {
         final Page<Comment> userPage = commentRepository.findByDocumentNodeId(documentNodeId, pageable);
-        return mapperService.mapPage(userPage, CommentDto.class);
+        return mapperService.mapPage(userPage, CommentIdentificationDto.class);
     }
 
     @Transactional(readOnly = true)

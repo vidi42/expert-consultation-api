@@ -1,6 +1,7 @@
 package com.code4ro.legalconsultation.controller;
 
 import com.code4ro.legalconsultation.model.dto.CommentDto;
+import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
 import com.code4ro.legalconsultation.service.api.CommentService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,14 +21,15 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<CommentDto> create(@PathVariable final UUID nodeId,
-                                             @RequestBody final CommentDto commentDto){
+                                             @RequestBody final CommentDto commentDto) {
         return ResponseEntity.ok(commentService.create(nodeId, commentDto));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CommentDto> update(@PathVariable final UUID nodeId,
                                              @PathVariable final UUID id,
-                                             @RequestBody final CommentDto commentDto){
+                                             @RequestBody final CommentDto commentDto) {
+
         return ResponseEntity.ok(commentService.update(nodeId, id, commentDto));
     }
 
@@ -39,8 +41,8 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CommentDto>> findAll(@PathVariable UUID nodeId,
-                                                    final Pageable pageable) {
+    public ResponseEntity<Page<CommentIdentificationDto>> findAll(@PathVariable UUID nodeId,
+                                                                  final Pageable pageable) {
         return ResponseEntity.ok(commentService.findAll(nodeId, pageable));
     }
 }

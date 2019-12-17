@@ -1,7 +1,10 @@
 package com.code4ro.legalconsultation.controller;
 
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
+import com.code4ro.legalconsultation.config.security.CurrentUserService;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
+import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
+import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.repository.CommentRepository;
 import com.code4ro.legalconsultation.service.api.CommentService;
@@ -13,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -31,6 +37,8 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
     private CommentFactory commentFactory;
     @Autowired
     private DocumentNodeFactory documentNodeFactory;
+    @Autowired
+    private CurrentUserService currentUserService;
 
     @Before
     public void before() {
@@ -48,7 +56,6 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
                 .content(objectMapper.writeValueAsString(commentDto))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.text").value(commentDto.getText()))
-                .andExpect(jsonPath("$.id").isNotEmpty())
                 .andExpect(status().isOk());
 
         assertThat(commentRepository.count()).isEqualTo(1);
@@ -59,18 +66,26 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
     @Transactional
     public void update() throws Exception {
         final DocumentNode node = documentNodeFactory.save();
-        final CommentDto commentDto = commentService.create(node.getId(), commentFactory.create());
+        final CommentDto commentDto = commentFactory.create();
+        final ApplicationUser currentUser = currentUserService.getCurrentUser();
+
+        Comment comment = commentFactory.createEntity();
+        comment.setDocumentNode(node);
+        comment.setOwner(currentUser);
+        comment.setLastEditDateTime(new Date());
+        comment = commentRepository.save(comment);
+
         final String newText = "new text";
         commentDto.setText(newText);
 
-        mvc.perform(put(endpoint("/api/documentnodes/", node.getId(), "/comments/", commentDto.getId()))
+       mvc.perform(put(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(commentDto))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.text").value(newText))
                 .andExpect(status().isOk());
 
-        assertThat(commentRepository.getOne(commentDto.getId()).getText()).isEqualTo(newText);
+        assertThat(commentRepository.getOne(comment.getId()).getText()).isEqualTo(newText);
     }
 
     @Test
@@ -78,9 +93,16 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
     @Transactional
     public void deleteComment() throws Exception {
         final DocumentNode node = documentNodeFactory.save();
-        final CommentDto commentDto = commentService.create(node.getId(), commentFactory.create());
+        final CommentDto commentDto = commentFactory.create();
+        final ApplicationUser currentUser = currentUserService.getCurrentUser();
 
-        mvc.perform(delete(endpoint("/api/documentnodes/", node.getId(), "/comments/", commentDto.getId()))
+        Comment comment = commentFactory.createEntity();
+        comment.setDocumentNode(node);
+        comment.setOwner(currentUser);
+        comment.setLastEditDateTime(new Date());
+        comment = commentRepository.save(comment);
+
+        mvc.perform(delete(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(commentDto))
                 .accept(MediaType.APPLICATION_JSON))

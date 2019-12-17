@@ -19,8 +19,6 @@ public final class CommentFactory {
 
     public CommentDto create() {
         final CommentDto commentDto = RandomObjectFiller.createAndFill(CommentDto.class);
-        commentDto.setId(null);
-        commentDto.setLastEditDateTime(new Date());
         return commentDto;
     }
 
