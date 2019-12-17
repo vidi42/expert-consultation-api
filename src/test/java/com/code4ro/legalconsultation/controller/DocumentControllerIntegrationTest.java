@@ -88,66 +88,79 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         assertDocumentNodeContent(expectedDocument, document);
 
         final DocumentNode expectedChapter1 = documentNodeFactory.createChapter("I", "Chapter title on multiple lines  ", null);
+        expectedChapter1.setParent(document);
         final DocumentNode chapter1 = document.getChildren().get(0);
         assertThat(chapter1.getChildren()).hasSize(2);
         assertDocumentNodeContent(expectedChapter1, chapter1);
 
         final DocumentNode expectedChapter2 = documentNodeFactory.createChapter("II", "Chapter title on single line", null);
+        expectedChapter2.setParent(document);
         final DocumentNode chapter2 = document.getChildren().get(1);
         assertThat(chapter1.getChildren()).hasSize(2);
         assertDocumentNodeContent(expectedChapter2, chapter2);
 
         final DocumentNode expectedArticle4 = documentNodeFactory.createArticle("4", null, "Article without children");
+        expectedArticle4.setParent(chapter2);
         final DocumentNode article4 = chapter2.getChildren().get(0);
         assertThat(article4.getChildren()).isEmpty();
         assertDocumentNodeContent(expectedArticle4, article4);
 
         final DocumentNode expectedSection1 = documentNodeFactory.createSection("1", "Section with title", null);
+        expectedSection1.setParent(chapter1);
         final DocumentNode section1 = chapter1.getChildren().get(0);
         assertThat(section1.getChildren()).hasSize(2);
         assertDocumentNodeContent(expectedSection1, section1);
 
         final DocumentNode expectedSection2 = documentNodeFactory.createSection("2", null, null);
+        expectedSection2.setParent(chapter1);
         final DocumentNode section2 = chapter1.getChildren().get(1);
         assertThat(section1.getChildren()).hasSize(2);
         assertDocumentNodeContent(expectedSection2, section2);
 
         final DocumentNode expectedArticle1 = documentNodeFactory.createArticle("1", null, null);
+        expectedArticle1.setParent(section1);
         final DocumentNode article1 = section1.getChildren().get(0);
         assertThat(article1.getChildren()).hasSize(1);
         assertDocumentNodeContent(expectedArticle1, article1);
 
         final DocumentNode expectedArticle2 = documentNodeFactory.createArticle("2", "Article with title on one line", null);
+        expectedArticle2.setParent(section1);
         final DocumentNode article2 = section1.getChildren().get(1);
         assertThat(article2.getChildren()).hasSize(1);
         assertDocumentNodeContent(expectedArticle2, article2);
 
         final DocumentNode expectedArticle3 = documentNodeFactory.createArticle("3", "Article with title on multiple lines", null);
+        expectedArticle3.setParent(section2);
         final DocumentNode article3 = section2.getChildren().get(0);
         assertThat(article2.getChildren()).hasSize(1);
         assertDocumentNodeContent(expectedArticle3, article3);
 
         final DocumentNode expectedParagraph11 = documentNodeFactory.createParagraph("1", null, "Paragraph content on a single line");
+        expectedParagraph11.setParent(article1);
         final DocumentNode paragraph11 = article1.getChildren().get(0);
         assertThat(paragraph11.getChildren()).isEmpty();
         assertDocumentNodeContent(expectedParagraph11, paragraph11);
 
         final DocumentNode expectedParagraph21 = documentNodeFactory.createParagraph("1", null, "Paragraph content on multiple lines");
+        expectedParagraph21.setParent(article2);
         final DocumentNode paragraph21 = article2.getChildren().get(0);
         assertThat(paragraph21.getChildren()).isEmpty();
         assertDocumentNodeContent(expectedParagraph21, paragraph21);
 
         final DocumentNode expectedParagraph35 = documentNodeFactory.createParagraph("5", null, "Paragraph with multiple letters");
+        expectedParagraph35.setParent(article3);
         final DocumentNode paragraph35 = article3.getChildren().get(0);
         assertThat(paragraph35.getChildren()).hasSize(2);
         assertDocumentNodeContent(expectedParagraph35, paragraph35);
 
         final DocumentNode expectedAlignmentA = documentNodeFactory.createAlignment("a", null, "Sample letter content 1");
+        expectedAlignmentA.setParent(paragraph35);
         final DocumentNode alignmentA = paragraph35.getChildren().get(0);
         assertThat(alignmentA.getChildren()).isEmpty();
         assertDocumentNodeContent(expectedAlignmentA, alignmentA);
 
         final DocumentNode expectedAlignmentB = documentNodeFactory.createAlignment("b", null, "Sample letter content 2");
+        expectedAlignmentB.setParent(paragraph35);
         final DocumentNode alignmentB = paragraph35.getChildren().get(1);
         assertThat(alignmentA.getChildren()).isEmpty();
         assertDocumentNodeContent(expectedAlignmentB, alignmentB);
@@ -158,6 +171,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         assertThat(expected.getTitle()).isEqualToIgnoringWhitespace(actual.getTitle());
         assertThat(expected.getContent()).isEqualToIgnoringWhitespace(actual.getContent());
         assertThat(expected.getDocumentNodeType()).isEqualByComparingTo(actual.getDocumentNodeType());
+        assertThat(expected.getParent()).isEqualTo(actual.getParent());
     }
 
     private void assertThatDocumentIsStored(String soredFilePath) {

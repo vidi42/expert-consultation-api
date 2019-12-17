@@ -45,7 +45,7 @@ public abstract class DocumentNodeParser {
         }
 
         documentNode.setContent(getNodeContent(contentBuilder));
-        documentNode.setChildren(getChildrenNodes());
+        documentNode.setChildren(getChildrenNodes(documentNode));
 
         return documentNode;
     }
@@ -132,12 +132,13 @@ public abstract class DocumentNodeParser {
         return content.isEmpty() ? null : content;
     }
 
-    private List<DocumentNode> getChildrenNodes() {
+    private List<DocumentNode> getChildrenNodes(DocumentNode documentNode) {
         final List<DocumentNode> children = new ArrayList<>();
         String currentLine = lines[metadata.getCurrentLineIndex()];
         while (!isSameNodeType(currentLine) && isChildType(currentLine)) {
             final DocumentNodeParser parser = documentNodeParserFactory.getParser(currentLine);
             final DocumentNode child = parser.parse(lines, metadata);
+            child.setParent(documentNode);
             children.add(child);
             currentLine = lines[metadata.getCurrentLineIndex()];
         }
