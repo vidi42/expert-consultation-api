@@ -160,7 +160,7 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
     @WithMockUser
     public void extractUsers() throws Exception {
         final String csvContent = "john,doe,john@email.com,42345,district,org";
-        final MockMultipartFile firstFile = new MockMultipartFile("csvFile", "users.csv",
+        final MockMultipartFile firstFile = new MockMultipartFile("file", "users.csv",
                 "text/plain", csvContent.getBytes());
 
         mvc.perform(MockMvcRequestBuilders.multipart("/api/users/extract")

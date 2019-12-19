@@ -1,5 +1,6 @@
 package com.code4ro.legalconsultation.controller;
 
+import com.amazonaws.util.json.Jackson;
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
 import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
@@ -17,7 +18,6 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
@@ -31,9 +31,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class DocumentControllerIntegrationTest extends AbstractControllerIntegrationTest {
 
@@ -49,27 +50,21 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     @Autowired
     private DocumentNodeFactory documentNodeFactory;
     @Autowired
-    private CommentService commentService;
-    @Autowired
     private CommentFactory commentFactory;
 
     @Test
     @WithMockUser
     @Transactional
     public void saveDocument() throws Exception {
+        final File file = PdfFileFactory.getAsFiles(getClass().getClassLoader()).get(0);
         final DocumentViewDto randomView = RandomObjectFiller.createAndFill(DocumentViewDto.class);
+        randomView.setFilePath(file.getPath());
 
-        final MockMultipartFile randomFile = PdfFileFactory.getAsMultipart(getClass().getClassLoader());
-        mvc.perform(multipart("/api/document/")
-                .file(randomFile)
-                .param("title", randomView.getTitle())
-                .param("number", randomView.getDocumentNumber().toString())
-                .param("documentInitializer", randomView.getDocumentInitializer())
-                .param("type", randomView.getDocumentType().toString())
-                .param("creationDate", "09/09/2018")
-                .param("receiveDate", "10/09/2018"))
+        mvc.perform(post("/api/document")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(Jackson.toJsonString(randomView))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
-
         assertThat(documentMetadataRepository.count()).isEqualTo(1);
         assertThat(documentConsolidatedRepository.count()).isEqualTo(1);
         assertThat(documentNodeRepository.count()).isEqualTo(14);
@@ -80,6 +75,56 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         final List<DocumentConsolidated> documents = documentConsolidatedRepository.findAll();
         final DocumentConsolidated document = documents.iterator().next();
         assertThatDocumentNodeTreeIsGeneratedCorrectly(document.getDocumentNode());
+    }
+
+    @Test
+    @WithMockUser
+    @Transactional
+    public void saveDocumentDuplicatedNumber() throws Exception {
+        final File file = PdfFileFactory.getAsFiles(getClass().getClassLoader()).get(0);
+        final DocumentViewDto firstDocument = RandomObjectFiller.createAndFill(DocumentViewDto.class);
+        firstDocument.setFilePath(file.getPath());
+
+        mvc.perform(post("/api/document")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(Jackson.toJsonString(firstDocument))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        final DocumentViewDto secondDocument = RandomObjectFiller.createAndFill(DocumentViewDto.class);
+        secondDocument.setDocumentNumber(firstDocument.getDocumentNumber());
+
+        mvc.perform(post("/api/document")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(Jackson.toJsonString(secondDocument))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    @WithMockUser
+    @Transactional
+    public void saveDocumentDuplicatedFilePath() throws Exception {
+        final File file = PdfFileFactory.getAsFiles(getClass().getClassLoader()).get(0);
+        final DocumentViewDto firstDocument = RandomObjectFiller.createAndFill(DocumentViewDto.class);
+        firstDocument.setFilePath(file.getPath());
+
+        mvc.perform(post("/api/document")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(Jackson.toJsonString(firstDocument))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        final DocumentViewDto secondDocument = RandomObjectFiller.createAndFill(DocumentViewDto.class);
+        secondDocument.setFilePath(file.getPath());
+
+        mvc.perform(post("/api/document")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(Jackson.toJsonString(secondDocument))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
     }
 
     private void assertThatDocumentNodeTreeIsGeneratedCorrectly(final DocumentNode document) {
@@ -175,7 +220,6 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     }
 
     private void assertThatDocumentIsStored(String soredFilePath) {
-        assertThat(soredFilePath).contains(customStoreDirPath);
         assertThat(Files.exists(Paths.get(soredFilePath))).isTrue();
         // remove the store directory
         final File storeDir = new File(customStoreDirPath);
@@ -345,7 +389,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     public void testGetDocumentsPaginationAndSorting() throws Exception {
         List<DocumentConsolidated> documentsConsolidated = new ArrayList<>();
 
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             documentsConsolidated.add(saveSingleConsolidated());
         }
 

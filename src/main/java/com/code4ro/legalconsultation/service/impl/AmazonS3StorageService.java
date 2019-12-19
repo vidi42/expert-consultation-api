@@ -66,14 +66,18 @@ public class AmazonS3StorageService implements StorageApi {
     }
 
     @Override
-    public byte[] loadFile(String documentURI) throws IOException {
-        return amazonS3.getObject(documentBucket, documentURI)
-                .getObjectContent()
-                .readAllBytes();
+    public byte[] loadFile(String documentURI)  {
+        try {
+            return amazonS3.getObject(documentBucket, documentURI)
+                    .getObjectContent()
+                    .readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Load File fail");
+        }
     }
 
     @Override
-    public void deleteFile(String documentURI) throws IOException {
+    public void deleteFile(String documentURI) {
         amazonS3.deleteObject(documentBucket, documentURI);
     }
 }

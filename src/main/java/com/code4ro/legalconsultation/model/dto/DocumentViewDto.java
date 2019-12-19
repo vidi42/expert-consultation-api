@@ -1,52 +1,41 @@
 package com.code4ro.legalconsultation.model.dto;
 
-import com.code4ro.legalconsultation.common.exceptions.InvalidDocumentException;
+import com.code4ro.legalconsultation.model.dto.dtoValidators.UniqueDocumentFilePath;
+import com.code4ro.legalconsultation.model.dto.dtoValidators.UniqueDocumentNumberConstraint;
 import com.code4ro.legalconsultation.model.persistence.DocumentType;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Date;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class DocumentViewDto {
-    private String title;
+    @NotNull(message = "document.save.number.null")
+    @UniqueDocumentNumberConstraint
     private BigInteger documentNumber;
+
+    @NotNull(message = "document.save.title.null")
+    private String documentTitle;
+
+    @NotNull(message = "document.save.initializer.null")
     private String documentInitializer;
+
+    @NotNull(message = "document.save.type.null")
     private DocumentType documentType;
+
+    @NotNull(message = "document.save.develop.null")
     private Date dateOfDevelopment;
+
+    @NotNull(message = "document.save.receiving.null")
     private Date dateOfReceipt;
-    private String documentURI;
-    private String documentUploadPath;
-    private final String[] extensions = {"xls", "xlsx", "doc", "docx"};
 
+    @NotNull(message = "document.save.filePath.null")
+    @UniqueDocumentFilePath
+    private String filePath;
 
-    public DocumentViewDto(String title, BigInteger documentNumber, String documentInitializer, DocumentType documentType, Date dateOfDevelopment, Date dateOfReceipt) {
-        this.title = title;
-        this.documentNumber = documentNumber;
-        this.documentInitializer = documentInitializer;
-        this.documentType = documentType;
-        this.dateOfDevelopment = dateOfDevelopment;
-        this.dateOfReceipt = dateOfReceipt;
-    }
-
-    public DocumentViewDto() {
-    }
-
-    public void setDocumentUploadPath(String documentUploadPath) {
-        if (isValidUploadPath(documentUploadPath))
-            this.documentUploadPath = documentUploadPath;
-        else throw new InvalidDocumentException();
-    }
-
-    private boolean isValidUploadPath(String path) {
-        String extension = computeExtension(path);
-        return Arrays.asList(extensions).contains(extension);
-    }
-
-    private String computeExtension(String path) {
-        return path.substring(path.lastIndexOf('.') + 1).toLowerCase();
-    }
 }

@@ -46,12 +46,20 @@ public class FilesystemStorageService implements StorageApi {
     }
 
     @Override
-    public byte[] loadFile(final String documentURI) throws IOException {
-        return Files.readAllBytes(Paths.get(documentURI));
+    public byte[] loadFile(final String documentURI)  {
+        try {
+            return Files.readAllBytes(Paths.get(documentURI));
+        } catch (IOException e) {
+            throw new RuntimeException("Load File fail");
+        }
     }
 
     @Override
-    public void deleteFile(String documentURI) throws IOException {
-        Files.delete(Paths.get(documentURI));
+    public void deleteFile(String documentURI)  {
+        try {
+            Files.delete(Paths.get(documentURI));
+        } catch (IOException e) {
+            throw  new RuntimeException();
+        }
     }
 }

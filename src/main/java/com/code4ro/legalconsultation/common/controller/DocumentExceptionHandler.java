@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class DocumentExceptionHandler extends GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidDocumentException.class)
-    public ResponseEntity<String> handleInvalidDocumentExcepion(InvalidDocumentException e){
+    public ResponseEntity<String> handleInvalidDocumentException(InvalidDocumentException e){
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

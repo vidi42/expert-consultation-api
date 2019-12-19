@@ -7,9 +7,7 @@ import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.UUID;
 
 @Service
@@ -25,14 +23,12 @@ public interface DocumentService {
     DocumentConsolidatedDto fetchOneConsolidated(final UUID id);
 
     //create a single document, including metadata and breakdown
-    DocumentConsolidated create(final DocumentViewDto document,
-                                final MultipartFile file);
+    DocumentConsolidated create(final DocumentViewDto document);
 
     //update a single document
     DocumentConsolidated update(final UUID id,
-                                final DocumentViewDto document,
-                                final MultipartFile multipartFile);
+                                final DocumentViewDto document);
 
     //delete a document based on id
-    void deleteById(final UUID id) throws EntityNotFoundException;
+    void deleteById(final UUID id);
 }

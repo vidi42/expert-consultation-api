@@ -1,5 +1,6 @@
 package com.code4ro.legalconsultation.model.dto;
 
+import com.code4ro.legalconsultation.model.dto.dtoValidators.UniqueUserEmailConstraint;
 import com.code4ro.legalconsultation.model.persistence.UserRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,12 +24,12 @@ public class UserDto extends BaseEntityDto {
     @NotBlank
     @Size(max = 40)
     @Email
-    @UniqueEmailConstraint
+    @UniqueUserEmailConstraint
     private String email;
     @Size(max = 40, message = "user.save.district.tooLong")
     private String district;
     @Size(max = 100, message = "user.save.organisation.tooLong")
     private String organisation;
-    @NotNull
+    @NotNull(message = "user.save.role.null")
     private UserRole role;
 }

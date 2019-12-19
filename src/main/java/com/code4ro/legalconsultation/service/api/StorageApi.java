@@ -5,20 +5,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 @Service
 public interface StorageApi {
 
-    static String resolveUniqueName(final MultipartFile document){
+    static String resolveUniqueName(final MultipartFile document) {
         return RandomStringUtils.randomAlphabetic(10) +
                 StringUtils.cleanPath(document.getOriginalFilename());
     }
 
-    String storeFile(final MultipartFile document) throws IOException, URISyntaxException, Exception;
+    String storeFile(final MultipartFile document) throws Exception;
 
-    byte[] loadFile(String documentURI) throws IOException;
+    byte[] loadFile(String documentURI);
 
-    void deleteFile(String documentURI) throws IOException;
+    void deleteFile(String documentURI);
 }

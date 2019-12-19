@@ -64,13 +64,11 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Transactional
     @Override
-    public DocumentConsolidated create(final DocumentViewDto document, final MultipartFile file) {
+    public DocumentConsolidated create(final DocumentViewDto document) {
 
         DocumentMetadata metadata = documentMetadataService.build(document);
-        final String filePath = storeFile(file);
-        metadata.setFilePath(filePath);
-
-        final String pdfContent = pdfService.readAsString(file);
+        metadata.setFilePath(document.getFilePath());
+        final String pdfContent = pdfService.readAsString(storageApi.loadFile(document.getFilePath()));
         final DocumentNode documentNode = documentNodeService.parse(pdfContent);
 
         return documentConsolidatedService.saveOne(new DocumentConsolidated(metadata, documentNode));
@@ -79,19 +77,17 @@ public class DocumentServiceImpl implements DocumentService {
     @Transactional
     @Override
     public DocumentConsolidated update(final UUID id,
-                                       final DocumentViewDto document,
-                                       final MultipartFile file) {
+                                       final DocumentViewDto document) {
         final DocumentConsolidated consolidated = documentConsolidatedService.getEntity(id);
 
         // TODO delete current file from storage and the document node
 
         //update the metadata
         DocumentMetadata metadata = documentMetadataService.build(document);
-        final String filePath = storeFile(file);
-        metadata.setFilePath(filePath);
+        metadata.setFilePath(document.getFilePath());
         metadata.setId(consolidated.getDocumentMetadata().getId());
 
-        final String pdfContent = pdfService.readAsString(file);
+        final String pdfContent = pdfService.readAsString(storageApi.loadFile(document.getFilePath()));
         final DocumentNode documentNode = documentNodeService.parse(pdfContent);
 
         consolidated.setDocumentMetadata(metadata);
@@ -101,17 +97,8 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Transactional
     @Override
-    public void deleteById(final UUID id) throws EntityNotFoundException {
+    public void deleteById(final UUID id) {
         documentConsolidatedService.getEntity(id);
         documentConsolidatedService.deleteById(id);
-    }
-
-    private String storeFile(MultipartFile file) {
-        try {
-            return storageApi.storeFile(file);
-        } catch (Exception e) {
-            LOG.error("Could not store document.", e);
-            return null;
-        }
     }
 }

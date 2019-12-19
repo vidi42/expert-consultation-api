@@ -3,37 +3,27 @@ package com.code4ro.legalconsultation.controller;
 import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
-import com.code4ro.legalconsultation.model.persistence.DocumentType;
 import com.code4ro.legalconsultation.service.api.DocumentService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigInteger;
-import java.util.Date;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/document")
+@RequiredArgsConstructor
 public class DocumentController {
 
     private final DocumentService documentService;
-
-    @Autowired
-    public DocumentController(DocumentService documentService) {
-        this.documentService = documentService;
-    }
 
     @ApiOperation(value = "Return document metadata for all documents in the platform",
             response = List.class,
@@ -73,16 +63,8 @@ public class DocumentController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping("")
     public ResponseEntity<UUID> createDocument(
-            @ApiParam(value = "Title of the created document") @RequestParam("title") String documentTitle,
-            @ApiParam(value = "The document number of the created document") @RequestParam("number") BigInteger documentNumber,
-            @ApiParam(value = "The organization that initiated the document") @RequestParam("documentInitializer") String initiator,
-            @ApiParam(value = "Type of the document") @RequestParam("type") DocumentType type,
-            @ApiParam(value = "Date when the document was created") @DateTimeFormat(pattern = "dd/MM/yyyy") Date creationDate,
-            @ApiParam(value = "Date when the document was received") @DateTimeFormat(pattern = "dd/MM/yyyy") Date receiveDate,
-            @ApiParam(value = "The file containing the document content") @RequestParam("file") MultipartFile documentFile) {
-
-        DocumentViewDto documentViewDto = new DocumentViewDto(documentTitle, documentNumber, initiator, type, creationDate, receiveDate);
-        DocumentConsolidated consolidated = documentService.create(documentViewDto, documentFile);
+            @Valid @RequestBody DocumentViewDto documentViewDto) {
+        DocumentConsolidated consolidated = documentService.create(documentViewDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(consolidated.getId());
@@ -92,18 +74,9 @@ public class DocumentController {
             response = UUID.class,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @PutMapping("/{id}")
-    public ResponseEntity<UUID> modifyDocument(@ApiParam(value = "Id of the document being modified") @RequestParam UUID id,
-                                               @ApiParam(value = "Title of the modified document") @RequestParam("title") String documentTitle,
-                                               @ApiParam(value = "The document number of the modified document") @RequestParam("number") BigInteger documentNumber,
-                                               @ApiParam(value = "The organization that initiated the document") @RequestParam("documentInitializer") String initiator,
-                                               @ApiParam(value = "Type of the document") @RequestParam("type") DocumentType type,
-                                               @ApiParam(value = "Date when the document was created") @DateTimeFormat(pattern = "dd/MM/yyyy") Date creationDate,
-                                               @ApiParam(value = "Date when the document was received") @DateTimeFormat(pattern = "dd/MM/yyyy") Date receiveDate,
-                                               @ApiParam(value = "The file containing the modified document content") @RequestParam("file") MultipartFile documentFile) {
-
-        DocumentViewDto documentViewDto = new DocumentViewDto(documentTitle, documentNumber, initiator, type, creationDate, receiveDate);
-        DocumentConsolidated consolidated = documentService.update(id, documentViewDto, documentFile);
-
+    public ResponseEntity<UUID> modifyDocument(@ApiParam(value = "Id of the document being modified") @PathVariable("id") UUID id,
+                                               @Valid @RequestBody DocumentViewDto documentViewDto) {
+        DocumentConsolidated consolidated = documentService.update(id, documentViewDto);
         return ResponseEntity.ok(consolidated.getId());
     }
 }

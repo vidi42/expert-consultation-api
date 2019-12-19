@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -26,10 +25,10 @@ public class PDFServiceImpl implements PDFService {
     }
 
     @Override
-    public String readAsString(final MultipartFile file) {
+    public String readAsString(final byte[] file) {
 
         try {
-            final PDDocument doc = PDDocument.load(file.getInputStream());
+            final PDDocument doc = PDDocument.load(file);
             // TODO: add a more general way for getting the right parser based on document template once we have more document types
             final PDFReader pdfReader = basicOARPdfReader;
             return pdfReader.getContent(doc);

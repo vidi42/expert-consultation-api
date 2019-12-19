@@ -4,7 +4,7 @@ import com.code4ro.legalconsultation.model.dto.UserDto;
 import com.code4ro.legalconsultation.service.impl.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -16,14 +16,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
-
-    @Autowired
-    public UserController(final UserService userService) {
-        this.userService = userService;
-    }
 
     @ApiOperation(value = "Save a new user in the platform",
             response = UserDto.class,
@@ -76,7 +72,7 @@ public class UserController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping(value = "/extract", consumes = "multipart/form-data")
     public List<UserDto> extractFromCsv(
-            @ApiParam("CSV file containing user information that is being uploaded") @RequestParam("csvFile") final MultipartFile file) {
+            @ApiParam("CSV file containing user information that is being uploaded") @RequestParam("file") final MultipartFile file) {
         return userService.extractFromCsv(file);
     }
 
