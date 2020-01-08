@@ -60,7 +60,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         final DocumentViewDto randomView = RandomObjectFiller.createAndFill(DocumentViewDto.class);
         randomView.setFilePath(file.getPath());
 
-        mvc.perform(post("/api/document")
+        mvc.perform(post("/api/documents")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(Jackson.toJsonString(randomView))
                 .accept(MediaType.APPLICATION_JSON))
@@ -85,7 +85,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         final DocumentViewDto firstDocument = RandomObjectFiller.createAndFill(DocumentViewDto.class);
         firstDocument.setFilePath(file.getPath());
 
-        mvc.perform(post("/api/document")
+        mvc.perform(post("/api/documents")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(Jackson.toJsonString(firstDocument))
                 .accept(MediaType.APPLICATION_JSON))
@@ -94,7 +94,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         final DocumentViewDto secondDocument = RandomObjectFiller.createAndFill(DocumentViewDto.class);
         secondDocument.setDocumentNumber(firstDocument.getDocumentNumber());
 
-        mvc.perform(post("/api/document")
+        mvc.perform(post("/api/documents")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(Jackson.toJsonString(secondDocument))
                 .accept(MediaType.APPLICATION_JSON))
@@ -110,7 +110,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         final DocumentViewDto firstDocument = RandomObjectFiller.createAndFill(DocumentViewDto.class);
         firstDocument.setFilePath(file.getPath());
 
-        mvc.perform(post("/api/document")
+        mvc.perform(post("/api/documents")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(Jackson.toJsonString(firstDocument))
                 .accept(MediaType.APPLICATION_JSON))
@@ -119,7 +119,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         final DocumentViewDto secondDocument = RandomObjectFiller.createAndFill(DocumentViewDto.class);
         secondDocument.setFilePath(file.getPath());
 
-        mvc.perform(post("/api/document")
+        mvc.perform(post("/api/documents")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(Jackson.toJsonString(secondDocument))
                 .accept(MediaType.APPLICATION_JSON))
@@ -233,12 +233,12 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     public void getDocument() throws Exception {
         DocumentConsolidated consolidated = saveSingleConsolidated();
 
-        mvc.perform(get(endpoint("/api/document/", consolidated.getId()))
+        mvc.perform(get(endpoint("/api/documents/", consolidated.getId()))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(consolidated.getDocumentMetadata().getId().toString()))
                 .andExpect(status().isOk());
 
-        mvc.perform(get(endpoint("/api/document/", consolidated.getId(), "/consolidated"))
+        mvc.perform(get(endpoint("/api/documents/", consolidated.getId(), "/consolidated"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(consolidated.getId().toString()))
                 .andExpect(status().isOk())
@@ -257,7 +257,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         commentFactory.save(consolidated.getDocumentNode().getId());
         commentFactory.save(consolidated.getDocumentNode().getId());
 
-        mvc.perform(get(endpoint("/api/document/", consolidated.getId(), "/consolidated"))
+        mvc.perform(get(endpoint("/api/documents/", consolidated.getId(), "/consolidated"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.documentNode.numberOfComments").value("2"))
                 .andExpect(status().isOk())
@@ -273,7 +273,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         documentsConsolidated.add(saveSingleConsolidated());
         documentsConsolidated.add(saveSingleConsolidated());
 
-        mvc.perform(get("/api/document/")
+        mvc.perform(get("/api/documents/")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.content.size()").value(2))
                 .andExpect(jsonPath("$.content[0].id").value(documentsConsolidated.get(0).getDocumentMetadata().getId().toString()))
@@ -296,7 +296,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         documentsConsolidated.add(saveSingleConsolidated());
         documentsConsolidated.add(saveSingleConsolidated());
 
-        mvc.perform(get("/api/document/")
+        mvc.perform(get("/api/documents/")
                 .accept(MediaType.APPLICATION_JSON)
                 .param("page", "0")
                 .param("size", "2"))
@@ -307,7 +307,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
                 .andExpect(jsonPath("$.totalElements").value(3))
                 .andExpect(status().isOk());
 
-        mvc.perform(get("/api/document/")
+        mvc.perform(get("/api/documents/")
                 .accept(MediaType.APPLICATION_JSON)
                 .param("page", "1")
                 .param("size", "2"))
@@ -332,7 +332,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
 
         documentsConsolidated.sort(Comparator.comparing(d -> d.getDocumentMetadata().getDateOfDevelopment()));
 
-        mvc.perform(get("/api/document/")
+        mvc.perform(get("/api/documents/")
                 .accept(MediaType.APPLICATION_JSON)
                 .param("sort", "dateOfDevelopment"))
                 .andExpect(jsonPath("$.content.size()").value(2))
@@ -344,7 +344,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
 
         documentsConsolidated.sort(Comparator.comparing(d -> d.getDocumentMetadata().getDocumentInitializer()));
 
-        mvc.perform(get("/api/document/")
+        mvc.perform(get("/api/documents/")
                 .accept(MediaType.APPLICATION_JSON)
                 .param("sort", "documentInitializer"))
                 .andExpect(jsonPath("$.content.size()").value(2))
@@ -364,7 +364,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     public void testGetDocumentsPaginationForNonExistingPage() throws Exception {
         saveSingleConsolidated();
 
-        mvc.perform(get("/api/document/")
+        mvc.perform(get("/api/documents/")
                 .accept(MediaType.APPLICATION_JSON)
                 .param("page", "10"))
                 .andExpect(jsonPath("$.content.size()").value(0))
@@ -377,7 +377,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     @WithMockUser
     @Transactional
     public void testGetDocumentsSortingByNonExistentField() throws Exception {
-        mvc.perform(get("/api/document/")
+        mvc.perform(get("/api/documents/")
                 .accept(MediaType.APPLICATION_JSON)
                 .param("sort", "nonExistentField"))
                 .andExpect(status().isInternalServerError());
@@ -395,7 +395,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
 
         documentsConsolidated.sort(Comparator.comparing(d -> d.getDocumentMetadata().getDocumentInitializer()));
 
-        mvc.perform(get("/api/document/")
+        mvc.perform(get("/api/documents/")
                 .accept(MediaType.APPLICATION_JSON)
                 .param("sort", "documentInitializer")
                 .param("page", "2")
@@ -415,7 +415,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     public void deleteDocument() throws Exception {
         DocumentConsolidated consolidated = saveSingleConsolidated();
 
-        mvc.perform(delete("/api/document/" + consolidated.getId().toString())
+        mvc.perform(delete("/api/documents/" + consolidated.getId().toString())
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -428,7 +428,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     public void testGetDocumentNotFound() throws Exception {
         UUID uuid = UUID.randomUUID();
 
-        mvc.perform(get("/api/document/" + uuid.toString()))
+        mvc.perform(get("/api/documents/" + uuid.toString()))
                 .andExpect(status().isNotFound());
     }
 
@@ -437,7 +437,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     public void testGetDocumentConsolidatedNotFound() throws Exception {
         UUID uuid = UUID.randomUUID();
 
-        mvc.perform(get("/api/document/" + uuid.toString() + "/consolidated"))
+        mvc.perform(get("/api/documents/" + uuid.toString() + "/consolidated"))
                 .andExpect(status().isNotFound());
     }
 
@@ -446,7 +446,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     public void deleteDocumentNotFound() throws Exception {
         UUID uuid = UUID.randomUUID();
 
-        mvc.perform(delete("/api/document/" + uuid.toString()))
+        mvc.perform(delete("/api/documents/" + uuid.toString()))
                 .andExpect(status().isNotFound());
     }
 

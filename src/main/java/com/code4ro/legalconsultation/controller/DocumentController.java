@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/document")
+@RequestMapping(value = "/api/documents")
 @RequiredArgsConstructor
 public class DocumentController {
 
