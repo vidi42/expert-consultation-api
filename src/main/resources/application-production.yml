@@ -42,12 +42,12 @@ app:
 
 storage:
   aws:
-    region: us-east-1
+    region: ${AWS_REGION}
     access:
       key:
-        id: aws_access_id
-        secret: aws_access_secret
+        id: ${AWS_ACCESS_ID}
+        secret: ${AWS_SECRET_KEY}
     s3:
-      documentBucket: legal-consultation-documents
+      documentBucket: ${AWS_DOCUMENT_BUCKET}
   filesystem:
     directory: ~
