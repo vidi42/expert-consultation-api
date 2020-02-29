@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.http.HttpHeaders;
 import java.util.UUID;
 
 import static com.code4ro.legalconsultation.model.persistence.CommentStatus.APPROVED;
@@ -26,14 +27,14 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<Comment> create(@PathVariable final UUID nodeId,
                                           @RequestBody final CommentDto commentDto) {
-        return ResponseEntity.ok(commentService.create(nodeId, commentDto));
+        Comment comment = commentService.create(nodeId, commentDto);
+        return ResponseEntity.ok().header("location", "/api/documentnodes/" + nodeId + "/comments/" + comment.getId()).body(comment);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CommentDto> update(@PathVariable final UUID nodeId,
                                              @PathVariable final UUID id,
                                              @RequestBody final CommentDto commentDto) {
-
         return ResponseEntity.ok(commentService.update(nodeId, id, commentDto));
     }
 
