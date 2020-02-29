@@ -59,7 +59,7 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
                 .content(objectMapper.writeValueAsString(commentDto))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.text").value(commentDto.getText()))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         assertThat(commentRepository.count()).isEqualTo(1);
     }
