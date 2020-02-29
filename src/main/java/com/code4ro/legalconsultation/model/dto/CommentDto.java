@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class CommentDto extends BaseEntityDto{
+public class CommentDto {
     private String text;
     private Date lastEditDateTime;
     private CommentStatus status;

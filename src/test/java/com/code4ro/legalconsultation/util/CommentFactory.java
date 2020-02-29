@@ -25,7 +25,7 @@ public final class CommentFactory {
         return commentDto;
     }
 
-    public CommentDto save(final UUID nodeId) {
+    public Comment save(final UUID nodeId) {
         return commentService.create(nodeId, create());
     }
 

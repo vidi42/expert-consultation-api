@@ -57,7 +57,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public CommentDto create(UUID nodeId, final CommentDto commentDto) {
+    public Comment create(UUID nodeId, final CommentDto commentDto) {
         final DocumentNode node = documentNodeService.getEntity(nodeId);
 
         final ApplicationUser currentUser = currentUserService.getCurrentUser();
@@ -68,7 +68,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setLastEditDateTime(new Date());
         comment = commentRepository.save(comment);
 
-        return mapperService.map(comment, CommentDto.class);
+        return comment;
     }
 
     @Transactional

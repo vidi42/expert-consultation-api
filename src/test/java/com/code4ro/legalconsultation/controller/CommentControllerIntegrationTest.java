@@ -139,8 +139,8 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
     @Transactional
     public void approve() throws Exception{
         final DocumentNode node = documentNodeFactory.save();
-        CommentDto commentDto = commentService.create(node.getId(), commentFactory.create());
-        mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments/", commentDto.getId(), "/approve"))
+        Comment comment = commentService.create(node.getId(), commentFactory.create());
+        mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId(), "/approve"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(APPROVED.toString()))
                 .andExpect(status().isOk());
@@ -151,8 +151,8 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
     @Transactional
     public void reject() throws Exception{
         final DocumentNode node = documentNodeFactory.save();
-        CommentDto commentDto = commentService.create(node.getId(), commentFactory.create());
-        mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments/", commentDto.getId(), "/reject"))
+        Comment comment = commentService.create(node.getId(), commentFactory.create());
+        mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId(), "/reject"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(REJECTED.toString()))
                 .andExpect(status().isOk());

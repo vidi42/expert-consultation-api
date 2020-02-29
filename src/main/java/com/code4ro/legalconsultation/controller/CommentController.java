@@ -2,6 +2,7 @@ package com.code4ro.legalconsultation.controller;
 
 import com.code4ro.legalconsultation.model.dto.CommentDto;
 import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
+import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.service.api.CommentService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,8 +24,8 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<CommentDto> create(@PathVariable final UUID nodeId,
-                                             @RequestBody final CommentDto commentDto) {
+    public ResponseEntity<Comment> create(@PathVariable final UUID nodeId,
+                                          @RequestBody final CommentDto commentDto) {
         return ResponseEntity.ok(commentService.create(nodeId, commentDto));
     }
 
