@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.net.http.HttpHeaders;
 import java.util.UUID;
 
@@ -28,7 +29,7 @@ public class CommentController {
     public ResponseEntity<Comment> create(@PathVariable final UUID nodeId,
                                           @RequestBody final CommentDto commentDto) {
         Comment comment = commentService.create(nodeId, commentDto);
-        return ResponseEntity.ok().header("location", "/api/documentnodes/" + nodeId + "/comments/" + comment.getId()).body(comment);
+        return ResponseEntity.created(URI.create("/api/documentnodes/" + nodeId + "/comments/" + comment.getId())).body(comment);
     }
 
     @PutMapping("/{id}")
