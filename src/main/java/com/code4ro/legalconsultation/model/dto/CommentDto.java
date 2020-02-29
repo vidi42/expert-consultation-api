@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Setter
-public class CommentDto{
+public class CommentDto extends BaseEntityDto{
     private String text;
     private Date lastEditDateTime;
     private CommentStatus status;
