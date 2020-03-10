@@ -21,6 +21,8 @@ import javax.mail.internet.MimeMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Profile("production")
@@ -86,11 +88,9 @@ public class MailService implements MailApi {
     }
 
     private String getUserName(final User user) {
-        if (StringUtils.isNotBlank(user.getLastName())) {
-            return StringUtils.isNotBlank(user.getFirstName())
-                    ? user.getFirstName() + ' ' + user.getLastName()
-                    : user.getLastName();
-        }
-        return user.getFirstName();
+        final String USERNAME_SEPARATOR = " ";
+        return Stream.of(user.getFirstName(), user.getLastName())
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining(USERNAME_SEPARATOR));
     }
 }
