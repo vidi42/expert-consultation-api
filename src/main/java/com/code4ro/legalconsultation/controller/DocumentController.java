@@ -64,6 +64,8 @@ public class DocumentController {
     @PostMapping("")
     public ResponseEntity<UUID> createDocument(
             @Valid @RequestBody DocumentViewDto documentViewDto) {
+        // TODO: decide the configuration for each document will be provided,
+        // currently the service will initialise it with default true values
         DocumentConsolidated consolidated = documentService.create(documentViewDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)

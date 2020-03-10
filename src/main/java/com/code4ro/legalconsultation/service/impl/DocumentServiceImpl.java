@@ -2,6 +2,7 @@ package com.code4ro.legalconsultation.service.impl;
 
 import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
 import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
+import com.code4ro.legalconsultation.model.persistence.DocumentConfiguration;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
@@ -70,8 +71,9 @@ public class DocumentServiceImpl implements DocumentService {
         metadata.setFilePath(document.getFilePath());
         final String pdfContent = pdfService.readAsString(storageApi.loadFile(document.getFilePath()));
         final DocumentNode documentNode = documentNodeService.parse(pdfContent);
+        final DocumentConfiguration documentConfiguration = new DocumentConfiguration(true, true);
 
-        return documentConsolidatedService.saveOne(new DocumentConsolidated(metadata, documentNode));
+        return documentConsolidatedService.saveOne(new DocumentConsolidated(metadata, documentNode, documentConfiguration));
     }
 
     @Transactional

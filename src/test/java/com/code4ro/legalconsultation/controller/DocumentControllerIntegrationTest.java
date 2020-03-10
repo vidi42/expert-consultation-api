@@ -3,9 +3,11 @@ package com.code4ro.legalconsultation.controller;
 import com.amazonaws.util.json.Jackson;
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
 import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
+import com.code4ro.legalconsultation.model.persistence.DocumentConfiguration;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
+import com.code4ro.legalconsultation.repository.DocumentConfigurationRepository;
 import com.code4ro.legalconsultation.repository.DocumentConsolidatedRepository;
 import com.code4ro.legalconsultation.repository.DocumentMetadataRepository;
 import com.code4ro.legalconsultation.repository.DocumentNodeRepository;
@@ -453,7 +455,8 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     private DocumentConsolidated saveSingleConsolidated() {
         final DocumentNode documentNode = documentNodeFactory.save();
         final DocumentMetadata documentMetadata = RandomObjectFiller.createAndFill(DocumentMetadata.class);
-        DocumentConsolidated consolidated = new DocumentConsolidated(documentMetadata, documentNode);
+        final DocumentConfiguration documentConfiguration = RandomObjectFiller.createAndFill(DocumentConfiguration.class);
+        DocumentConsolidated consolidated = new DocumentConsolidated(documentMetadata, documentNode, documentConfiguration);
         return documentConsolidatedRepository.save(consolidated);
     }
 }

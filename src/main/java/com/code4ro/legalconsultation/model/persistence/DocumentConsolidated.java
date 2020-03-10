@@ -24,6 +24,16 @@ public class DocumentConsolidated extends BaseEntity {
     @JoinColumn(name = "document_node_id")
     private DocumentNode documentNode;
 
+    @OneToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
+    @JoinColumn(name = "configuration_id")
+    private DocumentConfiguration documentConfiguration;
+
+    public DocumentConsolidated(DocumentMetadata documentMetadata, DocumentNode documentNode, DocumentConfiguration documentConfiguration) {
+        this.documentMetadata = documentMetadata;
+        this.documentNode = documentNode;
+        this.documentConfiguration = documentConfiguration;
+    }
+
     public DocumentConsolidated(DocumentMetadata documentMetadata, DocumentNode documentNode) {
         this.documentMetadata = documentMetadata;
         this.documentNode = documentNode;
