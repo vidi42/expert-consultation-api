@@ -6,9 +6,10 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
-@Table(name="comments")
+@Table(name = "comments")
 @Getter
 @Setter
 public class Comment extends BaseEntity {
@@ -23,7 +24,14 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "owner_id")
     private ApplicationUser owner;
 
-    @Column(name = "last_edit_date", nullable=false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_id")
+    private Comment parent;
+
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Comment> replies;
+
+    @Column(name = "last_edit_date", nullable = false)
     @Temporal(TemporalType.DATE)
     @LastModifiedDate
     private Date lastEditDateTime;

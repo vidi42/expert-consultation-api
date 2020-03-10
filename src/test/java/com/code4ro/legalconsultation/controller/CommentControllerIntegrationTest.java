@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
@@ -78,7 +77,7 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
         final String newText = "new text";
         commentDto.setText(newText);
 
-       mvc.perform(put(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId()))
+        mvc.perform(put(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(commentDto))
                 .accept(MediaType.APPLICATION_JSON))
@@ -129,5 +128,55 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.content.size()").value(1))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void findAllReplies() throws Exception {
+        DocumentNode node = documentNodeFactory.save();
+        Comment comment = createComment(node);
+
+        commentService.createReply(comment.getId(), commentFactory.create());
+        commentService.createReply(comment.getId(), commentFactory.create());
+        commentService.createReply(comment.getId(), commentFactory.create());
+
+        mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments", comment.getId(), "/replies?page=0"))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(status().isOk());
+
+        mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments", comment.getId(), "/replies?page=1"))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content.size()").value(1))
+                .andExpect(jsonPath("$.content[0].id").isNotEmpty())
+                .andExpect(jsonPath("$.content[0].text").isNotEmpty())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void createReply() throws Exception {
+        DocumentNode node = documentNodeFactory.save();
+        Comment comment = createComment(node);
+        CommentDto commentDto = commentFactory.create();
+
+        assertThat(commentRepository.count()).isEqualTo(1);
+
+        mvc.perform(post(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId(), "/replies"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(commentDto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.text").value(commentDto.getText()))
+                .andExpect(status().isOk());
+
+        assertThat(commentRepository.count()).isEqualTo(2);
+    }
+
+    private Comment createComment(DocumentNode node) {
+        Comment comment = commentFactory.createEntity();
+        comment.setDocumentNode(node);
+        comment.setOwner(currentUserService.getCurrentUser());
+        comment.setLastEditDateTime(new Date());
+        return commentRepository.save(comment);
     }
 }

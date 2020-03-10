@@ -45,4 +45,16 @@ public class CommentController {
                                                                   final Pageable pageable) {
         return ResponseEntity.ok(commentService.findAll(nodeId, pageable));
     }
+
+    @GetMapping("/{commentId}/replies")
+    public ResponseEntity<Page<CommentIdentificationDto>> findAllReplies(@PathVariable UUID commentId,
+                                                                         Pageable pageable) {
+        return ResponseEntity.ok(commentService.findAllReplies(commentId, pageable));
+    }
+
+    @PostMapping("/{commentId}/replies")
+    public ResponseEntity<CommentDto> createReply(@PathVariable UUID commentId,
+                                                  @RequestBody CommentDto commentDto) {
+        return ResponseEntity.ok(commentService.createReply(commentId, commentDto));
+    }
 }

@@ -130,4 +130,35 @@ public class CommentServiceTest {
 
         verify(commentRepository).findByDocumentNodeId(nodeId, pageable);
     }
+
+    @Test
+    public void findAllReplies() {
+        UUID parentId = UUID.randomUUID();
+        Pageable pageable = mock(Pageable.class);
+
+        commentService.findAllReplies(parentId, pageable);
+
+        verify(commentRepository).findByParentId(parentId, pageable);
+    }
+
+    @Test
+    public void createReply() {
+        UUID parentId = UUID.randomUUID();
+        CommentDto commentDto = RandomObjectFiller.createAndFill(CommentDto.class);
+        Comment parent = commentFactory.createEntity();
+        Comment reply = new Comment();
+
+        when(commentRepository.findById(parentId)).thenReturn(Optional.of(parent));
+        when(mapperService.map(commentDto, Comment.class)).thenReturn(reply);
+        when(currentUserService.getCurrentUser()).thenReturn(currentUser);
+
+        commentService.createReply(parentId, commentDto);
+
+        verify(commentRepository).save(reply);
+
+        assertThat(reply.getOwner()).isEqualTo(currentUser);
+        assertThat(reply.getParent()).isEqualTo(parent);
+        assertThat(reply.getDocumentNode()).isNull();
+    }
+
 }

@@ -71,6 +71,22 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
+    public CommentDto createReply(UUID parentId, CommentDto commentDto) {
+        Comment parent = commentRepository.findById(parentId).orElseThrow(EntityNotFoundException::new);
+        ApplicationUser currentUser = currentUserService.getCurrentUser();
+
+        Comment reply = mapperService.map(commentDto, Comment.class);
+        reply.setParent(parent);
+        reply.setOwner(currentUser);
+        reply.setLastEditDateTime(new Date());
+
+        reply = commentRepository.save(reply);
+
+        return mapperService.map(reply, CommentDto.class);
+    }
+
+    @Transactional
+    @Override
     public void delete(final UUID id) {
         final Comment comment = commentRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         checkIfAuthorized(comment);
@@ -82,6 +98,14 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Page<CommentIdentificationDto> findAll(final UUID documentNodeId, final Pageable pageable) {
         final Page<Comment> userPage = commentRepository.findByDocumentNodeId(documentNodeId, pageable);
+        return mapperService.mapPage(userPage, CommentIdentificationDto.class);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<CommentIdentificationDto> findAllReplies(UUID parentId, Pageable pageable) {
+        Page<Comment> userPage = commentRepository.findByParentId(parentId, pageable);
+
         return mapperService.mapPage(userPage, CommentIdentificationDto.class);
     }
 
