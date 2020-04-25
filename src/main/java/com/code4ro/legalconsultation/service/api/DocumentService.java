@@ -1,6 +1,7 @@
 package com.code4ro.legalconsultation.service.api;
 
 import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
+import com.code4ro.legalconsultation.model.dto.DocumentMetadataDto;
 import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
@@ -16,11 +17,11 @@ public interface DocumentService {
     Page<DocumentMetadata> fetchAll(Pageable pageable);
 
     //return document metadata for a single document
-    DocumentMetadata fetchOne(final UUID id);
+    DocumentMetadataDto fetchOne(final UUID id);
 
     //return the entire consolidated form of the document,
     //that contains the metadata and the breakdown into units
-    DocumentConsolidatedDto fetchOneConsolidated(final UUID id);
+    DocumentConsolidatedDto fetchConsolidatedByMetadataId(final UUID id);
 
     //create a single document, including metadata and breakdown
     DocumentConsolidated create(final DocumentViewDto document);

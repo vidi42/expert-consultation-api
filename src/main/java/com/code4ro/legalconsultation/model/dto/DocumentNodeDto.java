@@ -15,4 +15,5 @@ public class DocumentNodeDto extends BaseEntityDto {
     private String title;
     private String content;
     private BigInteger numberOfComments;
+    private String identifier;
 }

@@ -1,6 +1,7 @@
 package com.code4ro.legalconsultation.service.impl;
 
 import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
+import com.code4ro.legalconsultation.model.dto.DocumentMetadataDto;
 import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentConfiguration;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
@@ -17,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.UUID;
@@ -53,14 +53,14 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Transactional(readOnly = true)
     @Override
-    public DocumentMetadata fetchOne(final UUID id) {
-        return documentMetadataService.fetchOne(id).orElseThrow(EntityNotFoundException::new);
+    public DocumentMetadataDto fetchOne(final UUID id) {
+        return documentMetadataService.fetchOne(id);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public DocumentConsolidatedDto fetchOneConsolidated(final UUID id) {
-        return documentConsolidatedService.getOne(id);
+    public DocumentConsolidatedDto fetchConsolidatedByMetadataId(final UUID id) {
+        return documentConsolidatedService.getByDocumentMetadataId(id);
     }
 
     @Transactional

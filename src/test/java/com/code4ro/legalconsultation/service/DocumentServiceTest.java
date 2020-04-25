@@ -1,6 +1,7 @@
 package com.code4ro.legalconsultation.service;
 
 import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
+import com.code4ro.legalconsultation.model.dto.DocumentMetadataDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.service.impl.DocumentConsolidatedService;
 import com.code4ro.legalconsultation.service.impl.DocumentMetadataService;
@@ -34,7 +35,7 @@ public class DocumentServiceTest {
     @Test
     public void getDocument(){
         final UUID uuid = UUID.randomUUID();
-        when(documentMetadataService.fetchOne(any(UUID.class))).thenReturn(Optional.of(new DocumentMetadata()));
+        when(documentMetadataService.fetchOne(any(UUID.class))).thenReturn(new DocumentMetadataDto());
 
         documentService.fetchOne(uuid);
 
@@ -44,11 +45,11 @@ public class DocumentServiceTest {
     @Test
     public void getDocumentConsolidated(){
         final UUID uuid = UUID.randomUUID();
-        when(documentConsolidatedService.getOne(any(UUID.class))).thenReturn(new DocumentConsolidatedDto());
+        when(documentConsolidatedService.getByDocumentMetadataId(any(UUID.class))).thenReturn(new DocumentConsolidatedDto());
 
-        documentService.fetchOneConsolidated(uuid);
+        documentService.fetchConsolidatedByMetadataId(uuid);
 
-        verify(documentConsolidatedService).getOne(uuid);
+        verify(documentConsolidatedService).getByDocumentMetadataId(uuid);
     }
 
     @Test
