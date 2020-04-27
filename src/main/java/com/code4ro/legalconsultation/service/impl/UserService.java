@@ -78,10 +78,8 @@ public class UserService {
         return mapperService.map(user);
     }
 
-    public Page<UserDto> findAll(final Pageable pageable) {
-        final Page<User> userPage = userRepository.findAll(pageable);
-        List<UserDto> userDtos = userPage.stream().map(mapperService::map).collect(Collectors.toList());
-        return new PageImpl<>(userDtos, pageable, userPage.getTotalElements());
+    public Page<User> findAll(final Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     public Optional<User> findByEmail(final String email) {

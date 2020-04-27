@@ -99,20 +99,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CommentIdentificationDto> findAll(final UUID documentNodeId, final Pageable pageable) {
-        final Page<Comment> userPage = commentRepository.findByDocumentNodeId(documentNodeId, pageable);
-        List<CommentIdentificationDto> commentIdentificationDtos = userPage.getContent().stream()
-                .map(mapperService::mapToCommentIdentificationDto).collect(Collectors.toList());
-        return new PageImpl<>(commentIdentificationDtos, pageable, userPage.getTotalElements());
+    public Page<Comment> findAll(final UUID documentNodeId, final Pageable pageable) {
+        return commentRepository.findByDocumentNodeId(documentNodeId, pageable);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Page<CommentIdentificationDto> findAllReplies(UUID parentId, Pageable pageable) {
-        Page<Comment> userPage = commentRepository.findByParentId(parentId, pageable);
-        List<CommentIdentificationDto> commentIdentificationDtos = userPage.getContent().stream()
-                .map(mapperService::mapToCommentIdentificationDto).collect(Collectors.toList());
-        return new PageImpl<>(commentIdentificationDtos, pageable, userPage.getTotalElements());
+    public Page<Comment> findAllReplies(UUID parentId, Pageable pageable) {
+        return commentRepository.findByParentId(parentId, pageable);
     }
 
     @Transactional(readOnly = true)

@@ -3,9 +3,7 @@ package com.code4ro.legalconsultation.service;
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.config.security.CurrentUserService;
 import com.code4ro.legalconsultation.converters.CommentMapper;
-import com.code4ro.legalconsultation.converters.CommentMapperImpl;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
-import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
@@ -137,14 +135,9 @@ public class CommentServiceTest {
         comment1.setText(text);
 
         when(commentRepository.findByDocumentNodeId(nodeId, pageable)).thenReturn(new PageImpl<>(List.of(comment1)));
-        CommentMapperImpl commentMapper = new CommentMapperImpl();
-        when(mapperService.mapToCommentIdentificationDto(any(Comment.class))).thenAnswer(i -> {
-            Comment comment = i.getArgument(0);
-            return commentMapper.mapToCommentIdentificationDto(comment);
-        });
 
         //when
-        Page<CommentIdentificationDto> all = commentService.findAll(nodeId, pageable);
+        Page<Comment> all = commentService.findAll(nodeId, pageable);
 
         //then
         assertEquals("response size should be 1", all.getContent().size(), 1L);
@@ -161,14 +154,9 @@ public class CommentServiceTest {
         comment1.setText(text);
 
         when(commentRepository.findByParentId(parentId, pageable)).thenReturn(new PageImpl<>(List.of(comment1)));
-        CommentMapperImpl commentMapper = new CommentMapperImpl();
-        when(mapperService.mapToCommentIdentificationDto(any(Comment.class))).thenAnswer(i -> {
-            Comment comment = i.getArgument(0);
-            return commentMapper.mapToCommentIdentificationDto(comment);
-        });
 
         //when
-        Page<CommentIdentificationDto> all = commentService.findAllReplies(parentId, pageable);
+        Page<Comment> all = commentService.findAllReplies(parentId, pageable);
 
         //then
         assertEquals("response size should be 1", all.getContent().size(), 1L);

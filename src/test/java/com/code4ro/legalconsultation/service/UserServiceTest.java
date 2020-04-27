@@ -90,7 +90,7 @@ public class UserServiceTest {
         Mockito.when(userRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(new User())));
 
         //when
-        Page<UserDto> all = userService.findAll(pageable);
+        Page<User> all = userService.findAll(pageable);
 
         //then
         assertThat(all.getContent().size()).isEqualTo(1);
