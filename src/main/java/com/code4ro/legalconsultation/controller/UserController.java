@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -62,9 +61,8 @@ public class UserController {
     @GetMapping
     public PageDto<UserDto> findAll(@ApiParam("Page object information being requested") final Pageable pageable) {
         final Page<User> userPage = userService.findAll(pageable);
-
-        List<UserDto> usersDto = userPage.stream().map(userMapper::map).collect(Collectors.toList());
-        return PageDto.map(userPage, usersDto);
+        Page<UserDto> usersDto = userPage.map(userMapper::map);
+        return new PageDto<>(usersDto);
     }
 
     @ApiOperation(value = "Delete a user from the platform based on id",

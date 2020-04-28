@@ -15,9 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/documentnodes/{nodeId}/comments")
@@ -65,10 +63,9 @@ public class CommentController {
     public ResponseEntity<PageDto<CommentIdentificationDto>> findAll(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
                                                                      @ApiParam("Page object information being requested") final Pageable pageable) {
         Page<Comment> comments = commentService.findAll(nodeId, pageable);
-        List<CommentIdentificationDto> commentsDto = comments.getContent().stream()
-                .map(commentMapper::mapToCommentIdentificationDto).collect(Collectors.toList());
+        Page<CommentIdentificationDto> commentsDto = comments.map(commentMapper::mapToCommentIdentificationDto);
 
-        return ResponseEntity.ok(PageDto.map(comments, commentsDto));
+        return ResponseEntity.ok(new PageDto<>(commentsDto));
     }
 
     @ApiOperation(value = "Get all replies of a comment",
@@ -79,9 +76,9 @@ public class CommentController {
     public ResponseEntity<PageDto<CommentIdentificationDto>> findAllReplies(@ApiParam(value = "The id of the comment") @PathVariable final UUID commentId,
                                                                             @ApiParam("Page object information being requested") final Pageable pageable) {
         Page<Comment> replies = commentService.findAllReplies(commentId, pageable);
-        List<CommentIdentificationDto> repliesDto = replies.getContent().stream()
-                .map(commentMapper::mapToCommentIdentificationDto).collect(Collectors.toList());
-        return ResponseEntity.ok(PageDto.map(replies, repliesDto));
+        Page<CommentIdentificationDto> repliesDto = replies.map(commentMapper::mapToCommentIdentificationDto);
+
+        return ResponseEntity.ok(new PageDto<>(repliesDto));
     }
 
     @ApiOperation(value = "Create a new reply in the platform",

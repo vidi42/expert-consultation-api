@@ -19,15 +19,14 @@ public class PageDto<T> {
     private Long totalElements;
     private PageableDto pageable;
 
-    public static <T> PageDto<T> map(Page page, List<T> content) {
-        PageableDto pageable = PageableDto.builder()
+    public PageDto(Page<T> page) {
+        content = page.getContent();
+        totalPages = page.getTotalPages();
+        totalElements = page.getTotalElements();
+
+        pageable = PageableDto.builder()
                 .pageSize(page.getPageable().getPageSize())
                 .pageNumber(page.getPageable().getPageNumber())
                 .build();
-        return PageDto.<T>builder()
-                .content(content)
-                .totalPages(page.getTotalPages())
-                .totalElements(page.getTotalElements())
-                .pageable(pageable).build();
     }
 }
