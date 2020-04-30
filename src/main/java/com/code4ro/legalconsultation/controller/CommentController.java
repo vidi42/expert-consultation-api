@@ -1,11 +1,13 @@
 package com.code4ro.legalconsultation.controller;
 
+import com.code4ro.legalconsultation.converters.CommentMapper;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
 import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
+import com.code4ro.legalconsultation.model.dto.PageDto;
+import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.service.api.CommentService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +23,7 @@ import java.util.UUID;
 public class CommentController {
 
     private final CommentService commentService;
+    private final CommentMapper commentMapper;
 
     @ApiOperation(value = "Create a new comment in the platform",
             response = CommentDto.class,
@@ -57,9 +60,12 @@ public class CommentController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping
-    public ResponseEntity<Page<CommentIdentificationDto>> findAll(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
-                                                                  @ApiParam("Page object information being requested") final Pageable pageable) {
-        return ResponseEntity.ok(commentService.findAll(nodeId, pageable));
+    public ResponseEntity<PageDto<CommentIdentificationDto>> findAll(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
+                                                                     @ApiParam("Page object information being requested") final Pageable pageable) {
+        Page<Comment> comments = commentService.findAll(nodeId, pageable);
+        Page<CommentIdentificationDto> commentsDto = comments.map(commentMapper::mapToCommentIdentificationDto);
+
+        return ResponseEntity.ok(new PageDto<>(commentsDto));
     }
 
     @ApiOperation(value = "Get all replies of a comment",
@@ -67,9 +73,12 @@ public class CommentController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping("/{commentId}/replies")
-    public ResponseEntity<Page<CommentIdentificationDto>> findAllReplies(@ApiParam(value = "The id of the comment") @PathVariable final UUID commentId,
-                                                                         @ApiParam("Page object information being requested") final Pageable pageable) {
-        return ResponseEntity.ok(commentService.findAllReplies(commentId, pageable));
+    public ResponseEntity<PageDto<CommentIdentificationDto>> findAllReplies(@ApiParam(value = "The id of the comment") @PathVariable final UUID commentId,
+                                                                            @ApiParam("Page object information being requested") final Pageable pageable) {
+        Page<Comment> replies = commentService.findAllReplies(commentId, pageable);
+        Page<CommentIdentificationDto> repliesDto = replies.map(commentMapper::mapToCommentIdentificationDto);
+
+        return ResponseEntity.ok(new PageDto<>(repliesDto));
     }
 
     @ApiOperation(value = "Create a new reply in the platform",

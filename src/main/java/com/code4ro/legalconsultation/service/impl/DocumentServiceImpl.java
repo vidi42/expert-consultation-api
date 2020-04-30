@@ -1,11 +1,15 @@
 package com.code4ro.legalconsultation.service.impl;
 
+import com.code4ro.legalconsultation.converters.UserMapper;
 import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
 import com.code4ro.legalconsultation.model.dto.DocumentMetadataDto;
 import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.model.dto.UserDto;
 import com.code4ro.legalconsultation.model.persistence.*;
-import com.code4ro.legalconsultation.service.api.*;
+import com.code4ro.legalconsultation.service.api.DocumentNodeService;
+import com.code4ro.legalconsultation.service.api.DocumentService;
+import com.code4ro.legalconsultation.service.api.PDFService;
+import com.code4ro.legalconsultation.service.api.StorageApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
@@ -28,7 +33,7 @@ public class DocumentServiceImpl implements DocumentService {
     private final DocumentNodeService documentNodeService;
     private final StorageApi storageApi;
     private final UserService userService;
-    private final MapperService mapperService;
+    private final UserMapper mapperService;
 
     @Autowired
     public DocumentServiceImpl(final DocumentConsolidatedService documentConsolidatedService,
@@ -37,7 +42,7 @@ public class DocumentServiceImpl implements DocumentService {
                                final DocumentNodeService documentNodeService,
                                final StorageApi storageApi,
                                final UserService userService,
-                               final MapperService mapperService) {
+                               final UserMapper mapperService) {
         this.documentConsolidatedService = documentConsolidatedService;
         this.documentMetadataService = documentMetadataService;
         this.pdfService = pdfService;
@@ -119,6 +124,7 @@ public class DocumentServiceImpl implements DocumentService {
     public List<UserDto> getAssignedUsers(final UUID id) {
         final DocumentConsolidated documentConsolidated = documentConsolidatedService.getEntity(id);
         final List<User> assignedUsers = documentConsolidated.getAssignedUsers();
-        return mapperService.mapList(assignedUsers, UserDto.class);
+
+        return assignedUsers.stream().map(mapperService::map).collect(Collectors.toList());
     }
 }
