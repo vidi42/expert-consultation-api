@@ -67,7 +67,8 @@ public class DocumentServiceImpl implements DocumentService {
     @Transactional(readOnly = true)
     @Override
     public DocumentConsolidatedDto fetchConsolidatedByMetadataId(final UUID id) {
-        return documentConsolidatedService.getByDocumentMetadataId(id);
+        final DocumentConsolidated document = documentConsolidatedService.getByDocumentMetadataId(id);
+        return mapperService.map(document, DocumentConsolidatedDto.class);
     }
 
     @Transactional
@@ -114,7 +115,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public void assignUsers(final UUID id, final Set<UUID> userIds) {
         final List<User> users = userService.findByIds(userIds);
-        final DocumentConsolidated documentConsolidated = documentConsolidatedService.getEntity(id);
+        final DocumentConsolidated documentConsolidated = documentConsolidatedService.getByDocumentMetadataId(id);
         documentConsolidated.setAssignedUsers(users);
 
         documentConsolidatedService.saveOne(documentConsolidated);
@@ -122,7 +123,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<UserDto> getAssignedUsers(final UUID id) {
-        final DocumentConsolidated documentConsolidated = documentConsolidatedService.getEntity(id);
+        final DocumentConsolidated documentConsolidated = documentConsolidatedService.getByDocumentMetadataId(id);
         final List<User> assignedUsers = documentConsolidated.getAssignedUsers();
 
         return assignedUsers.stream().map(mapperService::map).collect(Collectors.toList());

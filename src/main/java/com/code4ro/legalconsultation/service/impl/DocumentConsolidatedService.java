@@ -38,8 +38,8 @@ public class DocumentConsolidatedService {
     }
 
     @Transactional(readOnly = true)
-    public DocumentConsolidatedDto getByDocumentMetadataId(final UUID id) {
-        DocumentConsolidated documentConsolidated = documentConsolidatedRepository.
+    public DocumentConsolidated getByDocumentMetadataId(final UUID id) {
+        return documentConsolidatedRepository.
                 findByDocumentMetadataId(id).orElseThrow(EntityNotFoundException::new);
         UUID documentNodeId = documentConsolidated.getDocumentNode().getId();
         BigInteger noOfcComments = commentService.count(documentNodeId);
