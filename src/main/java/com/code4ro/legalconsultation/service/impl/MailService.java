@@ -35,6 +35,9 @@ public class MailService implements MailApi {
     @Value("${spring.mvc.locale}")
     private String configuredLocale;
 
+    @Value("${app.email.sender}")
+    private String from;
+
     private final JavaMailSender mailSender;
     private final I18nService i18nService;
     private final Configuration freemarkerConfig;
@@ -55,6 +58,7 @@ public class MailService implements MailApi {
             final MimeMessage message = mailSender.createMimeMessage();
             final MimeMessageHelper helper = new MimeMessageHelper(message);
             try {
+                helper.setFrom(from);
                 helper.setTo(user.getEmail());
                 final Template template = freemarkerConfig.getTemplate(getRegisterTemplate());
                 final String content =
