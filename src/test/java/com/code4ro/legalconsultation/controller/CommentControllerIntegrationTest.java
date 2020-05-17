@@ -122,11 +122,19 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
         mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments?page=0"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.pageable.pageSize").value(2))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(0))
                 .andExpect(status().isOk());
 
         mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments?page=1"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.content.size()").value(1))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.pageable.pageSize").value(2))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(1))
                 .andExpect(status().isOk());
     }
 

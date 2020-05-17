@@ -304,6 +304,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
                 .andExpect(jsonPath("$.content[1].id").value(documentsConsolidated.get(1).getDocumentMetadata().getId().toString()))
                 .andExpect(jsonPath("$.totalPages").value(2))
                 .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(0))
                 .andExpect(status().isOk());
 
         mvc.perform(get("/api/documents/")
@@ -314,6 +315,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
                 .andExpect(jsonPath("$.content[0].id").value(documentsConsolidated.get(2).getDocumentMetadata().getId().toString()))
                 .andExpect(jsonPath("$.totalPages").value(2))
                 .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(1))
                 .andExpect(status().isOk());
 
         assertThat(documentMetadataRepository.count()).isEqualTo(3);
