@@ -46,6 +46,7 @@ public class MailServiceTest {
     @Test
     public void sendRegisterMail() throws IOException, TemplateException {
         ReflectionTestUtils.setField(mailService, "signupUrl", "signupurl");
+        ReflectionTestUtils.setField(mailService, "from", "email@legalconsultingtest.ro");
         final User user = RandomObjectFiller.createAndFill(User.class);
         final MimeMessage message = mock(MimeMessage.class);
         when(mailSender.createMimeMessage()).thenReturn(message);
