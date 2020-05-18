@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "Return a paginated list of users from the platform",
-            response = Page.class,
+            response = PageDto.class,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping

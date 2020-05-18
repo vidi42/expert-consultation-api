@@ -56,7 +56,7 @@ public class CommentController {
     }
 
     @ApiOperation(value = "Get all comments of a node",
-            response = Page.class,
+            response = PageDto.class,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping
@@ -69,7 +69,7 @@ public class CommentController {
     }
 
     @ApiOperation(value = "Get all replies of a comment",
-            response = Page.class,
+            response = PageDto.class,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping("/{commentId}/replies")
