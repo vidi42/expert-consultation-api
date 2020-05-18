@@ -70,7 +70,7 @@ public class DocumentController {
         DocumentConsolidated consolidated = documentService.create(documentViewDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(consolidated.getId());
+                .body(consolidated.getDocumentMetadata().getId());
     }
 
     @ApiOperation(value = "Modify a saved document in the platform",
