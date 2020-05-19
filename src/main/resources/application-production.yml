@@ -52,7 +52,7 @@ storage:
     s3:
       documentBucket: ${AWS_DOCUMENT_BUCKET}
   filesystem:
-    directory: ~
+    directory: legal_consult_uploads
 management:
   endpoints:
     web:

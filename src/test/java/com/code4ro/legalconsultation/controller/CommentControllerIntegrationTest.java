@@ -19,10 +19,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.code4ro.legalconsultation.model.persistence.CommentStatus.APPROVED;
-import static com.code4ro.legalconsultation.model.persistence.CommentStatus.REJECTED;
 import java.util.Date;
 
+import static com.code4ro.legalconsultation.model.persistence.CommentStatus.APPROVED;
+import static com.code4ro.legalconsultation.model.persistence.CommentStatus.REJECTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -49,6 +49,7 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
 
     @Test
     @WithMockUser
+    @Transactional
     public void create() throws Exception {
         final DocumentNode node = documentNodeFactory.save();
         final CommentDto commentDto = commentFactory.create();
@@ -167,6 +168,7 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
 
     @Test
     @WithMockUser
+    @Transactional
     public void findAllReplies() throws Exception {
         DocumentNode node = documentNodeFactory.save();
         Comment comment = createComment(node);
@@ -190,6 +192,7 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
 
     @Test
     @WithMockUser
+    @Transactional
     public void createReply() throws Exception {
         DocumentNode node = documentNodeFactory.save();
         Comment comment = createComment(node);
