@@ -5,9 +5,8 @@ import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.service.api.MailApi;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -26,8 +25,8 @@ import java.util.stream.Stream;
 
 @Service
 @Profile("production")
+@Slf4j
 public class MailService implements MailApi {
-    private static final Logger LOG = LoggerFactory.getLogger(MailService.class);
 
     @Value("${app.signupurl}")
     private String signupUrl;
@@ -67,7 +66,7 @@ public class MailService implements MailApi {
                 helper.setSubject(i18nService.translate("register.User.confirmation.subject"));
                 mailSender.send(message);
             } catch (final Exception e) {
-                LOG.error("Problem preparing or sending email to user with address {}", user.getEmail(), e);
+                log.error("Problem preparing or sending email to user with address {}", user.getEmail(), e);
                 failedEmails.add(user.getEmail());
             }
         });

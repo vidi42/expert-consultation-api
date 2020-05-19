@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
-    private static final Logger LOG = LoggerFactory.getLogger(DocumentServiceImpl.class);
 
     private final DocumentConsolidatedService documentConsolidatedService;
     private final DocumentMetadataService documentMetadataService;

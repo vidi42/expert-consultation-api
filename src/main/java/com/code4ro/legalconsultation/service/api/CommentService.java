@@ -1,7 +1,6 @@
 package com.code4ro.legalconsultation.service.api;
 
 import com.code4ro.legalconsultation.model.dto.CommentDto;
-import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

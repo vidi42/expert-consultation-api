@@ -5,7 +5,7 @@ import com.code4ro.legalconsultation.model.dto.documentnode.DocumentNodeDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface DocumentNodeMapper {
 
     DocumentNodeDto map(DocumentNode documentNode);

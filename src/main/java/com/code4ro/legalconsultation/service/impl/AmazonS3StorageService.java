@@ -7,8 +7,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.code4ro.legalconsultation.service.api.StorageApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -19,8 +18,8 @@ import java.io.IOException;
 
 @Service
 @Profile("production")
+@Slf4j
 public class AmazonS3StorageService implements StorageApi {
-    private static final Logger LOG = LoggerFactory.getLogger(AmazonS3StorageService.class);
 
     @Value("${storage.aws.access.key.id}")
     private String awsKeyId;
@@ -46,13 +45,13 @@ public class AmazonS3StorageService implements StorageApi {
                     .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
                     .build();
             if (amazonS3.doesBucketExist(documentBucket)) {
-                LOG.info("Bucket already created");
+                log.info("Bucket already created");
                 return;
             }
-            LOG.info("Creating aws s3 bucket {}.", documentBucket);
+            log.info("Creating aws s3 bucket {}.", documentBucket);
             amazonS3.createBucket(documentBucket);
         } catch (Exception e) {
-            LOG.error("Could not access aws s3", e);
+            log.error("Could not access aws s3", e);
         }
     }
 

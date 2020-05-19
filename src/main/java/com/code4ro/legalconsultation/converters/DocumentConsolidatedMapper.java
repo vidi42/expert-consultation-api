@@ -8,7 +8,7 @@ import org.mapstruct.MappingTarget;
 
 import java.math.BigInteger;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface DocumentConsolidatedMapper {
 
     DocumentConsolidatedDto map(DocumentConsolidated documentConsolidated, BigInteger numberOfComments);
