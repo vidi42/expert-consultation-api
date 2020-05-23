@@ -24,7 +24,7 @@ public class FileController {
         return ResponseEntity.ok(Jackson.toJsonString(storageApi.storeFile(file)));
     }
 
-    @ApiOperation(value = "Add a new file that will be attached one document")
+    @ApiOperation(value = "Delete a file that is attached to a document")
     @DeleteMapping("")
     public void deleteFile(
             @ApiParam(value = "The filePath that will be deleted") @RequestParam("filePath") String filePath) {
