@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -46,6 +45,7 @@ public class MailServiceTest {
     @Test
     public void sendRegisterMail() throws IOException, TemplateException {
         ReflectionTestUtils.setField(mailService, "signupUrl", "signupurl");
+        ReflectionTestUtils.setField(mailService, "from", "email@legalconsultingtest.ro");
         final User user = RandomObjectFiller.createAndFill(User.class);
         final MimeMessage message = mock(MimeMessage.class);
         when(mailSender.createMimeMessage()).thenReturn(message);

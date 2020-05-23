@@ -4,11 +4,11 @@ import com.code4ro.legalconsultation.model.dto.CommentDto;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.service.api.CommentService;
+import java.util.Date;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.UUID;
 
 @Component

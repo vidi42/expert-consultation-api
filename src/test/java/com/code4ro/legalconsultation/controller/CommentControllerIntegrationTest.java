@@ -5,7 +5,6 @@ import com.code4ro.legalconsultation.config.security.CurrentUserService;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
-import com.code4ro.legalconsultation.model.persistence.CommentStatus;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.repository.CommentRepository;
 import com.code4ro.legalconsultation.service.api.CommentService;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.code4ro.legalconsultation.model.persistence.CommentStatus.APPROVED;
@@ -81,7 +79,7 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
         final String newText = "new text";
         commentDto.setText(newText);
 
-       mvc.perform(put(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId()))
+        mvc.perform(put(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId()))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(commentDto))
                 .accept(MediaType.APPLICATION_JSON))
@@ -126,11 +124,19 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
         mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments?page=0"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.pageable.pageSize").value(2))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(0))
                 .andExpect(status().isOk());
 
         mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments?page=1"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.content.size()").value(1))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.pageable.pageSize").value(2))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(1))
                 .andExpect(status().isOk());
     }
 
@@ -156,5 +162,55 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(REJECTED.toString()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void findAllReplies() throws Exception {
+        DocumentNode node = documentNodeFactory.save();
+        Comment comment = createComment(node);
+
+        commentService.createReply(comment.getId(), commentFactory.create());
+        commentService.createReply(comment.getId(), commentFactory.create());
+        commentService.createReply(comment.getId(), commentFactory.create());
+
+        mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments", comment.getId(), "/replies?page=0"))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content.size()").value(2))
+                .andExpect(status().isOk());
+
+        mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments", comment.getId(), "/replies?page=1"))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content.size()").value(1))
+                .andExpect(jsonPath("$.content[0].id").isNotEmpty())
+                .andExpect(jsonPath("$.content[0].text").isNotEmpty())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser
+    public void createReply() throws Exception {
+        DocumentNode node = documentNodeFactory.save();
+        Comment comment = createComment(node);
+        CommentDto commentDto = commentFactory.create();
+
+        assertThat(commentRepository.count()).isEqualTo(1);
+
+        mvc.perform(post(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId(), "/replies"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(commentDto))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.text").value(commentDto.getText()))
+                .andExpect(status().isOk());
+
+        assertThat(commentRepository.count()).isEqualTo(2);
+    }
+
+    private Comment createComment(DocumentNode node) {
+        Comment comment = commentFactory.createEntity();
+        comment.setDocumentNode(node);
+        comment.setOwner(currentUserService.getCurrentUser());
+        comment.setLastEditDateTime(new Date());
+        return commentRepository.save(comment);
     }
 }

@@ -13,5 +13,8 @@ import java.util.UUID;
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
     Page<Comment> findByDocumentNodeId(final UUID nodeId,
                                        final Pageable pageable);
+
+    Page<Comment> findByParentId(UUID parentId, Pageable pageable);
+
     BigInteger countByDocumentNodeId(final UUID nodeId);
 }

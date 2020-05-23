@@ -2,7 +2,7 @@ spring:
   profiles:
     active: dev
   datasource:
-    url: jdbc:mysql://localhost:3306/legalconsultation?serverTimezone=Europe/Bucharest
+    url: jdbc:mysql://${MYSQL_DB_URL:localhost}:3306/legalconsultation?serverTimezone=Europe/Bucharest&characterEncoding=UTF-8
     username: root
     password: root
   jpa:
@@ -41,6 +41,8 @@ app:
   jwtSecret: ORy9HWgKoZPAs50ECKw0
   jwtExpirationInMs: 1728000000   # two days expiration time, can be extended
   signupurl: 'http://localhost:4200/authentication/sign-up'
+  email:
+    sender: noreply@legalconsultation.ro # temporary value. change this to a real email that is validated in SES : https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses-procedure.html
 
 storage:
   aws:

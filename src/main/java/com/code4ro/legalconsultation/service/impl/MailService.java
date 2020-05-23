@@ -5,9 +5,8 @@ import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.service.api.MailApi;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -21,17 +20,22 @@ import javax.mail.internet.MimeMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Profile("production")
+@Slf4j
 public class MailService implements MailApi {
-    private static final Logger LOG = LoggerFactory.getLogger(MailService.class);
 
     @Value("${app.signupurl}")
     private String signupUrl;
 
     @Value("${spring.mvc.locale}")
     private String configuredLocale;
+
+    @Value("${app.email.sender}")
+    private String from;
 
     private final JavaMailSender mailSender;
     private final I18nService i18nService;
@@ -53,6 +57,7 @@ public class MailService implements MailApi {
             final MimeMessage message = mailSender.createMimeMessage();
             final MimeMessageHelper helper = new MimeMessageHelper(message);
             try {
+                helper.setFrom(from);
                 helper.setTo(user.getEmail());
                 final Template template = freemarkerConfig.getTemplate(getRegisterTemplate());
                 final String content =
@@ -61,7 +66,7 @@ public class MailService implements MailApi {
                 helper.setSubject(i18nService.translate("register.User.confirmation.subject"));
                 mailSender.send(message);
             } catch (final Exception e) {
-                LOG.error("Problem preparing or sending email to user with address {}", user.getEmail(), e);
+                log.error("Problem preparing or sending email to user with address {}", user.getEmail(), e);
                 failedEmails.add(user.getEmail());
             }
         });
@@ -86,11 +91,9 @@ public class MailService implements MailApi {
     }
 
     private String getUserName(final User user) {
-        if (StringUtils.isNotBlank(user.getLastName())) {
-            return StringUtils.isNotBlank(user.getFirstName())
-                    ? user.getFirstName() + ' ' + user.getLastName()
-                    : user.getLastName();
-        }
-        return user.getFirstName();
+        final String USERNAME_SEPARATOR = " ";
+        return Stream.of(user.getFirstName(), user.getLastName())
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.joining(USERNAME_SEPARATOR));
     }
 }

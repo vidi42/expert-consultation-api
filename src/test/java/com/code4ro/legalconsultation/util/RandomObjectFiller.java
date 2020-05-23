@@ -72,7 +72,7 @@ public class RandomObjectFiller {
         }
         final Size size = field.getAnnotation(Size.class);
         if (size != null) {
-            return RandomStringUtils.randomAlphabetic(size.min(), size.max());
+            return RandomStringUtils.randomAlphabetic(size.min() > 0 ? size.min() : 1, size.max());
         }
         return RandomStringUtils.randomAlphabetic(10);
     }

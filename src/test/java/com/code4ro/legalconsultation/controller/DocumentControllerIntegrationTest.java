@@ -3,13 +3,13 @@ package com.code4ro.legalconsultation.controller;
 import com.amazonaws.util.json.Jackson;
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
 import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
+import com.code4ro.legalconsultation.model.persistence.DocumentConfiguration;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.repository.DocumentConsolidatedRepository;
 import com.code4ro.legalconsultation.repository.DocumentMetadataRepository;
 import com.code4ro.legalconsultation.repository.DocumentNodeRepository;
-import com.code4ro.legalconsultation.service.api.CommentService;
 import com.code4ro.legalconsultation.util.CommentFactory;
 import com.code4ro.legalconsultation.util.DocumentNodeFactory;
 import com.code4ro.legalconsultation.util.PdfFileFactory;
@@ -31,10 +31,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.endsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class DocumentControllerIntegrationTest extends AbstractControllerIntegrationTest {
 
@@ -233,12 +232,12 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     public void getDocument() throws Exception {
         DocumentConsolidated consolidated = saveSingleConsolidated();
 
-        mvc.perform(get(endpoint("/api/documents/", consolidated.getId()))
+        mvc.perform(get(endpoint("/api/documents/", consolidated.getDocumentMetadata().getId()))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(consolidated.getDocumentMetadata().getId().toString()))
                 .andExpect(status().isOk());
 
-        mvc.perform(get(endpoint("/api/documents/", consolidated.getId(), "/consolidated"))
+        mvc.perform(get(endpoint("/api/documents/", consolidated.getDocumentMetadata().getId(), "/consolidated"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(consolidated.getId().toString()))
                 .andExpect(status().isOk())
@@ -257,7 +256,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         commentFactory.save(consolidated.getDocumentNode().getId());
         commentFactory.save(consolidated.getDocumentNode().getId());
 
-        mvc.perform(get(endpoint("/api/documents/", consolidated.getId(), "/consolidated"))
+        mvc.perform(get(endpoint("/api/documents/", consolidated.getDocumentMetadata().getId(), "/consolidated"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.documentNode.numberOfComments").value("2"))
                 .andExpect(status().isOk())
@@ -305,6 +304,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
                 .andExpect(jsonPath("$.content[1].id").value(documentsConsolidated.get(1).getDocumentMetadata().getId().toString()))
                 .andExpect(jsonPath("$.totalPages").value(2))
                 .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(0))
                 .andExpect(status().isOk());
 
         mvc.perform(get("/api/documents/")
@@ -315,6 +315,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
                 .andExpect(jsonPath("$.content[0].id").value(documentsConsolidated.get(2).getDocumentMetadata().getId().toString()))
                 .andExpect(jsonPath("$.totalPages").value(2))
                 .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.pageable.pageNumber").value(1))
                 .andExpect(status().isOk());
 
         assertThat(documentMetadataRepository.count()).isEqualTo(3);
@@ -453,7 +454,8 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     private DocumentConsolidated saveSingleConsolidated() {
         final DocumentNode documentNode = documentNodeFactory.save();
         final DocumentMetadata documentMetadata = RandomObjectFiller.createAndFill(DocumentMetadata.class);
-        DocumentConsolidated consolidated = new DocumentConsolidated(documentMetadata, documentNode);
+        final DocumentConfiguration documentConfiguration = RandomObjectFiller.createAndFill(DocumentConfiguration.class);
+        DocumentConsolidated consolidated = new DocumentConsolidated(documentMetadata, documentNode, documentConfiguration);
         return documentConsolidatedRepository.save(consolidated);
     }
 }
