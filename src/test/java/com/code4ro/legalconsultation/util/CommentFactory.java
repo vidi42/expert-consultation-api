@@ -1,6 +1,7 @@
 package com.code4ro.legalconsultation.util;
 
 import com.code4ro.legalconsultation.model.dto.CommentDto;
+import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.service.api.CommentService;
@@ -25,7 +26,7 @@ public final class CommentFactory {
         return commentDto;
     }
 
-    public Comment save(final UUID nodeId) {
+    public CommentIdentificationDto save(final UUID nodeId) {
         return commentService.create(nodeId, create());
     }
 

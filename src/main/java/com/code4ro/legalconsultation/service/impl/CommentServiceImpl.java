@@ -4,6 +4,7 @@ import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.config.security.CurrentUserService;
 import com.code4ro.legalconsultation.converters.CommentMapper;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
+import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
@@ -56,7 +57,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public Comment create(UUID nodeId, final CommentDto commentDto) {
+    public CommentIdentificationDto create(UUID nodeId, final CommentDto commentDto) {
         final DocumentNode node = documentNodeService.findById(nodeId);
 
         final ApplicationUser currentUser = currentUserService.getCurrentUser();
@@ -67,7 +68,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setLastEditDateTime(new Date());
         comment = commentRepository.save(comment);
 
-        return comment;
+        return mapperService.mapToCommentIdentificationDto(comment);
     }
 
     @Transactional

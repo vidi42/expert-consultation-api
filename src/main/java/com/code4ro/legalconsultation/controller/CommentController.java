@@ -35,9 +35,9 @@ public class CommentController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping
-    public ResponseEntity<Comment> create(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
-                                          @ApiParam("The DTO object containing a new comment") @RequestBody final CommentDto commentDto) {
-        Comment comment = commentService.create(nodeId, commentDto);
+    public ResponseEntity<CommentIdentificationDto> create(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
+                                                           @ApiParam("The DTO object containing a new comment") @RequestBody final CommentDto commentDto) {
+        CommentIdentificationDto comment = commentService.create(nodeId, commentDto);
         return ResponseEntity.created(URI.create("/api/documentnodes/" + nodeId + "/comments/" + comment.getId())).body(comment);
     }
 

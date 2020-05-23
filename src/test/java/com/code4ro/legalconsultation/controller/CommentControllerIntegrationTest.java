@@ -3,6 +3,7 @@ package com.code4ro.legalconsultation.controller;
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
 import com.code4ro.legalconsultation.config.security.CurrentUserService;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
+import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
@@ -145,7 +146,7 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
     @Transactional
     public void approve() throws Exception{
         final DocumentNode node = documentNodeFactory.save();
-        Comment comment = commentService.create(node.getId(), commentFactory.create());
+        CommentIdentificationDto comment = commentService.create(node.getId(), commentFactory.create());
         mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId(), "/approve"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(APPROVED.toString()))
@@ -157,7 +158,7 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
     @Transactional
     public void reject() throws Exception{
         final DocumentNode node = documentNodeFactory.save();
-        Comment comment = commentService.create(node.getId(), commentFactory.create());
+        CommentIdentificationDto comment = commentService.create(node.getId(), commentFactory.create());
         mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId(), "/reject"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(REJECTED.toString()))
