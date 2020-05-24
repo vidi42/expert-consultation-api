@@ -67,7 +67,9 @@ public class DocumentNodeController {
 
     @ApiOperation(value = "Delete document node based on id")
     @DeleteMapping("/{id}")
-    public void deleteDocument(@ApiParam("Id of the document node being deleted") @PathVariable UUID id) {
+    public ResponseEntity<UUID> deleteDocument(@ApiParam("Id of the document node being deleted") @PathVariable UUID id) {
+        DocumentNode rootNode = documentNodeService.findRootNodeForId(id);
         documentNodeService.deleteById(id);
+        return ResponseEntity.ok(rootNode.getId());
     }
 }

@@ -7,6 +7,8 @@ import java.util.UUID;
 public interface DocumentNodeService {
     DocumentNode findById(UUID id);
 
+    DocumentNode findRootNodeForId(UUID id);
+
     DocumentNode parse(String pdfContent);
 
     DocumentNode create(final DocumentNode documentNode);

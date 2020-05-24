@@ -55,6 +55,12 @@ public class DocumentController {
         return ResponseEntity.ok(documentService.fetchConsolidatedByMetadataId(id));
     }
 
+    @GetMapping("/{id}/node")
+    public ResponseEntity<DocumentConsolidatedDto> getDocumentConsolidatedByDocumentNodeId(
+            @ApiParam("Id of on of the nodes included in the document being requested") @PathVariable UUID id) {
+        return ResponseEntity.ok(documentService.fetchConsolidatedByDocumentNodeId(id));
+    }
+
     @ApiOperation(value = "Delete metadata and contents for a single document in the platform based on id")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDocument(@ApiParam("Id of the document object being deleted") @PathVariable UUID id) {

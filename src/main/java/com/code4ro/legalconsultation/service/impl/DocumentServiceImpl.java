@@ -70,6 +70,12 @@ public class DocumentServiceImpl implements DocumentService {
         return documentConsolidatedService.getByDocumentMetadataId(id);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public DocumentConsolidatedDto fetchConsolidatedByDocumentNodeId(UUID id) {
+        return documentConsolidatedService.getByMemberDocumentNodeId(id);
+    }
+
     @Transactional
     @Override
     public DocumentConsolidated create(final DocumentViewDto document) {
