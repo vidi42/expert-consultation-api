@@ -4,7 +4,6 @@ import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.repository.DocumentConsolidatedRepository;
-import com.code4ro.legalconsultation.service.api.CommentService;
 import com.code4ro.legalconsultation.service.api.DocumentNodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,18 +17,12 @@ import java.util.UUID;
 public class DocumentConsolidatedService {
 
     private final DocumentConsolidatedRepository documentConsolidatedRepository;
-    private final CommentService commentService;
     private final DocumentNodeService documentNodeService;
-    private final DocumentConsolidatedMapper mapperService;
 
     @Autowired
     public DocumentConsolidatedService(final DocumentConsolidatedRepository repository,
-                                       final DocumentConsolidatedMapper mapperService,
-                                       final CommentService commentService,
                                        final DocumentNodeService documentNodeService) {
         this.documentConsolidatedRepository = repository;
-        this.mapperService = mapperService;
-        this.commentService = commentService;
         this.documentNodeService = documentNodeService;
     }
 
@@ -45,14 +38,11 @@ public class DocumentConsolidatedService {
     }
 
     @Transactional(readOnly = true)
-    public DocumentConsolidatedDto getByMemberDocumentNodeId(final UUID id) {
+    public DocumentConsolidated getByMemberDocumentNodeId(final UUID id) {
         DocumentNode rootNodeForDocument = documentNodeService.findRootNodeForId(id);
-        DocumentConsolidated documentConsolidated = documentConsolidatedRepository
+        return documentConsolidatedRepository
                 .findByDocumentNodeId(rootNodeForDocument.getId())
                 .orElseThrow(EntityNotFoundException::new);
-        BigInteger noOfComments = commentService.count(rootNodeForDocument.getId());
-
-        return mapperService.map(documentConsolidated, noOfComments);
     }
 
     @Transactional(readOnly = true)

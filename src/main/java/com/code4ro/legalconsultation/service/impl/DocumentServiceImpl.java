@@ -71,17 +71,20 @@ public class DocumentServiceImpl implements DocumentService {
     @Transactional(readOnly = true)
     @Override
     public DocumentConsolidatedDto fetchConsolidatedByMetadataId(final UUID id) {
-        final DocumentConsolidated document = documentConsolidatedService.getByDocumentMetadataId(id);
-        UUID documentNodeId = document.getDocumentNode().getId();
-        BigInteger noOfcComments = commentService.count(documentNodeId);
-
-        return documentConsolidatedMapper.map(document, noOfcComments);
+        return convertModelToDto(documentConsolidatedService.getByDocumentMetadataId(id));
     }
 
     @Transactional(readOnly = true)
     @Override
     public DocumentConsolidatedDto fetchConsolidatedByDocumentNodeId(UUID id) {
-        return documentConsolidatedService.getByMemberDocumentNodeId(id);
+        return convertModelToDto(documentConsolidatedService.getByMemberDocumentNodeId(id));
+    }
+
+    private DocumentConsolidatedDto convertModelToDto(DocumentConsolidated document) {
+        UUID documentNodeId = document.getDocumentNode().getId();
+        BigInteger noOfcComments = commentService.count(documentNodeId);
+
+        return documentConsolidatedMapper.map(document, noOfcComments);
     }
 
     @Transactional
