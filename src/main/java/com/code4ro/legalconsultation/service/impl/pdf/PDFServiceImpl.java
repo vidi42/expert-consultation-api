@@ -4,9 +4,8 @@ import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.service.api.PDFService;
 import com.code4ro.legalconsultation.service.impl.pdf.reader.BasicOARPdfReader;
 import com.code4ro.legalconsultation.service.impl.pdf.reader.PDFReader;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,8 +13,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 @Service
+@Slf4j
 public class PDFServiceImpl implements PDFService {
-    private static final Logger LOG = LoggerFactory.getLogger(PDFServiceImpl.class);
 
     private final BasicOARPdfReader basicOARPdfReader;
 
@@ -33,7 +32,7 @@ public class PDFServiceImpl implements PDFService {
             final PDFReader pdfReader = basicOARPdfReader;
             return pdfReader.getContent(doc);
         } catch (IOException e) {
-            LOG.warn("Exception while parsing PDF file", e);
+            log.warn("Exception while parsing PDF file", e);
             throw new LegalValidationException("document.parse.pdf.failed", HttpStatus.BAD_REQUEST);
         }
     }

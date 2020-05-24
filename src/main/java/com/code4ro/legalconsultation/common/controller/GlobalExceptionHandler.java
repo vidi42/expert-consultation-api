@@ -3,8 +3,7 @@ package com.code4ro.legalconsultation.common.controller;
 import com.code4ro.legalconsultation.common.exceptions.ExceptionResponse;
 import com.code4ro.legalconsultation.common.exceptions.I18nError;
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(LegalValidationException.class)
     protected ResponseEntity<Object> handleLegalValidationException(final LegalValidationException ex) {
@@ -50,7 +49,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<Object> handleException(final Exception ex) {
-        LOG.error("Unknown problem.", ex);
+        log.error("Unknown problem.", ex);
         return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, null, null, ex.getLocalizedMessage());
     }
 

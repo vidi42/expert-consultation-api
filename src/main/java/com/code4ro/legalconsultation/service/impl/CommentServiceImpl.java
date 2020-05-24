@@ -13,7 +13,6 @@ import com.code4ro.legalconsultation.repository.CommentRepository;
 import com.code4ro.legalconsultation.service.api.CommentService;
 import com.code4ro.legalconsultation.service.api.DocumentNodeService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,10 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.math.BigInteger;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -58,7 +55,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public CommentDto create(UUID nodeId, final CommentDto commentDto) {
+    public CommentIdentificationDto create(UUID nodeId, final CommentDto commentDto) {
         final DocumentNode node = documentNodeService.findById(nodeId);
 
         final ApplicationUser currentUser = currentUserService.getCurrentUser();
@@ -69,7 +66,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setLastEditDateTime(new Date());
         comment = commentRepository.save(comment);
 
-        return mapperService.map(comment);
+        return mapperService.mapToCommentIdentificationDto(comment);
     }
 
     @Transactional

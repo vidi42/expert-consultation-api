@@ -10,12 +10,10 @@ import com.code4ro.legalconsultation.service.api.MailApi;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,9 +26,9 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserService {
-    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
     private static final String COMMA_REGEX = ",";
 
     private final UserRepository userRepository;
@@ -108,7 +106,7 @@ public class UserService {
         try {
             return extractUsers(csvFile.getInputStream());
         } catch (Exception e) {
-            LOG.error("Exception while parsing the csv file", e);
+            log.error("Exception while parsing the csv file", e);
             throw new LegalValidationException("user.Extract.csv.failed", HttpStatus.BAD_REQUEST);
         }
     }
@@ -142,7 +140,7 @@ public class UserService {
 
             return users;
         } catch (Exception e) {
-            LOG.error("Exception while parsing the input stream", e);
+            log.error("Exception while parsing the input stream", e);
             throw new LegalValidationException("user.Extract.users.failed", HttpStatus.BAD_REQUEST);
         }
     }

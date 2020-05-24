@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface CommentService {
     CommentDto update(UUID nodeId, UUID id, CommentDto commentDto);
 
-    CommentDto create(UUID nodeId, CommentDto commentDto);
+    CommentIdentificationDto create(UUID nodeId, CommentDto commentDto);
 
     CommentDto createReply(UUID parentId, CommentDto commentDto);
 

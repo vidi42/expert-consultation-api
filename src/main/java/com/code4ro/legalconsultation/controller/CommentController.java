@@ -30,8 +30,8 @@ public class CommentController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping
-    public ResponseEntity<CommentDto> create(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
-                                             @ApiParam("The DTO object containing a new comment") @RequestBody final CommentDto commentDto) {
+    public ResponseEntity<CommentIdentificationDto> create(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
+                                                           @ApiParam("The DTO object containing a new comment") @RequestBody final CommentDto commentDto) {
         return ResponseEntity.ok(commentService.create(nodeId, commentDto));
     }
 
@@ -56,7 +56,7 @@ public class CommentController {
     }
 
     @ApiOperation(value = "Get all comments of a node",
-            response = Page.class,
+            response = PageDto.class,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping
@@ -69,7 +69,7 @@ public class CommentController {
     }
 
     @ApiOperation(value = "Get all replies of a comment",
-            response = Page.class,
+            response = PageDto.class,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping("/{commentId}/replies")

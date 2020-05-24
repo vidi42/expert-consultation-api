@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://${MYSQL_DB_URL}:3306/legalconsultation?serverTimezone=Europe/Bucharest&characterEncoding=UTF-8
-    username: ${MYSQL_DB_USERNAME}
-    password: ${MYSQL_DB_PASSWORD}
+    url: jdbc:mysql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}?serverTimezone=Europe/Bucharest&characterEncoding=UTF-8
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
   jpa:
     show-sql: true
     hibernate.ddl-auto: update
@@ -21,16 +21,17 @@ spring:
   mvc:
     locale: ro
   mail:
-    host: '127.0.0.1'
-    port: 1025
-    username: ""
-    password: ""
+    host: email-smtp.us-east-1.amazonaws.com
+    port: 25 #  25, 465 or 587
+    # This is Different from AWS_ACCESS_ID and AWS_SECRET_KEY.  Required to generate AWS SES production credentials: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/smtp-credentials.html
+    username: ${AWS_SES_USERNAME}
+    password:  ${AWS_SES_PASSWORD}
     properties:
       transport:
         protocol: 'smtp'
       mail:
         smtp:
-          auth: false # set the access user/password and change this to true
+          auth: true # set the access user/password and change this to true
           starttls:
             enable: true
   cache:
@@ -39,7 +40,8 @@ app:
   jwtSecret: ORy9HWgKoZPAs50ECKw0
   jwtExpirationInMs: 1728000000   # two days expiration time, can be extended
   signupurl: 'http://localhost:4200/authentication/sign-up'
-
+  email:
+    sender: noreply@legalconsultation.ro # temporary value. change this to a real email that is validated in SES : https://docs.aws.amazon.com/ses/latest/DeveloperGuide/verify-email-addresses-procedure.html
 storage:
   aws:
     region: ${AWS_REGION}

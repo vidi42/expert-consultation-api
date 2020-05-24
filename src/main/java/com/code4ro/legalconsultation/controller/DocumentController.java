@@ -1,10 +1,7 @@
 package com.code4ro.legalconsultation.controller;
 
 import com.code4ro.legalconsultation.model.DocumentUserAssignmentDto;
-import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
-import com.code4ro.legalconsultation.model.dto.DocumentMetadataDto;
-import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
-import com.code4ro.legalconsultation.model.dto.UserDto;
+import com.code4ro.legalconsultation.model.dto.*;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.service.api.DocumentService;
@@ -30,13 +27,13 @@ public class DocumentController {
     private final DocumentService documentService;
 
     @ApiOperation(value = "Return document metadata for all documents in the platform",
-            response = List.class,
+            response = PageDto.class,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping("")
-    public ResponseEntity<Page<DocumentMetadata>> getAllDocuments(@ApiParam("Page object information being requested") Pageable pageable) {
+    public ResponseEntity<PageDto<DocumentMetadata>> getAllDocuments(@ApiParam("Page object information being requested") Pageable pageable) {
         Page<DocumentMetadata> documents = documentService.fetchAll(pageable);
 
-        return new ResponseEntity<>(documents, HttpStatus.OK);
+        return ResponseEntity.ok(new PageDto<>(documents));
     }
 
     @ApiOperation(value = "Return document metadata for a single document in the platform based on id",
@@ -79,7 +76,7 @@ public class DocumentController {
         DocumentConsolidated consolidated = documentService.create(documentViewDto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(consolidated.getId());
+                .body(consolidated.getDocumentMetadata().getId());
     }
 
     @ApiOperation(value = "Modify a saved document in the platform",

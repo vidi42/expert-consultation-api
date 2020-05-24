@@ -68,24 +68,17 @@ public class DocumentConsolidatedServiceTest {
 
 
         when(documentConsolidatedRepository.findByDocumentMetadataId(any(UUID.class))).thenReturn(Optional.of(documentConsolidated));
-        when(commentService.count(documentNodeUuid)).thenReturn(BigInteger.ONE);
-        DocumentConsolidatedMapperImpl mapper = new DocumentConsolidatedMapperImpl();
-        when(mapperService.map(any(DocumentConsolidated.class), eq(BigInteger.ONE))).thenAnswer(i -> {
-            DocumentConsolidated argument = i.getArgument(0);
-            return mapper.map(argument, BigInteger.ONE);
-        });
 
         //when
-        DocumentConsolidatedDto documentConsolidatedDto = documentConsolidatedService.getByDocumentMetadataId(uuid);
+        DocumentConsolidated document = documentConsolidatedService.getByDocumentMetadataId(uuid);
 
         //then
-        assertEquals("DocumentNode id is different", documentNodeUuid, documentConsolidatedDto.getDocumentNode().getId());
-        assertEquals("DocumentNode title is different", documentNodeTitle, documentConsolidatedDto.getDocumentNode().getTitle());
-        assertEquals("No. of comments is different", BigInteger.ONE, documentConsolidatedDto.getDocumentNode().getNumberOfComments());
+        assertEquals("DocumentNode id is different", documentNodeUuid, document.getDocumentNode().getId());
+        assertEquals("DocumentNode title is different", documentNodeTitle, document.getDocumentNode().getTitle());
 
-        assertEquals("DocumentMetadata title is different", documentMetadataTitle, documentConsolidatedDto.getDocumentMetadata().getDocumentTitle());
+        assertEquals("DocumentMetadata title is different", documentMetadataTitle, document.getDocumentMetadata().getDocumentTitle());
 
-        assertEquals("OpenForCommenting should be true", true, documentConsolidatedDto.getDocumentConfiguration().getOpenForCommenting());
+        assertEquals("OpenForCommenting should be true", true, document.getDocumentConfiguration().getOpenForCommenting());
     }
 
     @Test
