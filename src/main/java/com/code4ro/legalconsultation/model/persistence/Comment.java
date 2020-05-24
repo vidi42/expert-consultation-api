@@ -35,4 +35,7 @@ public class Comment extends BaseEntity {
     @Temporal(TemporalType.DATE)
     @LastModifiedDate
     private Date lastEditDateTime;
+
+    @Column(name = "status")
+    private CommentStatus status;
 }

@@ -9,6 +9,7 @@ import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.model.persistence.UserRole;
+import com.code4ro.legalconsultation.model.persistence.*;
 import com.code4ro.legalconsultation.repository.CommentRepository;
 import com.code4ro.legalconsultation.service.api.CommentService;
 import com.code4ro.legalconsultation.service.api.DocumentNodeService;
@@ -22,6 +23,7 @@ import javax.persistence.EntityNotFoundException;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -110,6 +112,16 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public BigInteger count(UUID nodeId) {
         return commentRepository.countByDocumentNodeId(nodeId);
+    }
+
+    @Transactional
+    @Override
+    public CommentDto setStatus(UUID commentId, CommentStatus status) {
+        final Comment comment = commentRepository.findById(commentId).orElseThrow(EntityNotFoundException::new);
+        if (comment.getStatus() != null) throw new RuntimeException("The comment status is already set!");
+        comment.setStatus(status);
+        commentRepository.save(comment);
+        return mapperService.map(comment);
     }
 
     private void checkIfAuthorized(Comment comment) {

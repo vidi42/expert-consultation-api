@@ -5,6 +5,7 @@ import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.service.api.CommentService;
+import java.util.Date;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,9 @@ public final class CommentFactory {
 
     public CommentDto create() {
         final CommentDto commentDto = RandomObjectFiller.createAndFill(CommentDto.class);
+        if (commentDto== null) throw new IllegalArgumentException("Failed to create the comment");
+        commentDto.setLastEditDateTime(new Date());
+        commentDto.setStatus(null);
         return commentDto;
     }
 
@@ -30,6 +34,7 @@ public final class CommentFactory {
         final Comment comment = new Comment();
         comment.setOwner(RandomObjectFiller.createAndFillWithBaseEntity(ApplicationUser.class));
         comment.setText(RandomStringUtils.randomAlphanumeric(10));
+        comment.setId(UUID.randomUUID());
         return comment;
     }
 }
