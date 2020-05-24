@@ -13,6 +13,8 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -143,6 +145,20 @@ public class UserService {
             log.error("Exception while parsing the input stream", e);
             throw new LegalValidationException("user.Extract.users.failed", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    public List<User> searchByTerm(final String term) {
+        User userWithDesiredFields = new User();
+        userWithDesiredFields.setFirstName(term);
+        userWithDesiredFields.setLastName(term);
+        userWithDesiredFields.setEmail(term);
+
+        ExampleMatcher anyMatcher = ExampleMatcher.matchingAny()
+                .withMatcher("firstName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                .withMatcher("lastName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                .withMatcher("email", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+
+        return userRepository.findAll(Example.of(userWithDesiredFields, anyMatcher));
     }
 
 }

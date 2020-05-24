@@ -92,4 +92,13 @@ public class UserController {
             @RequestBody final List<String> usersList) {
         return userService.extractFromCopyPaste(usersList);
     }
+
+    @ApiOperation(value = "Search fields within the user for a given input term",
+            response = List.class,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/search")
+    public List<UserDto> searchByTerm(@ApiParam("String of the input searching term")
+                                      @RequestParam("searchTerm") final String searchTerm) {
+        return userMapper.map(userService.searchByTerm(searchTerm));
+    }
 }
