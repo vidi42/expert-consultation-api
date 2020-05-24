@@ -4,6 +4,7 @@ import com.code4ro.legalconsultation.model.DocumentUserAssignmentDto;
 import com.code4ro.legalconsultation.model.dto.*;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
+import com.code4ro.legalconsultation.model.persistence.PdfHandle;
 import com.code4ro.legalconsultation.service.api.DocumentService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -96,5 +98,16 @@ public class DocumentController {
     public ResponseEntity<List<UserDto>> getAssignedUsers(@ApiParam(value = "Id of the document") @PathVariable("id") UUID id) {
         final List<UserDto> assignedUsers = documentService.getAssignedUsers(id);
         return ResponseEntity.ok(assignedUsers);
+    }
+    
+    @ApiOperation(value = "Upload a pdf to this document",
+            consumes = MediaType.APPLICATION_PDF_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            response = PdfHandleDto.class)
+    @PostMapping("/{id}/pdf")
+    public ResponseEntity<PdfHandle> uploadPdf(@ApiParam(value = "Id of the document") @PathVariable UUID id,
+                                               @ApiParam(value = "State of the pdf document") @RequestParam String state,
+                                               @ApiParam(value = "The pdf document") @RequestBody MultipartFile file) {
+        return ResponseEntity.ok(documentService.addPdf(id, state, file));
     }
 }
