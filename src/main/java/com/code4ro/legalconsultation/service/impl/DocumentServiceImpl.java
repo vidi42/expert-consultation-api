@@ -1,11 +1,9 @@
 package com.code4ro.legalconsultation.service.impl;
 
 import com.code4ro.legalconsultation.converters.DocumentConsolidatedMapper;
+import com.code4ro.legalconsultation.converters.PdfHandleMapper;
 import com.code4ro.legalconsultation.converters.UserMapper;
-import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
-import com.code4ro.legalconsultation.model.dto.DocumentMetadataDto;
-import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
-import com.code4ro.legalconsultation.model.dto.UserDto;
+import com.code4ro.legalconsultation.model.dto.*;
 import com.code4ro.legalconsultation.model.persistence.*;
 import com.code4ro.legalconsultation.service.api.*;
 import org.slf4j.Logger;
@@ -35,6 +33,7 @@ public class DocumentServiceImpl implements DocumentService {
     private final UserMapper userMapperService;
     private final DocumentConsolidatedMapper documentConsolidatedMapper;
     private final CommentService commentService;
+    private final PdfHandleMapper pdfHandleMapper;
 
     @Autowired
     public DocumentServiceImpl(final DocumentConsolidatedService documentConsolidatedService,
@@ -45,7 +44,8 @@ public class DocumentServiceImpl implements DocumentService {
                                final UserService userService,
                                final UserMapper userMapperService,
                                final DocumentConsolidatedMapper documentConsolidatedMapper,
-                               final CommentService commentService) {
+                               final CommentService commentService,
+                               final PdfHandleMapper pdfHandleMapper) {
         this.documentConsolidatedService = documentConsolidatedService;
         this.documentMetadataService = documentMetadataService;
         this.pdfService = pdfService;
@@ -55,6 +55,7 @@ public class DocumentServiceImpl implements DocumentService {
         this.userMapperService = userMapperService;
         this.documentConsolidatedMapper = documentConsolidatedMapper;
         this.commentService = commentService;
+        this.pdfHandleMapper = pdfHandleMapper;
     }
 
     @Transactional(readOnly = true)
@@ -138,9 +139,9 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public PdfHandle addPdf(final UUID id, final String state, final MultipartFile file) {
+    public PdfHandleDto addPdf(final UUID id, final String state, final MultipartFile file) {
         final DocumentConsolidated documentConsolidated = documentConsolidatedService.getEntity(id);
 
-        return pdfService.createPdf(documentConsolidated, state, file);
+        return pdfHandleMapper.map(pdfService.createPdf(documentConsolidated, state, file));
     }
 }

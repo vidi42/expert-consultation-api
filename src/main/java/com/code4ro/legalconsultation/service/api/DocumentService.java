@@ -1,12 +1,8 @@
 package com.code4ro.legalconsultation.service.api;
 
-import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
-import com.code4ro.legalconsultation.model.dto.DocumentMetadataDto;
-import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
-import com.code4ro.legalconsultation.model.dto.UserDto;
+import com.code4ro.legalconsultation.model.dto.*;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
-import com.code4ro.legalconsultation.model.persistence.PdfHandle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,5 +38,5 @@ public interface DocumentService {
 
     List<UserDto> getAssignedUsers(final UUID id);
 
-    PdfHandle addPdf(final UUID id, final String state, final MultipartFile file);
+    PdfHandleDto addPdf(final UUID id, final String state, final MultipartFile file);
 }

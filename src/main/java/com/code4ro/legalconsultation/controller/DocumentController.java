@@ -4,7 +4,6 @@ import com.code4ro.legalconsultation.model.DocumentUserAssignmentDto;
 import com.code4ro.legalconsultation.model.dto.*;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
-import com.code4ro.legalconsultation.model.persistence.PdfHandle;
 import com.code4ro.legalconsultation.service.api.DocumentService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -105,7 +104,7 @@ public class DocumentController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             response = PdfHandleDto.class)
     @PostMapping("/{id}/pdf")
-    public ResponseEntity<PdfHandle> uploadPdf(@ApiParam(value = "Id of the document") @PathVariable UUID id,
+    public ResponseEntity<PdfHandleDto> uploadPdf(@ApiParam(value = "Id of the document") @PathVariable UUID id,
                                                @ApiParam(value = "State of the pdf document") @RequestParam String state,
                                                @ApiParam(value = "The pdf document") @RequestBody MultipartFile file) {
         return ResponseEntity.ok(documentService.addPdf(id, state, file));
