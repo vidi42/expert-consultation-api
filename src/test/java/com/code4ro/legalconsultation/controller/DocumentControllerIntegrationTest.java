@@ -10,6 +10,7 @@ import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.repository.DocumentConsolidatedRepository;
 import com.code4ro.legalconsultation.repository.DocumentMetadataRepository;
 import com.code4ro.legalconsultation.repository.DocumentNodeRepository;
+import com.code4ro.legalconsultation.repository.PdfHandleRepository;
 import com.code4ro.legalconsultation.util.CommentFactory;
 import com.code4ro.legalconsultation.util.DocumentNodeFactory;
 import com.code4ro.legalconsultation.util.PdfFileFactory;
@@ -18,6 +19,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
@@ -50,6 +52,8 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     private DocumentNodeFactory documentNodeFactory;
     @Autowired
     private CommentFactory commentFactory;
+    @Autowired
+    private PdfHandleRepository pdfHandleRepository;
 
     @Test
     @WithMockUser
@@ -449,6 +453,23 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
 
         mvc.perform(delete("/api/documents/" + uuid.toString()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser
+    @Transactional
+    public void addPdf() throws Exception {
+        DocumentConsolidated consolidated = saveSingleConsolidated();
+
+        final String state = "abcdef";
+        final MockMultipartFile randomFile = PdfFileFactory
+                .getAsMultipart(getClass().getClassLoader());
+        
+        mvc.perform(multipart("/api/documents/" + consolidated.getId().toString() + "/pdf")
+                .file(randomFile)
+                .contentType(MediaType.APPLICATION_PDF)
+                .param("state", state))
+                .andExpect(status().isOk());
     }
 
     private DocumentConsolidated saveSingleConsolidated() {
