@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -134,5 +135,12 @@ public class DocumentServiceImpl implements DocumentService {
         final List<User> assignedUsers = documentConsolidated.getAssignedUsers();
 
         return assignedUsers.stream().map(userMapperService::map).collect(Collectors.toList());
+    }
+
+    @Override
+    public PdfHandle addPdf(final UUID id, final String state, final MultipartFile file) {
+        final DocumentConsolidated documentConsolidated = documentConsolidatedService.getEntity(id);
+
+        return pdfService.createPdf(documentConsolidated, state, file);
     }
 }
