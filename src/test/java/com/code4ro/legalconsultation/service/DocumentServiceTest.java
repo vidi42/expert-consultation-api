@@ -3,15 +3,13 @@ package com.code4ro.legalconsultation.service;
 import com.code4ro.legalconsultation.converters.DocumentConsolidatedMapper;
 import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
 import com.code4ro.legalconsultation.model.dto.DocumentMetadataDto;
-import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
-import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
-import com.code4ro.legalconsultation.model.persistence.DocumentNode;
-import com.code4ro.legalconsultation.model.persistence.User;
+import com.code4ro.legalconsultation.model.persistence.*;
 import com.code4ro.legalconsultation.service.api.CommentService;
 import com.code4ro.legalconsultation.service.impl.DocumentConsolidatedService;
 import com.code4ro.legalconsultation.service.impl.DocumentMetadataService;
 import com.code4ro.legalconsultation.service.impl.DocumentServiceImpl;
 import com.code4ro.legalconsultation.service.impl.UserService;
+import com.code4ro.legalconsultation.service.impl.pdf.PDFServiceImpl;
 import com.code4ro.legalconsultation.util.RandomObjectFiller;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +18,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
@@ -30,6 +29,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,6 +47,8 @@ public class DocumentServiceTest {
     private CommentService commentService;
     @Mock
     private DocumentConsolidatedMapper documentConsolidatedMapper;
+    @Mock
+    private PDFServiceImpl pdfService;
 
     @Captor
     private ArgumentCaptor<DocumentConsolidated> documentConsolidatedArgumentCaptor;
@@ -122,5 +124,29 @@ public class DocumentServiceTest {
         final DocumentConsolidated capturedDocument = documentConsolidatedArgumentCaptor.getValue();
         assertThat(capturedDocument.getAssignedUsers()).hasSize(3);
         assertThat(capturedDocument.getAssignedUsers()).containsAll(assignedUsers);
+    }
+
+    @Test
+    public void addPdf() {
+        final UUID documentId = UUID.randomUUID();
+        
+        when(documentConsolidatedService.getEntity(any(UUID.class))).thenAnswer((Answer<DocumentConsolidated>) invocationOnMock -> {
+            DocumentConsolidated documentConsolidated = new DocumentConsolidated();
+            documentConsolidated.setId(documentId);
+            return documentConsolidated;
+        });
+        final DocumentConsolidated documentConsolidated = documentConsolidatedService.getEntity(documentId);
+        
+        assertThat(documentConsolidated.getId()).isEqualTo(documentId);
+
+        when(pdfService.createPdf(any(DocumentConsolidated.class), any(), any())).thenAnswer((Answer<PdfHandle>) invocationOnMock -> {
+            PdfHandle pdfHandle = new PdfHandle();
+            pdfHandle.setOwner(documentConsolidated);
+            return pdfHandle;
+        });
+        
+        final PdfHandle pdfHandle = pdfService.createPdf(documentConsolidated, null, null);
+
+        assertThat(documentConsolidated).isEqualTo(pdfHandle.getOwner());
     }
 }
