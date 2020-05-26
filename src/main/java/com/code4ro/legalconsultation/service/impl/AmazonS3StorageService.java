@@ -5,7 +5,9 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.code4ro.legalconsultation.service.api.StorageApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,12 +62,15 @@ public class AmazonS3StorageService implements StorageApi {
         final ObjectMetadata data = new ObjectMetadata();
         data.setContentLength(document.getSize());
         final String uniqueDocumentName = StorageApi.resolveUniqueName(document);
-        amazonS3.putObject(documentBucket, uniqueDocumentName, document.getInputStream(), data);
+        final PutObjectRequest putObjectRequest =
+                new PutObjectRequest(documentBucket, uniqueDocumentName, document.getInputStream(), data)
+                        .withCannedAcl(CannedAccessControlList.PublicRead);
+        amazonS3.putObject(putObjectRequest);
         return amazonS3.getUrl(documentBucket, uniqueDocumentName).toString();
     }
 
     @Override
-    public byte[] loadFile(String documentURI)  {
+    public byte[] loadFile(String documentURI) {
         try {
             return amazonS3.getObject(documentBucket, documentURI)
                     .getObjectContent()
