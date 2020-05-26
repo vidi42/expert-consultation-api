@@ -8,15 +8,16 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.service.api.StorageApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 
 @Service
 @Profile("production")
@@ -58,30 +59,43 @@ public class AmazonS3StorageService implements StorageApi {
     }
 
     @Override
-    public String storeFile(final MultipartFile document) throws Exception {
+    public String storeFile(final MultipartFile document) {
         final ObjectMetadata data = new ObjectMetadata();
         data.setContentLength(document.getSize());
         final String uniqueDocumentName = StorageApi.resolveUniqueName(document);
-        final PutObjectRequest putObjectRequest =
+        log.info("Storing document with name {}.", uniqueDocumentName);
+        try {
+            final PutObjectRequest putObjectRequest =
                 new PutObjectRequest(documentBucket, uniqueDocumentName, document.getInputStream(), data)
-                        .withCannedAcl(CannedAccessControlList.PublicRead);
-        amazonS3.putObject(putObjectRequest);
+                .withCannedAcl(CannedAccessControlList.PublicRead);
+            amazonS3.putObject(putObjectRequest);
+        } catch (Exception e) {
+            log.error("Storing of document with name: {} failed.", uniqueDocumentName, e);
+            throw new LegalValidationException("storage.upload.failed", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         return amazonS3.getUrl(documentBucket, uniqueDocumentName).toString();
     }
 
     @Override
     public byte[] loadFile(String documentURI) {
+        log.info("Loading document with uri {}.", documentURI);
         try {
             return amazonS3.getObject(documentBucket, documentURI)
                     .getObjectContent()
                     .readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException("Load File fail");
+        } catch (Exception e) {
+            log.error("Loading of document uri: {} failed.", documentURI, e);
+            throw new LegalValidationException("storage.load.failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
     public void deleteFile(String documentURI) {
-        amazonS3.deleteObject(documentBucket, documentURI);
+        try {
+            amazonS3.deleteObject(documentBucket, documentURI);
+        } catch (Exception e) {
+            log.error("Load File fail", e);
+            throw new LegalValidationException("storage.delete.failed", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
