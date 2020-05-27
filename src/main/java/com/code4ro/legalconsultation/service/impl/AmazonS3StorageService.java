@@ -73,7 +73,7 @@ public class AmazonS3StorageService implements StorageApi {
             log.error("Storing of document with name: {} failed.", uniqueDocumentName, e);
             throw new LegalValidationException("storage.upload.failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return amazonS3.getUrl(documentBucket, uniqueDocumentName).toString();
+        return uniqueDocumentName;
     }
 
     @Override
