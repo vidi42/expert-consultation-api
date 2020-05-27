@@ -102,7 +102,7 @@ public abstract class DocumentNodeParser {
     }
 
     private String getCurrentLine() {
-        return lines[metadata.getCurrentLineIndex()].trim() + " ";
+        return lines[metadata.getCurrentLineIndex()].trim();
     }
 
     private void skipTitleLines(final String title) {
