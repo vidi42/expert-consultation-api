@@ -51,12 +51,10 @@ public class AmazonS3StorageServiceTest {
     public void storeFile() throws Exception {
         final MultipartFile randomFile = new MockMultipartFile("file", "file", "text/plain",
                 "text".getBytes());
-        when(client.getUrl(eq(documentBucket), anyString())).thenReturn(new URL("http://url"));
 
         storageService.storeFile(randomFile);
 
         verify(client).putObject(putObjectRequestArgumentCaptor.capture());
-        verify(client).getUrl(eq(documentBucket), anyString());
 
         final PutObjectRequest putObjectRequest = putObjectRequestArgumentCaptor.getValue();
         assertThat(putObjectRequest.getBucketName()).isEqualTo(documentBucket);
