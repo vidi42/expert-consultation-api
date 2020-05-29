@@ -32,20 +32,20 @@ jobs:
         region: ${{ secrets.AWS_REGION }}
         application_name: ExpertConsultationApi
         environment_name: ExpertConsultationApi-staging
-        version_label: 0.0.1-SNAPSHOT
+        version_label: expert-staging-${{ github.run_id }}
         deployment_package: target/expert-consultation-0.0.1-SNAPSHOT.jar
 
-    # - name: Build the Docker image
-    #   if: github.ref == 'refs/heads/develop'
-    #   run: |
-    #     docker build . \
-    #     --file etc/docker/Dockerfile-dev \
-    #     --tag ${{ secrets.ORGANIZATION }}/${{ secrets.REPO }}:latest
+    - name: Build the Docker image
+      if: github.ref == 'refs/heads/develop'
+      run: |
+        docker build . \
+        --file etc/docker/Dockerfile-dev \
+        --tag ${{ secrets.ORGANIZATION }}/${{ secrets.REPO }}:latest
 
-    # - name: Login to docker registry
-    #   if: github.ref == 'refs/heads/develop'
-    #   run: docker login -u ${{ secrets.USERNAME }} -p ${{ secrets.PASSWORD }}
+    - name: Login to docker registry
+      if: github.ref == 'refs/heads/develop'
+      run: docker login -u ${{ secrets.USERNAME }} -p ${{ secrets.PASSWORD }}
 
-    # - name: Push to docker registry
-    #   if: github.ref == 'refs/heads/develop'
-    #   run: docker push ${{ secrets.ORGANIZATION }}/${{ secrets.REPO }}:latest
+    - name: Push to docker registry
+      if: github.ref == 'refs/heads/develop'
+      run: docker push ${{ secrets.ORGANIZATION }}/${{ secrets.REPO }}:latest
