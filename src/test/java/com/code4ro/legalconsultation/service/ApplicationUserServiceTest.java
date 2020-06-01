@@ -7,7 +7,7 @@ import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.repository.ApplicationUserRepository;
 import com.code4ro.legalconsultation.service.impl.ApplicationUserService;
 import com.code4ro.legalconsultation.service.impl.UserService;
-import com.code4ro.legalconsultation.util.RandomObjectFiller;
+import com.code4ro.legalconsultation.factory.RandomObjectFiller;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

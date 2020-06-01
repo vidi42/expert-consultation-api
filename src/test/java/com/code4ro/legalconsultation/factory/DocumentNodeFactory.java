@@ -1,4 +1,4 @@
-package com.code4ro.legalconsultation.util;
+package com.code4ro.legalconsultation.factory;
 
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.model.persistence.DocumentNodeType;

@@ -11,10 +11,10 @@ import com.code4ro.legalconsultation.repository.DocumentConsolidatedRepository;
 import com.code4ro.legalconsultation.repository.DocumentMetadataRepository;
 import com.code4ro.legalconsultation.repository.DocumentNodeRepository;
 import com.code4ro.legalconsultation.repository.PdfHandleRepository;
-import com.code4ro.legalconsultation.util.CommentFactory;
-import com.code4ro.legalconsultation.util.DocumentNodeFactory;
-import com.code4ro.legalconsultation.util.PdfFileFactory;
-import com.code4ro.legalconsultation.util.RandomObjectFiller;
+import com.code4ro.legalconsultation.factory.CommentFactory;
+import com.code4ro.legalconsultation.factory.DocumentNodeFactory;
+import com.code4ro.legalconsultation.factory.PdfFileFactory;
+import com.code4ro.legalconsultation.factory.RandomObjectFiller;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -159,7 +159,7 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
         assertThat(section1.getChildren()).hasSize(2);
         assertDocumentNodeContent(expectedSection1, section1);
 
-        final DocumentNode expectedSection2 = documentNodeFactory.createSection("2", null, null);
+        final DocumentNode expectedSection2 = documentNodeFactory.createSection("2", "", "");
         expectedSection2.setParent(chapter1);
         final DocumentNode section2 = chapter1.getChildren().get(1);
         assertThat(section1.getChildren()).hasSize(2);

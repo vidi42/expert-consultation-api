@@ -2,7 +2,7 @@ package com.code4ro.legalconsultation.common.controller;
 
 import com.code4ro.legalconsultation.model.dto.SignUpRequest;
 import com.code4ro.legalconsultation.service.impl.ApplicationUserService;
-import com.code4ro.legalconsultation.util.RandomObjectFiller;
+import com.code4ro.legalconsultation.factory.RandomObjectFiller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.runner.RunWith;
