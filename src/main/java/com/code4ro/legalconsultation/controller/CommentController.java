@@ -15,7 +15,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.net.http.HttpHeaders;
 import java.util.UUID;
+
+import static com.code4ro.legalconsultation.model.persistence.CommentStatus.APPROVED;
+import static com.code4ro.legalconsultation.model.persistence.CommentStatus.REJECTED;
 
 @RestController
 @RequestMapping("/api/documentnodes/{nodeId}/comments")
@@ -32,7 +37,8 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<CommentIdentificationDto> create(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
                                                            @ApiParam("The DTO object containing a new comment") @RequestBody final CommentDto commentDto) {
-        return ResponseEntity.ok(commentService.create(nodeId, commentDto));
+        CommentIdentificationDto comment = commentService.create(nodeId, commentDto);
+        return ResponseEntity.created(URI.create("/api/documentnodes/" + nodeId + "/comments/" + comment.getId())).body(comment);
     }
 
     @ApiOperation(value = "Update a comment in the platform",
@@ -66,6 +72,16 @@ public class CommentController {
         Page<CommentIdentificationDto> commentsDto = comments.map(commentMapper::mapToCommentIdentificationDto);
 
         return ResponseEntity.ok(new PageDto<>(commentsDto));
+    }
+
+    @GetMapping("/{commentId}/approve")
+    public ResponseEntity<CommentDto> approve(@PathVariable UUID commentId){
+        return ResponseEntity.ok(commentService.setStatus(commentId, APPROVED));
+    }
+
+    @GetMapping("/{commentId}/reject")
+    public ResponseEntity<CommentDto> reject(@PathVariable UUID commentId){
+        return ResponseEntity.ok(commentService.setStatus(commentId, REJECTED));
     }
 
     @ApiOperation(value = "Get all replies of a comment",

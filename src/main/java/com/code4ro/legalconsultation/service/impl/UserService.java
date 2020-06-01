@@ -13,6 +13,8 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -107,7 +109,10 @@ public class UserService {
             return extractUsers(csvFile.getInputStream());
         } catch (Exception e) {
             log.error("Exception while parsing the csv file", e);
-            throw new LegalValidationException("user.Extract.csv.failed", HttpStatus.BAD_REQUEST);
+            throw LegalValidationException.builder()
+                    .i18nKey("user.Extract.csv.failed")
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .build();
         }
     }
 
@@ -141,8 +146,25 @@ public class UserService {
             return users;
         } catch (Exception e) {
             log.error("Exception while parsing the input stream", e);
-            throw new LegalValidationException("user.Extract.users.failed", HttpStatus.BAD_REQUEST);
+            throw LegalValidationException.builder()
+                    .i18nKey("user.Extract.users.failed")
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .build();
         }
+    }
+
+    public List<User> searchByTerm(final String term) {
+        User userWithDesiredFields = new User();
+        userWithDesiredFields.setFirstName(term);
+        userWithDesiredFields.setLastName(term);
+        userWithDesiredFields.setEmail(term);
+
+        ExampleMatcher anyMatcher = ExampleMatcher.matchingAny()
+                .withMatcher("firstName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                .withMatcher("lastName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase())
+                .withMatcher("email", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+
+        return userRepository.findAll(Example.of(userWithDesiredFields, anyMatcher));
     }
 
 }

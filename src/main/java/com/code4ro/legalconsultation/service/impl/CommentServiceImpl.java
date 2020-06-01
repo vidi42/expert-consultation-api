@@ -9,6 +9,7 @@ import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.model.persistence.UserRole;
+import com.code4ro.legalconsultation.model.persistence.*;
 import com.code4ro.legalconsultation.repository.CommentRepository;
 import com.code4ro.legalconsultation.service.api.CommentService;
 import com.code4ro.legalconsultation.service.api.DocumentNodeService;
@@ -22,6 +23,7 @@ import javax.persistence.EntityNotFoundException;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -112,11 +114,29 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.countByDocumentNodeId(nodeId);
     }
 
+    @Transactional
+    @Override
+    public CommentDto setStatus(UUID commentId, CommentStatus status) {
+        final Comment comment = commentRepository.findById(commentId).orElseThrow(EntityNotFoundException::new);
+        if (comment.getStatus() != null) {
+            throw LegalValidationException.builder()
+                    .i18nKey("comment.Status.already.set")
+                    .httpStatus(HttpStatus.CONFLICT)
+                    .build();
+        }
+        comment.setStatus(status);
+        commentRepository.save(comment);
+        return mapperService.map(comment);
+    }
+
     private void checkIfAuthorized(Comment comment) {
         final ApplicationUser owner = comment.getOwner();
         final ApplicationUser currentUser = currentUserService.getCurrentUser();
         if (currentUser.getUser().getRole() != UserRole.ADMIN && !Objects.equals(currentUser.getId(), owner.getId())) {
-            throw new LegalValidationException("comment.Unauthorized.user", HttpStatus.BAD_REQUEST);
+            throw LegalValidationException.builder()
+                    .i18nKey("comment.Unauthorized.user")
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .build();
         }
     }
 }

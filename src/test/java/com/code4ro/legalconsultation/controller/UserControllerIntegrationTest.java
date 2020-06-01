@@ -195,4 +195,41 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
                 .andExpect(jsonPath("$[0].role").value(UserRole.CONTRIBUTOR.toString()))
                 .andExpect(status().isOk());
     }
+
+
+    @Test
+    @WithMockUser
+    public void searchUserByTerm() throws Exception {
+        User firstNameUser = RandomObjectFiller.createAndFill(User.class);
+        firstNameUser.setFirstName("firstly");
+        User lastNameUser = RandomObjectFiller.createAndFill(User.class);
+        lastNameUser.setLastName("lastly");
+        User emailUser = RandomObjectFiller.createAndFill(User.class);
+        emailUser.setEmail("emaily@mail.com");
+        userRepository.saveAll(Arrays.asList(firstNameUser, lastNameUser, emailUser));
+
+        assertThat(userRepository.count()).isEqualTo(3);
+
+        mvc.perform(get("/api/users/search")
+                .param("searchTerm", "first")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].firstName").value("firstly"))
+                .andExpect(status().isOk());
+
+        mvc.perform(get("/api/users/search")
+                .param("searchTerm", "lastly")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].lastName").value("lastly"))
+                .andExpect(status().isOk());
+
+        mvc.perform(get("/api/users/search")
+                .param("searchTerm", "emaily")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].email").value("emaily@mail.com"))
+                .andExpect(status().isOk());
+    }
+
 }

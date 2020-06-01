@@ -1,11 +1,9 @@
 package com.code4ro.legalconsultation.service.impl;
 
 import com.code4ro.legalconsultation.converters.DocumentConsolidatedMapper;
+import com.code4ro.legalconsultation.converters.PdfHandleMapper;
 import com.code4ro.legalconsultation.converters.UserMapper;
-import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
-import com.code4ro.legalconsultation.model.dto.DocumentMetadataDto;
-import com.code4ro.legalconsultation.model.dto.DocumentViewDto;
-import com.code4ro.legalconsultation.model.dto.UserDto;
+import com.code4ro.legalconsultation.model.dto.*;
 import com.code4ro.legalconsultation.model.persistence.*;
 import com.code4ro.legalconsultation.service.api.*;
 import org.slf4j.Logger;
@@ -15,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -34,6 +33,7 @@ public class DocumentServiceImpl implements DocumentService {
     private final UserMapper userMapperService;
     private final DocumentConsolidatedMapper documentConsolidatedMapper;
     private final CommentService commentService;
+    private final PdfHandleMapper pdfHandleMapper;
 
     @Autowired
     public DocumentServiceImpl(final DocumentConsolidatedService documentConsolidatedService,
@@ -44,7 +44,8 @@ public class DocumentServiceImpl implements DocumentService {
                                final UserService userService,
                                final UserMapper userMapperService,
                                final DocumentConsolidatedMapper documentConsolidatedMapper,
-                               final CommentService commentService) {
+                               final CommentService commentService,
+                               final PdfHandleMapper pdfHandleMapper) {
         this.documentConsolidatedService = documentConsolidatedService;
         this.documentMetadataService = documentMetadataService;
         this.pdfService = pdfService;
@@ -54,6 +55,7 @@ public class DocumentServiceImpl implements DocumentService {
         this.userMapperService = userMapperService;
         this.documentConsolidatedMapper = documentConsolidatedMapper;
         this.commentService = commentService;
+        this.pdfHandleMapper = pdfHandleMapper;
     }
 
     @Transactional(readOnly = true)
@@ -71,7 +73,8 @@ public class DocumentServiceImpl implements DocumentService {
     @Transactional(readOnly = true)
     @Override
     public DocumentConsolidatedDto fetchConsolidatedByMetadataId(final UUID id) {
-        return convertModelToDto(documentConsolidatedService.getByDocumentMetadataId(id));
+        final DocumentConsolidated document = documentConsolidatedService.getByDocumentMetadataId(id);
+        return convertModelToDto(document);
     }
 
     @Transactional(readOnly = true)
@@ -81,10 +84,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     private DocumentConsolidatedDto convertModelToDto(DocumentConsolidated document) {
-        UUID documentNodeId = document.getDocumentNode().getId();
-        BigInteger noOfcComments = commentService.count(documentNodeId);
-
-        return documentConsolidatedMapper.map(document, noOfcComments);
+        return documentConsolidatedMapper.map(document);
     }
 
     @Transactional
@@ -143,5 +143,12 @@ public class DocumentServiceImpl implements DocumentService {
         final List<User> assignedUsers = documentConsolidated.getAssignedUsers();
 
         return assignedUsers.stream().map(userMapperService::map).collect(Collectors.toList());
+    }
+
+    @Override
+    public PdfHandleDto addPdf(final UUID id, final String state, final MultipartFile file) {
+        final DocumentConsolidated documentConsolidated = documentConsolidatedService.getEntity(id);
+
+        return pdfHandleMapper.map(pdfService.createPdf(documentConsolidated, state, file));
     }
 }
