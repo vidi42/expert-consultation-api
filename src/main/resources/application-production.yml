@@ -53,3 +53,11 @@ storage:
       documentBucket: ${AWS_DOCUMENT_BUCKET}
   filesystem:
     directory: ~
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
