@@ -86,4 +86,9 @@ public class DocumentNodeControllerTest {
 
         assertEquals("parentDocumentNode is different", parentDocumentNode, documentNodeToCreate.getParent());
     }
+
+    @Test
+    public void shouldDeleteDocumentNodeAndReturnRoot() {
+
+    }
 }

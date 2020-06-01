@@ -69,7 +69,13 @@ public class DocumentNodeServiceImpl implements DocumentNodeService {
     @Transactional
     @Override
     public void deleteById(UUID id) {
-        log.info("Delete DocumentNode by id: {}", id);
+        DocumentNode documentNode = documentNodeRepository.getOne(id);
+        DocumentNode parentNode = documentNode.getParent();
+        if (parentNode != null) {
+            parentNode.getChildren().remove(documentNode);
+            documentNodeRepository.save(parentNode);
+        }
+
         documentNodeRepository.deleteById(id);
     }
 }

@@ -6,7 +6,9 @@ import com.code4ro.legalconsultation.repository.DocumentNodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 public class DocumentNodeFactory {
@@ -23,7 +25,9 @@ public class DocumentNodeFactory {
         root.setDocumentNodeType(DocumentNodeType.DOCUMENT);
         final DocumentNode child = new DocumentNode();
         child.setDocumentNodeType(DocumentNodeType.ARTICLE);
-        root.setChildren(Collections.singletonList(child));
+        List<DocumentNode> nodeChildren = new ArrayList<>();
+        nodeChildren.add(child);
+        root.setChildren(nodeChildren);
         child.setParent(root);
         return root;
     }
