@@ -1,7 +1,7 @@
 package com.code4ro.legalconsultation.controller;
 
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
-import com.code4ro.legalconsultation.util.PdfFileFactory;
+import com.code4ro.legalconsultation.factory.PdfFileFactory;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;

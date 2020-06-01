@@ -9,7 +9,7 @@ import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.UserRepository;
 import com.code4ro.legalconsultation.service.impl.MailService;
 import com.code4ro.legalconsultation.service.impl.UserService;
-import com.code4ro.legalconsultation.util.RandomObjectFiller;
+import com.code4ro.legalconsultation.factory.RandomObjectFiller;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

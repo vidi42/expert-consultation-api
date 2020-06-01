@@ -5,7 +5,7 @@ import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegra
 import com.code4ro.legalconsultation.model.dto.LoginRequest;
 import com.code4ro.legalconsultation.model.dto.SignUpRequest;
 import com.code4ro.legalconsultation.repository.ApplicationUserRepository;
-import com.code4ro.legalconsultation.util.RandomObjectFiller;
+import com.code4ro.legalconsultation.factory.RandomObjectFiller;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

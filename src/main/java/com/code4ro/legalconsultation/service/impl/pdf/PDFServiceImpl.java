@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URI;
 import java.time.Instant;
 import java.util.Collections;
 
@@ -27,7 +26,7 @@ import java.util.Collections;
 public class PDFServiceImpl implements PDFService {
 
     private final BasicOARPdfReader basicOARPdfReader;
-    
+
     private final StorageApi storageApi;
     private final PdfHandleMapper pdfHandleMapper;
     private final PdfHandleRepository pdfHandleRepository;
@@ -91,7 +90,7 @@ public class PDFServiceImpl implements PDFService {
         pdfHandle.setHash(hash);
         pdfHandle.setOwner(owner);
         pdfHandle.setState(state);
-        pdfHandle.setUri(URI.create(uriString));
+        pdfHandle.setUri(uriString);
         pdfHandle.setTimestamp(Instant.now());
 
         return pdfHandleRepository.save(pdfHandle);
