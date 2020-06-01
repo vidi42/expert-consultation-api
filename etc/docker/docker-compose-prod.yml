@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  mysql:
+  database:
     container_name: postgres
     image: postgres:13
     restart: always

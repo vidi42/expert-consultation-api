@@ -39,7 +39,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/v2/api-docs",
             "/configuration/**",
             "/swagger*/**",
-            "/webjars/**"
+            "/webjars/**",
+            "/actuator/**"
     };
 
     private CustomUserDetailsService customUserDetailsService;
