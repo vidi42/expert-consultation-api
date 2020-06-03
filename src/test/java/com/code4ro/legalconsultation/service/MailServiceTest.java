@@ -4,7 +4,7 @@ import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.service.impl.I18nService;
 import com.code4ro.legalconsultation.service.impl.MailService;
-import com.code4ro.legalconsultation.util.RandomObjectFiller;
+import com.code4ro.legalconsultation.factory.RandomObjectFiller;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;

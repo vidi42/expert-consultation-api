@@ -5,7 +5,7 @@ import com.code4ro.legalconsultation.model.dto.UserDto;
 import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.UserRepository;
-import com.code4ro.legalconsultation.util.RandomObjectFiller;
+import com.code4ro.legalconsultation.factory.RandomObjectFiller;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.internet.MimeMessage;
 import java.util.Arrays;
@@ -41,6 +42,7 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
 
     @Test
     @WithMockUser
+    @Transactional
     public void saveUser() throws Exception {
         final UserDto userDto = RandomObjectFiller.createAndFill(UserDto.class);
         userDto.setId(null);
@@ -59,6 +61,7 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
 
     @Test
     @WithMockUser
+    @Transactional
     public void saveUserEmailException() throws Exception {
         final UserDto userDto = RandomObjectFiller.createAndFill(UserDto.class);
         userDto.setId(null);
@@ -86,6 +89,7 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
 
     @Test
     @WithMockUser
+    @Transactional
     public void saveUsers() throws Exception {
         final List<User> users = Arrays.asList(
                 RandomObjectFiller.createAndFill(User.class), RandomObjectFiller.createAndFill(User.class));
@@ -102,6 +106,7 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
 
     @Test
     @WithMockUser
+    @Transactional
     public void getUser() throws Exception {
         final User user = userRepository.save(RandomObjectFiller.createAndFill(User.class));
 
@@ -113,6 +118,7 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
 
     @Test
     @WithMockUser
+    @Transactional
     public void list() throws Exception {
         final List<User> users = Arrays.asList(
                 RandomObjectFiller.createAndFill(User.class),
@@ -145,6 +151,7 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
 
     @Test
     @WithMockUser
+    @Transactional
     public void deleteUser() throws Exception {
         final User user = userRepository.save(RandomObjectFiller.createAndFill(User.class));
         assertThat(userRepository.count()).isEqualTo(1);
@@ -199,6 +206,7 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
 
     @Test
     @WithMockUser
+    @Transactional
     public void searchUserByTerm() throws Exception {
         User firstNameUser = RandomObjectFiller.createAndFill(User.class);
         firstNameUser.setFirstName("firstly");

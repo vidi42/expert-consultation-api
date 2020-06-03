@@ -2,6 +2,7 @@ package com.code4ro.legalconsultation.service.api;
 
 import com.code4ro.legalconsultation.model.dto.*;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
+import com.code4ro.legalconsultation.model.persistence.DocumentExportFormat;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,4 +47,6 @@ public interface DocumentService {
     List<UserDto> getAssignedUsers(final UUID id);
 
     PdfHandleDto addPdf(final UUID id, final String state, final MultipartFile file);
+
+    byte[] export(final UUID id, final DocumentExportFormat type);
 }

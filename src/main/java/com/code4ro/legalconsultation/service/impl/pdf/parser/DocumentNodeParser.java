@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.code4ro.legalconsultation.util.StringComparator.containsIgnoreWhitespace;
+
 public abstract class DocumentNodeParser {
 
     @Lazy
@@ -102,12 +104,12 @@ public abstract class DocumentNodeParser {
     }
 
     private String getCurrentLine() {
-        return lines[metadata.getCurrentLineIndex()].trim();
+        return lines[metadata.getCurrentLineIndex()].trim() + " ";
     }
 
     private void skipTitleLines(final String title) {
         String currentLine = getNextLine();
-        while (title.contains(currentLine)) {
+        while (containsIgnoreWhitespace(title, currentLine)) {
             currentLine = getNextLine();
         }
     }

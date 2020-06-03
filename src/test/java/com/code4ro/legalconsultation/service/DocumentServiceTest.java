@@ -10,7 +10,7 @@ import com.code4ro.legalconsultation.service.impl.DocumentMetadataService;
 import com.code4ro.legalconsultation.service.impl.DocumentServiceImpl;
 import com.code4ro.legalconsultation.service.impl.UserService;
 import com.code4ro.legalconsultation.service.impl.pdf.PDFServiceImpl;
-import com.code4ro.legalconsultation.util.RandomObjectFiller;
+import com.code4ro.legalconsultation.factory.RandomObjectFiller;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -21,7 +21,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;

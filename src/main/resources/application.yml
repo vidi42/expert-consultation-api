@@ -54,4 +54,12 @@ storage:
     s3:
       documentBucket: documents
   filesystem:
-    directory: ~
+    directory: legal_consult_uploads
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

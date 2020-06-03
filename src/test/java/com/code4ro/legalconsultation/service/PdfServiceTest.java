@@ -5,7 +5,7 @@ import com.code4ro.legalconsultation.model.persistence.PdfHandle;
 import com.code4ro.legalconsultation.repository.PdfHandleRepository;
 import com.code4ro.legalconsultation.service.impl.FilesystemStorageService;
 import com.code4ro.legalconsultation.service.impl.pdf.PDFServiceImpl;
-import com.code4ro.legalconsultation.util.PdfFileFactory;
+import com.code4ro.legalconsultation.factory.PdfFileFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -15,12 +15,10 @@ import org.mockito.stubbing.Answer;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URI;
 import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,7 +44,7 @@ public class PdfServiceTest {
         final String state = "abcdef";
         final MultipartFile randomFile = PdfFileFactory
                 .getAsMultipart(getClass().getClassLoader());
-        final URI randomFilePath = URI.create("file:///" + randomFile.getOriginalFilename());
+        final String randomFilePath = "file:///" + randomFile.getOriginalFilename();
         assertThat(randomFile).isNotNull();
         Instant timestamp = Instant.now();
         final Integer hash = randomFile.hashCode();
@@ -56,7 +54,7 @@ public class PdfServiceTest {
             mockPdfHandle.setId(pdfHandleId);
             return mockPdfHandle;
         });
-        when(storageApi.storeFile(any(MultipartFile.class))).thenReturn(randomFilePath.toString());
+        when(storageApi.storeFile(any(MultipartFile.class))).thenReturn(randomFilePath);
 
         final PdfHandle pdfHandle = pdfService.createPdf(owner, state, randomFile);
 
@@ -68,7 +66,7 @@ public class PdfServiceTest {
         assertThat(ownerUuid).isEqualTo(pdfHandle.getOwner().getId());
         assertThat(state).isEqualTo(pdfHandle.getState());
         assertThat(timestamp).isBefore(pdfHandle.getTimestamp());
-        assertThat(timestampAfter).isAfter(pdfHandle.getTimestamp());
+        assertThat(timestampAfter).isAfterOrEqualTo(pdfHandle.getTimestamp());
         assertThat(hash).isEqualTo(pdfHandle.getHash());
         assertThat(randomFilePath).isEqualTo(pdfHandle.getUri());
     }
