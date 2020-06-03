@@ -26,4 +26,6 @@ public interface CommentService {
     BigInteger count(UUID nodeId);
 
     CommentDto setStatus(UUID commentId, CommentStatus approved);
+
+    Comment findById(UUID id);
 }
