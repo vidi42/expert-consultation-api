@@ -5,9 +5,12 @@ import com.code4ro.legalconsultation.converters.PdfHandleMapper;
 import com.code4ro.legalconsultation.converters.UserMapper;
 import com.code4ro.legalconsultation.model.dto.*;
 import com.code4ro.legalconsultation.model.persistence.*;
-import com.code4ro.legalconsultation.service.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.code4ro.legalconsultation.service.api.DocumentNodeService;
+import com.code4ro.legalconsultation.service.api.DocumentService;
+import com.code4ro.legalconsultation.service.api.PDFService;
+import com.code4ro.legalconsultation.service.api.StorageApi;
+import com.code4ro.legalconsultation.service.export.DocumentExporter;
+import com.code4ro.legalconsultation.service.export.DocumentExporterFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -32,8 +34,8 @@ public class DocumentServiceImpl implements DocumentService {
     private final UserService userService;
     private final UserMapper userMapperService;
     private final DocumentConsolidatedMapper documentConsolidatedMapper;
-    private final CommentService commentService;
     private final PdfHandleMapper pdfHandleMapper;
+    private final DocumentExporterFactory documentExporterFactory;
 
     @Autowired
     public DocumentServiceImpl(final DocumentConsolidatedService documentConsolidatedService,
@@ -44,8 +46,8 @@ public class DocumentServiceImpl implements DocumentService {
                                final UserService userService,
                                final UserMapper userMapperService,
                                final DocumentConsolidatedMapper documentConsolidatedMapper,
-                               final CommentService commentService,
-                               final PdfHandleMapper pdfHandleMapper) {
+                               final PdfHandleMapper pdfHandleMapper,
+                               final DocumentExporterFactory documentExporterFactory) {
         this.documentConsolidatedService = documentConsolidatedService;
         this.documentMetadataService = documentMetadataService;
         this.pdfService = pdfService;
@@ -54,8 +56,8 @@ public class DocumentServiceImpl implements DocumentService {
         this.userService = userService;
         this.userMapperService = userMapperService;
         this.documentConsolidatedMapper = documentConsolidatedMapper;
-        this.commentService = commentService;
         this.pdfHandleMapper = pdfHandleMapper;
+        this.documentExporterFactory = documentExporterFactory;
     }
 
     @Transactional(readOnly = true)
@@ -140,5 +142,13 @@ public class DocumentServiceImpl implements DocumentService {
         final DocumentConsolidated documentConsolidated = documentConsolidatedService.getEntity(id);
 
         return pdfHandleMapper.map(pdfService.createPdf(documentConsolidated, state, file));
+    }
+
+    @Override
+    @Transactional
+    public byte[] export(final UUID id, final DocumentExportFormat type) {
+        final DocumentExporter exporter = documentExporterFactory.getExporter(type);
+        final DocumentConsolidated documentConsolidated = documentConsolidatedService.getEntity(id);
+        return exporter.export(documentConsolidated);
     }
 }

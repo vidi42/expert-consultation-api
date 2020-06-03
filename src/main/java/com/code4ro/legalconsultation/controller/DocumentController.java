@@ -3,11 +3,13 @@ package com.code4ro.legalconsultation.controller;
 import com.code4ro.legalconsultation.model.DocumentUserAssignmentDto;
 import com.code4ro.legalconsultation.model.dto.*;
 import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
+import com.code4ro.legalconsultation.model.persistence.DocumentExportFormat;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.service.api.DocumentService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -98,15 +100,28 @@ public class DocumentController {
         final List<UserDto> assignedUsers = documentService.getAssignedUsers(id);
         return ResponseEntity.ok(assignedUsers);
     }
-    
+
     @ApiOperation(value = "Upload a pdf to this document",
             consumes = MediaType.APPLICATION_PDF_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE,
             response = PdfHandleDto.class)
     @PostMapping("/{id}/pdf")
     public ResponseEntity<PdfHandleDto> uploadPdf(@ApiParam(value = "Id of the document") @PathVariable UUID id,
-                                               @ApiParam(value = "State of the pdf document") @RequestParam String state,
-                                               @ApiParam(value = "The pdf document") @RequestBody MultipartFile file) {
+                                                  @ApiParam(value = "State of the pdf document") @RequestParam String state,
+                                                  @ApiParam(value = "The pdf document") @RequestBody MultipartFile file) {
         return ResponseEntity.ok(documentService.addPdf(id, state, file));
+    }
+
+    @ApiOperation(value = "Generate a PDF file from this document",
+            consumes = MediaType.APPLICATION_PDF_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/{id}/export")
+    public ResponseEntity<ByteArrayResource> generate(@PathVariable UUID id,
+                                                      @RequestParam("type") DocumentExportFormat type) {
+        final byte[] pdfContent = documentService.export(id, type);
+        return ResponseEntity.ok()
+                .contentLength(pdfContent.length)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(new ByteArrayResource(pdfContent));
     }
 }
