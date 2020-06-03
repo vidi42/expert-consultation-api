@@ -3,7 +3,7 @@ package com.code4ro.legalconsultation.controller;
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
 import com.code4ro.legalconsultation.converters.DocumentNodeMapper;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
-import com.code4ro.legalconsultation.util.DocumentNodeFactory;
+import com.code4ro.legalconsultation.factory.DocumentNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
