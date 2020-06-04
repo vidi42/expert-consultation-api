@@ -19,7 +19,7 @@
             <div th:include="fragments/inline-node-fragment ::frag (${node})"></div>
         </div>
     </div>
-    <div th:if="${node.children.size()} > 0">
+    <div th:unless="${#arrays.isEmpty(node.children)}">
         <div th:each="child: ${node.children}">
             <div th:include="fragments/node-fragment ::frag (${child})"></div>
         </div>
