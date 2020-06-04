@@ -1,16 +1,18 @@
 package com.code4ro.legalconsultation.service;
 
 import com.code4ro.legalconsultation.converters.DocumentConsolidatedMapper;
+import com.code4ro.legalconsultation.factory.RandomObjectFiller;
 import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
 import com.code4ro.legalconsultation.model.dto.DocumentMetadataDto;
 import com.code4ro.legalconsultation.model.persistence.*;
 import com.code4ro.legalconsultation.service.api.CommentService;
+import com.code4ro.legalconsultation.service.export.DocumentExporterFactory;
+import com.code4ro.legalconsultation.service.export.PDFExporter;
 import com.code4ro.legalconsultation.service.impl.DocumentConsolidatedService;
 import com.code4ro.legalconsultation.service.impl.DocumentMetadataService;
 import com.code4ro.legalconsultation.service.impl.DocumentServiceImpl;
 import com.code4ro.legalconsultation.service.impl.UserService;
 import com.code4ro.legalconsultation.service.impl.pdf.PDFServiceImpl;
-import com.code4ro.legalconsultation.factory.RandomObjectFiller;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -28,7 +30,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,6 +49,10 @@ public class DocumentServiceTest {
     private DocumentConsolidatedMapper documentConsolidatedMapper;
     @Mock
     private PDFServiceImpl pdfService;
+    @Mock
+    private DocumentExporterFactory documentExporterFactory;
+    @Mock
+    private PDFExporter pdfExporter;
 
     @Captor
     private ArgumentCaptor<DocumentConsolidated> documentConsolidatedArgumentCaptor;
@@ -127,14 +132,14 @@ public class DocumentServiceTest {
     @Test
     public void addPdf() {
         final UUID documentId = UUID.randomUUID();
-        
+
         when(documentConsolidatedService.getEntity(any(UUID.class))).thenAnswer((Answer<DocumentConsolidated>) invocationOnMock -> {
             DocumentConsolidated documentConsolidated = new DocumentConsolidated();
             documentConsolidated.setId(documentId);
             return documentConsolidated;
         });
         final DocumentConsolidated documentConsolidated = documentConsolidatedService.getEntity(documentId);
-        
+
         assertThat(documentConsolidated.getId()).isEqualTo(documentId);
 
         when(pdfService.createPdf(any(DocumentConsolidated.class), any(), any())).thenAnswer((Answer<PdfHandle>) invocationOnMock -> {
@@ -142,9 +147,28 @@ public class DocumentServiceTest {
             pdfHandle.setOwner(documentConsolidated);
             return pdfHandle;
         });
-        
+
         final PdfHandle pdfHandle = pdfService.createPdf(documentConsolidated, null, null);
 
         assertThat(documentConsolidated).isEqualTo(pdfHandle.getOwner());
+    }
+
+    @Test
+    public void exportDocumentToPdf() {
+        final UUID id = UUID.randomUUID();
+        final byte[] pdfContent = new byte[]{1, 2, 3};
+
+        when(documentExporterFactory.getExporter(DocumentExportFormat.PDF)).thenReturn(pdfExporter);
+        when(pdfExporter.export(any())).thenReturn(pdfContent);
+
+        final byte[] result = documentService.export(id, DocumentExportFormat.PDF);
+
+        verify(documentExporterFactory).getExporter(DocumentExportFormat.PDF);
+        verify(documentConsolidatedService).getEntity(id);
+
+        assertThat(result)
+                .isNotEmpty()
+                .hasSameSizeAs(pdfContent)
+                .isEqualTo(pdfContent);
     }
 }
