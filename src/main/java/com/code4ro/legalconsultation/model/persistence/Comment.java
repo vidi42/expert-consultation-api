@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Comment extends BaseEntity {
-    @Column(name = "text")
+    @Column(name = "text", columnDefinition = "TEXT")
     private String text;
 
     @ManyToOne(fetch = FetchType.LAZY)
