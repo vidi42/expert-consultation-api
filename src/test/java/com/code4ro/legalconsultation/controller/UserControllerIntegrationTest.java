@@ -37,6 +37,7 @@ public class UserControllerIntegrationTest extends AbstractControllerIntegration
 
     @Before
     public void before() {
+        userRepository.deleteAll();
         when(mailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
     }
 

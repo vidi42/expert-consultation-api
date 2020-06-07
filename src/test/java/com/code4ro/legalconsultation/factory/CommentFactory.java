@@ -1,15 +1,15 @@
 package com.code4ro.legalconsultation.factory;
 
+import com.code4ro.legalconsultation.model.dto.CommentDetailDto;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
-import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.service.api.CommentService;
-import java.util.Date;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Component
@@ -20,13 +20,13 @@ public final class CommentFactory {
 
     public CommentDto create() {
         final CommentDto commentDto = RandomObjectFiller.createAndFill(CommentDto.class);
-        if (commentDto== null) throw new IllegalArgumentException("Failed to create the comment");
+        if (commentDto == null) throw new IllegalArgumentException("Failed to create the comment");
         commentDto.setLastEditDateTime(new Date());
         commentDto.setStatus(null);
         return commentDto;
     }
 
-    public CommentIdentificationDto save(final UUID nodeId) {
+    public CommentDetailDto save(final UUID nodeId) {
         return commentService.create(nodeId, create());
     }
 

@@ -3,8 +3,8 @@ package com.code4ro.legalconsultation.service.impl;
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.config.security.CurrentUserService;
 import com.code4ro.legalconsultation.converters.CommentMapper;
+import com.code4ro.legalconsultation.model.dto.CommentDetailDto;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
-import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
 import com.code4ro.legalconsultation.model.persistence.*;
 import com.code4ro.legalconsultation.repository.CommentRepository;
 import com.code4ro.legalconsultation.service.api.CommentService;
@@ -40,19 +40,19 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public CommentDto update(UUID nodeId, final UUID id, final CommentDto commentDto) {
+    public CommentDetailDto update(UUID nodeId, final UUID id, final CommentDto commentDto) {
         Comment comment = commentRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         checkIfAuthorized(comment);
 
         comment.setText(commentDto.getText());
         comment = commentRepository.save(comment);
 
-        return mapperService.map(comment);
+        return mapperService.mapToCommentDetailDto(comment);
     }
 
     @Transactional
     @Override
-    public CommentIdentificationDto create(UUID nodeId, final CommentDto commentDto) {
+    public CommentDetailDto create(UUID nodeId, final CommentDto commentDto) {
         final DocumentNode node = documentNodeService.findById(nodeId);
 
         final ApplicationUser currentUser = currentUserService.getCurrentUser();
@@ -63,12 +63,12 @@ public class CommentServiceImpl implements CommentService {
         comment.setLastEditDateTime(new Date());
         comment = commentRepository.save(comment);
 
-        return mapperService.mapToCommentIdentificationDto(comment);
+        return mapperService.mapToCommentDetailDto(comment);
     }
 
     @Transactional
     @Override
-    public CommentDto createReply(UUID parentId, CommentDto commentDto) {
+    public CommentDetailDto createReply(UUID parentId, CommentDto commentDto) {
         Comment parent = commentRepository.findById(parentId).orElseThrow(EntityNotFoundException::new);
         ApplicationUser currentUser = currentUserService.getCurrentUser();
 
@@ -79,7 +79,7 @@ public class CommentServiceImpl implements CommentService {
 
         reply = commentRepository.save(reply);
 
-        return mapperService.map(reply);
+        return mapperService.mapToCommentDetailDto(reply);
     }
 
     @Transactional
