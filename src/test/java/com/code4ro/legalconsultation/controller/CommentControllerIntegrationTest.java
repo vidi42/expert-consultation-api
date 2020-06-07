@@ -2,15 +2,15 @@ package com.code4ro.legalconsultation.controller;
 
 import com.code4ro.legalconsultation.common.controller.AbstractControllerIntegrationTest;
 import com.code4ro.legalconsultation.config.security.CurrentUserService;
+import com.code4ro.legalconsultation.factory.CommentFactory;
+import com.code4ro.legalconsultation.factory.DocumentNodeFactory;
+import com.code4ro.legalconsultation.model.dto.CommentDetailDto;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
-import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.repository.CommentRepository;
 import com.code4ro.legalconsultation.service.api.CommentService;
-import com.code4ro.legalconsultation.factory.CommentFactory;
-import com.code4ro.legalconsultation.factory.DocumentNodeFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
                 .content(objectMapper.writeValueAsString(commentDto))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.text").value(commentDto.getText()))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
 
         assertThat(commentRepository.count()).isEqualTo(1);
     }
@@ -145,9 +145,9 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
     @Test
     @WithMockUser
     @Transactional
-    public void approve() throws Exception{
+    public void approve() throws Exception {
         final DocumentNode node = documentNodeFactory.save();
-        CommentIdentificationDto comment = commentService.create(node.getId(), commentFactory.create());
+        CommentDetailDto comment = commentService.create(node.getId(), commentFactory.create());
         mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId(), "/approve"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(APPROVED.toString()))
@@ -157,9 +157,9 @@ public class CommentControllerIntegrationTest extends AbstractControllerIntegrat
     @Test
     @WithMockUser
     @Transactional
-    public void reject() throws Exception{
+    public void reject() throws Exception {
         final DocumentNode node = documentNodeFactory.save();
-        CommentIdentificationDto comment = commentService.create(node.getId(), commentFactory.create());
+        CommentDetailDto comment = commentService.create(node.getId(), commentFactory.create());
         mvc.perform(get(endpoint("/api/documentnodes/", node.getId(), "/comments/", comment.getId(), "/reject"))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.status").value(REJECTED.toString()))

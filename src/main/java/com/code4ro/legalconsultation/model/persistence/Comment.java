@@ -32,7 +32,7 @@ public class Comment extends BaseEntity {
     private List<Comment> replies;
 
     @Column(name = "last_edit_date", nullable = false)
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date lastEditDateTime;
 

@@ -1,8 +1,8 @@
 package com.code4ro.legalconsultation.controller;
 
 import com.code4ro.legalconsultation.converters.CommentMapper;
+import com.code4ro.legalconsultation.model.dto.CommentDetailDto;
 import com.code4ro.legalconsultation.model.dto.CommentDto;
-import com.code4ro.legalconsultation.model.dto.CommentIdentificationDto;
 import com.code4ro.legalconsultation.model.dto.PageDto;
 import com.code4ro.legalconsultation.model.persistence.Comment;
 import com.code4ro.legalconsultation.service.api.CommentService;
@@ -15,8 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
-import java.net.http.HttpHeaders;
 import java.util.UUID;
 
 import static com.code4ro.legalconsultation.model.persistence.CommentStatus.APPROVED;
@@ -35,10 +33,10 @@ public class CommentController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping
-    public ResponseEntity<CommentIdentificationDto> create(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
-                                                           @ApiParam("The DTO object containing a new comment") @RequestBody final CommentDto commentDto) {
-        CommentIdentificationDto comment = commentService.create(nodeId, commentDto);
-        return ResponseEntity.created(URI.create("/api/documentnodes/" + nodeId + "/comments/" + comment.getId())).body(comment);
+    public ResponseEntity<CommentDetailDto> create(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
+                                                   @ApiParam("The DTO object containing a new comment") @RequestBody final CommentDto commentDto) {
+        CommentDetailDto comment = commentService.create(nodeId, commentDto);
+        return ResponseEntity.ok(comment);
     }
 
     @ApiOperation(value = "Update a comment in the platform",
@@ -46,9 +44,9 @@ public class CommentController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @PutMapping("/{id}")
-    public ResponseEntity<CommentDto> update(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
-                                             @ApiParam(value = "The id of the comment") @PathVariable final UUID id,
-                                             @ApiParam("The DTO object to update") @RequestBody final CommentDto commentDto) {
+    public ResponseEntity<CommentDetailDto> update(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
+                                                   @ApiParam(value = "The id of the comment") @PathVariable final UUID id,
+                                                   @ApiParam("The DTO object to update") @RequestBody final CommentDto commentDto) {
         return ResponseEntity.ok(commentService.update(nodeId, id, commentDto));
     }
 
@@ -66,21 +64,21 @@ public class CommentController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping
-    public ResponseEntity<PageDto<CommentIdentificationDto>> findAll(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
-                                                                     @ApiParam("Page object information being requested") final Pageable pageable) {
+    public ResponseEntity<PageDto<CommentDetailDto>> findAll(@ApiParam(value = "The id of the node") @PathVariable final UUID nodeId,
+                                                             @ApiParam("Page object information being requested") final Pageable pageable) {
         Page<Comment> comments = commentService.findAll(nodeId, pageable);
-        Page<CommentIdentificationDto> commentsDto = comments.map(commentMapper::mapToCommentIdentificationDto);
+        Page<CommentDetailDto> commentsDto = comments.map(commentMapper::mapToCommentDetailDto);
 
         return ResponseEntity.ok(new PageDto<>(commentsDto));
     }
 
     @GetMapping("/{commentId}/approve")
-    public ResponseEntity<CommentDto> approve(@PathVariable UUID commentId){
+    public ResponseEntity<CommentDto> approve(@PathVariable UUID commentId) {
         return ResponseEntity.ok(commentService.setStatus(commentId, APPROVED));
     }
 
     @GetMapping("/{commentId}/reject")
-    public ResponseEntity<CommentDto> reject(@PathVariable UUID commentId){
+    public ResponseEntity<CommentDto> reject(@PathVariable UUID commentId) {
         return ResponseEntity.ok(commentService.setStatus(commentId, REJECTED));
     }
 
@@ -89,10 +87,10 @@ public class CommentController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @GetMapping("/{commentId}/replies")
-    public ResponseEntity<PageDto<CommentIdentificationDto>> findAllReplies(@ApiParam(value = "The id of the comment") @PathVariable final UUID commentId,
-                                                                            @ApiParam("Page object information being requested") final Pageable pageable) {
+    public ResponseEntity<PageDto<CommentDetailDto>> findAllReplies(@ApiParam(value = "The id of the comment") @PathVariable final UUID commentId,
+                                                                    @ApiParam("Page object information being requested") final Pageable pageable) {
         Page<Comment> replies = commentService.findAllReplies(commentId, pageable);
-        Page<CommentIdentificationDto> repliesDto = replies.map(commentMapper::mapToCommentIdentificationDto);
+        Page<CommentDetailDto> repliesDto = replies.map(commentMapper::mapToCommentDetailDto);
 
         return ResponseEntity.ok(new PageDto<>(repliesDto));
     }
@@ -102,8 +100,8 @@ public class CommentController {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     @PostMapping("/{commentId}/replies")
-    public ResponseEntity<CommentDto> createReply(@ApiParam(value = "The id of the comment") @PathVariable final UUID commentId,
-                                                  @ApiParam("The DTO object containing a new reply") @RequestBody CommentDto commentDto) {
+    public ResponseEntity<CommentDetailDto> createReply(@ApiParam(value = "The id of the comment") @PathVariable final UUID commentId,
+                                                        @ApiParam("The DTO object containing a new reply") @RequestBody CommentDto commentDto) {
         return ResponseEntity.ok(commentService.createReply(commentId, commentDto));
     }
 }
