@@ -34,6 +34,17 @@ public class DocumentNodeServiceImpl implements DocumentNodeService {
                 .orElseThrow(EntityNotFoundException::new);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public DocumentNode findRootNodeForId(UUID id) {
+        DocumentNode root = findById(id);
+        while (root.getParent() != null) {
+            root = root.getParent();
+        }
+
+        return root;
+    }
+
     @Transactional
     @Override
     public DocumentNode parse(final String pdfContent) {
@@ -55,9 +66,16 @@ public class DocumentNodeServiceImpl implements DocumentNodeService {
         return documentNodeRepository.save(documentNode);
     }
 
+    @Transactional
     @Override
     public void deleteById(UUID id) {
-        log.info("Delete DocumentNode by id: {}", id);
+        DocumentNode documentNode = documentNodeRepository.getOne(id);
+        DocumentNode parentNode = documentNode.getParent();
+        if (parentNode != null) {
+            parentNode.getChildren().remove(documentNode);
+            documentNodeRepository.save(parentNode);
+        }
+
         documentNodeRepository.deleteById(id);
     }
 }

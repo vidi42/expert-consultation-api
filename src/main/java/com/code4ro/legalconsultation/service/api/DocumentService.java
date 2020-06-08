@@ -25,6 +25,13 @@ public interface DocumentService {
     //that contains the metadata and the breakdown into units
     DocumentConsolidatedDto fetchConsolidatedByMetadataId(final UUID id);
 
+    /**
+     * @param id of one of the document nodes contained in the requested document
+     * @return the entire consolidated form of the document,
+     * that contains the metadata and the breakdown into units
+     */
+    DocumentConsolidatedDto fetchConsolidatedByDocumentNodeId(final UUID id);
+
     //create a single document, including metadata and breakdown
     DocumentConsolidated create(final DocumentViewDto document);
 

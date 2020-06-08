@@ -426,6 +426,20 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
 
     @Test
     @WithMockUser
+    @Transactional
+    public void retrieveDocumentByInnerNodeId() throws Exception {
+        DocumentConsolidated consolidated = saveSingleConsolidated();
+        DocumentNode node = consolidated.getDocumentNode();
+
+        mvc.perform(get("/api/documents/" + node.getId() + "/node")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(consolidated.getId().toString()))
+                .andExpect(status().isOk());
+
+    }
+
+    @Test
+    @WithMockUser
     public void testGetDocumentNotFound() throws Exception {
         UUID uuid = UUID.randomUUID();
 

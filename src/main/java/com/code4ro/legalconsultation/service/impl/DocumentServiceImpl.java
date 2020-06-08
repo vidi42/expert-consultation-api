@@ -76,6 +76,16 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public DocumentConsolidatedDto fetchConsolidatedByMetadataId(final UUID id) {
         final DocumentConsolidated document = documentConsolidatedService.getByDocumentMetadataId(id);
+        return convertModelToDto(document);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public DocumentConsolidatedDto fetchConsolidatedByDocumentNodeId(UUID id) {
+        return convertModelToDto(documentConsolidatedService.getByMemberDocumentNodeId(id));
+    }
+
+    private DocumentConsolidatedDto convertModelToDto(DocumentConsolidated document) {
         return documentConsolidatedMapper.map(document);
     }
 

@@ -4,6 +4,7 @@ import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.repository.DocumentConsolidatedRepository;
+import com.code4ro.legalconsultation.service.api.DocumentNodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +17,13 @@ import java.util.UUID;
 public class DocumentConsolidatedService {
 
     private final DocumentConsolidatedRepository documentConsolidatedRepository;
+    private final DocumentNodeService documentNodeService;
 
     @Autowired
-    public DocumentConsolidatedService(final DocumentConsolidatedRepository repository) {
+    public DocumentConsolidatedService(final DocumentConsolidatedRepository repository,
+                                       final DocumentNodeService documentNodeService) {
         this.documentConsolidatedRepository = repository;
+        this.documentNodeService = documentNodeService;
     }
 
     @Transactional(readOnly = true)
@@ -31,6 +35,14 @@ public class DocumentConsolidatedService {
     public DocumentConsolidated getByDocumentMetadataId(final UUID id) {
         return documentConsolidatedRepository.
                 findByDocumentMetadataId(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Transactional(readOnly = true)
+    public DocumentConsolidated getByMemberDocumentNodeId(final UUID id) {
+        DocumentNode rootNodeForDocument = documentNodeService.findRootNodeForId(id);
+        return documentConsolidatedRepository
+                .findByDocumentNodeId(rootNodeForDocument.getId())
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     @Transactional(readOnly = true)
