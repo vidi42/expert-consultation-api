@@ -5,7 +5,7 @@ import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring",
-        uses = {DocumentMetadataMapper.class, DocumentNodeMapper.class})
+        uses = {DocumentMetadataMapper.class, DocumentNodeMapper.class, UserMapper.class})
 public interface DocumentConsolidatedMapper {
 
     DocumentConsolidatedDto map(DocumentConsolidated documentConsolidated);
