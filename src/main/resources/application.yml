@@ -56,6 +56,9 @@ storage:
   filesystem:
     directory: legal_consult_uploads
 management:
+  health:
+    mail:
+      enabled: false
   endpoints:
     web:
       exposure:
