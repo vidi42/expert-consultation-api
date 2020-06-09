@@ -3,9 +3,11 @@ package com.code4ro.legalconsultation.service.impl;
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
 import com.code4ro.legalconsultation.converters.UserMapper;
 import com.code4ro.legalconsultation.model.dto.UserDto;
+import com.code4ro.legalconsultation.model.persistence.Invitation;
 import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.model.persistence.UserRole;
 import com.code4ro.legalconsultation.repository.UserRepository;
+import com.code4ro.legalconsultation.service.api.InvitationService;
 import com.code4ro.legalconsultation.service.api.MailApi;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -37,14 +39,17 @@ public class UserService {
     private final CsvMapper csvMapper = new CsvMapper();
     private final MailApi mailApi;
     private final UserMapper mapperService;
+    private final InvitationService invitationService;
 
     @Autowired
     public UserService(final UserRepository userRepository,
                        final MailApi mailApi,
-                       final UserMapper mapperService) {
+                       final UserMapper mapperService,
+                       final InvitationService invitationService) {
         this.userRepository = userRepository;
         this.mailApi = mailApi;
         this.mapperService = mapperService;
+        this.invitationService = invitationService;
     }
 
     public User saveEntity(final User user) {
@@ -53,21 +58,29 @@ public class UserService {
 
     public UserDto saveAndSendRegistrationMail(final UserDto userDto) throws LegalValidationException {
         final User user = mapperService.map(userDto);
+        final boolean isNew = user.isNew();
         final User savedUser = userRepository.save(user);
-        if (user.isNew()) {
-            mailApi.sendRegisterMail(Collections.singletonList(user));
+
+        if (isNew) {
+            final Invitation invitation = invitationService.create(savedUser);
+            mailApi.sendRegisterMail(Collections.singletonList(invitation));
         }
+
         return mapperService.map(savedUser);
     }
 
     public List<UserDto> saveAndSendRegistrationMail(final List<UserDto> userDtos) throws LegalValidationException {
-        final List<User> users = userDtos.stream().map(mapperService::map).collect(Collectors.toList());
-        final List<User> newUsers = users.stream()
-                .filter(User::isNew)
+        final List<User> users = userDtos.stream()
+                .map(mapperService::map)
                 .collect(Collectors.toList());
         final List<User> savedUsers = userRepository.saveAll(users);
-        if (!newUsers.isEmpty()) {
-            mailApi.sendRegisterMail(newUsers);
+        final List<Invitation> invitations = savedUsers.stream()
+                .filter(User::isNew)
+                .map(invitationService::create)
+                .collect(Collectors.toList());
+
+        if (!invitations.isEmpty()) {
+            mailApi.sendRegisterMail(invitations);
         }
 
         return savedUsers.stream().map(mapperService::map).collect(Collectors.toList());
@@ -89,7 +102,6 @@ public class UserService {
     public void deleteById(final String id) {
         userRepository.deleteById(UUID.fromString(id));
     }
-
 
     private List<UserDto> read(InputStream stream) throws IOException {
         final CsvSchema schema = CsvSchema.builder()
