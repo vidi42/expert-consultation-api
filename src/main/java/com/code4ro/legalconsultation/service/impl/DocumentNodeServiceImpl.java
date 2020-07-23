@@ -1,5 +1,6 @@
 package com.code4ro.legalconsultation.service.impl;
 
+import com.code4ro.legalconsultation.model.dto.documentnode.DocumentNodeSimpleDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.repository.DocumentNodeRepository;
 import com.code4ro.legalconsultation.service.api.DocumentNodeService;
@@ -61,9 +62,14 @@ public class DocumentNodeServiceImpl implements DocumentNodeService {
     }
 
     @Override
-    public DocumentNode update(DocumentNode documentNode) {
+    public DocumentNode update(DocumentNodeSimpleDto documentNode) {
         log.info("Update DocumentNode: {}", documentNode);
-        return documentNodeRepository.save(documentNode);
+        final DocumentNode exitingDocumentNode = documentNodeRepository.findById(documentNode.getId())
+                .orElseThrow(EntityNotFoundException::new);
+        exitingDocumentNode.setTitle(documentNode.getTitle());
+        exitingDocumentNode.setIdentifier(documentNode.getIdentifier());
+        exitingDocumentNode.setContent(documentNode.getContent());
+        return documentNodeRepository.save(exitingDocumentNode);
     }
 
     @Transactional

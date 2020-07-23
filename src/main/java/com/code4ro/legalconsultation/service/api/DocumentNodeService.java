@@ -1,8 +1,8 @@
 package com.code4ro.legalconsultation.service.api;
 
+import com.code4ro.legalconsultation.model.dto.documentnode.DocumentNodeSimpleDto;
 import com.code4ro.legalconsultation.model.persistence.DocumentNode;
 
-import java.util.Set;
 import java.util.UUID;
 
 public interface DocumentNodeService {
@@ -14,7 +14,7 @@ public interface DocumentNodeService {
 
     DocumentNode create(final DocumentNode documentNode);
 
-    DocumentNode update(DocumentNode documentNode);
+    DocumentNode update(DocumentNodeSimpleDto documentNode);
 
     void deleteById(UUID id);
 }
