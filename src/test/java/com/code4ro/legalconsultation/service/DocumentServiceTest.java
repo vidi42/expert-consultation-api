@@ -4,6 +4,9 @@ import com.code4ro.legalconsultation.converters.DocumentConsolidatedMapper;
 import com.code4ro.legalconsultation.factory.RandomObjectFiller;
 import com.code4ro.legalconsultation.model.dto.DocumentConsolidatedDto;
 import com.code4ro.legalconsultation.model.dto.DocumentMetadataDto;
+import com.code4ro.legalconsultation.model.persistence.DocumentConsolidated;
+import com.code4ro.legalconsultation.model.persistence.User;
+import com.code4ro.legalconsultation.service.api.MailApi;
 import com.code4ro.legalconsultation.model.persistence.*;
 import com.code4ro.legalconsultation.service.api.CommentService;
 import com.code4ro.legalconsultation.service.export.DocumentExporterFactory;
@@ -31,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,6 +48,7 @@ public class DocumentServiceTest {
     @Mock
     private DocumentMetadataService documentMetadataService;
     @Mock
+    private MailApi mailService;
     private CommentService commentService;
     @Mock
     private DocumentConsolidatedMapper documentConsolidatedMapper;
@@ -123,6 +128,7 @@ public class DocumentServiceTest {
 
         documentService.assignUsers(documentConsolidated.getDocumentMetadata().getId(), assignedUsersIds);
 
+        verify(mailService).sendDocumentAssignedEmail(eq(documentConsolidated.getDocumentMetadata()), eq(assignedUsers));
         verify(documentConsolidatedService).saveOne(documentConsolidatedArgumentCaptor.capture());
         final DocumentConsolidated capturedDocument = documentConsolidatedArgumentCaptor.getValue();
         assertThat(capturedDocument.getAssignedUsers()).hasSize(3);

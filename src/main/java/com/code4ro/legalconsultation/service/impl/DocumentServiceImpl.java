@@ -5,6 +5,9 @@ import com.code4ro.legalconsultation.converters.PdfHandleMapper;
 import com.code4ro.legalconsultation.converters.UserMapper;
 import com.code4ro.legalconsultation.model.dto.*;
 import com.code4ro.legalconsultation.model.persistence.*;
+import com.code4ro.legalconsultation.service.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.code4ro.legalconsultation.service.api.DocumentNodeService;
 import com.code4ro.legalconsultation.service.api.DocumentService;
 import com.code4ro.legalconsultation.service.api.PDFService;
@@ -26,12 +29,15 @@ import java.util.stream.Collectors;
 @Service
 public class DocumentServiceImpl implements DocumentService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DocumentServiceImpl.class);
+
     private final DocumentConsolidatedService documentConsolidatedService;
     private final DocumentMetadataService documentMetadataService;
     private final PDFService pdfService;
     private final DocumentNodeService documentNodeService;
     private final StorageApi storageApi;
     private final UserService userService;
+    private final MailApi mailService;
     private final UserMapper userMapperService;
     private final DocumentConsolidatedMapper documentConsolidatedMapper;
     private final PdfHandleMapper pdfHandleMapper;
@@ -47,7 +53,8 @@ public class DocumentServiceImpl implements DocumentService {
                                final UserMapper userMapperService,
                                final DocumentConsolidatedMapper documentConsolidatedMapper,
                                final PdfHandleMapper pdfHandleMapper,
-                               final DocumentExporterFactory documentExporterFactory) {
+                               final DocumentExporterFactory documentExporterFactory,
+                               final MailApi mailService) {
         this.documentConsolidatedService = documentConsolidatedService;
         this.documentMetadataService = documentMetadataService;
         this.pdfService = pdfService;
@@ -58,6 +65,7 @@ public class DocumentServiceImpl implements DocumentService {
         this.documentConsolidatedMapper = documentConsolidatedMapper;
         this.pdfHandleMapper = pdfHandleMapper;
         this.documentExporterFactory = documentExporterFactory;
+        this.mailService = mailService;
     }
 
     @Transactional(readOnly = true)
@@ -135,8 +143,9 @@ public class DocumentServiceImpl implements DocumentService {
         final List<User> users = userService.findByIds(userIds);
         final DocumentConsolidated documentConsolidated = documentConsolidatedService.getByDocumentMetadataId(id);
         documentConsolidated.setAssignedUsers(users);
-
         documentConsolidatedService.saveOne(documentConsolidated);
+
+        mailService.sendDocumentAssignedEmail(documentConsolidated.getDocumentMetadata(), users);
     }
 
     @Override

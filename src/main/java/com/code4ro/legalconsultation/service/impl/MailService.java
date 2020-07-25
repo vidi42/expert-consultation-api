@@ -1,6 +1,7 @@
 package com.code4ro.legalconsultation.service.impl;
 
 import com.code4ro.legalconsultation.common.exceptions.LegalValidationException;
+import com.code4ro.legalconsultation.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.model.persistence.Invitation;
 import com.code4ro.legalconsultation.model.persistence.User;
 import com.code4ro.legalconsultation.service.api.MailApi;
@@ -21,6 +22,7 @@ import javax.mail.internet.MimeMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,16 +30,19 @@ import java.util.stream.Stream;
 @Profile("production")
 @Slf4j
 public class MailService implements MailApi {
-
-    private final JavaMailSender mailSender;
-    private final I18nService i18nService;
-    private final Configuration freemarkerConfig;
-    @Value("${app.signupurl}")
+    @Value("${app.email.signupurl}")
     private String signupUrl;
+    @Value("${app.email.documenturl}")
+    private String documentUrl;
     @Value("${spring.mvc.locale}")
     private String configuredLocale;
     @Value("${app.email.sender}")
     private String from;
+  
+    private final JavaMailSender mailSender;
+    private final I18nService i18nService;
+    private final Configuration freemarkerConfig;
+
 
     @Autowired
     public MailService(final JavaMailSender mailSender,
@@ -51,24 +56,15 @@ public class MailService implements MailApi {
     @Override
     public void sendRegisterMail(final List<Invitation> invitations) {
         final List<String> failedEmails = new ArrayList<>();
-        invitations.forEach(invitation -> {
-            final User user = invitation.getUser();
-            final MimeMessage message = mailSender.createMimeMessage();
-            final MimeMessageHelper helper = new MimeMessageHelper(message);
-            try {
-                helper.setFrom(from);
-                helper.setTo(user.getEmail());
-                final Template template = freemarkerConfig.getTemplate(getRegisterTemplate());
-                final String content =
-                        FreeMarkerTemplateUtils.processTemplateIntoString(template, getRegisterModel(invitation));
-                helper.setText(content, true);
-                helper.setSubject(i18nService.translate("register.User.confirmation.subject"));
-                mailSender.send(message);
-            } catch (final Exception e) {
-                log.error("Problem preparing or sending email to user with address {}", user.getEmail(), e);
-                failedEmails.add(user.getEmail());
-            }
-        });
+
+        final String translatedSubject = i18nService.translate("register.User.confirmation.subject");
+        final String registerTemplate = getRegisterTemplate();
+        invitations.forEach(invitation ->
+            buildAndSendEmail(translatedSubject,
+                    registerTemplate,
+                    getRegisterModel(invitation),
+                    invitation.getUser().getEmail())
+                    .ifPresent(failedEmails::add));
 
         if (!failedEmails.isEmpty()) {
             throw LegalValidationException.builder()
@@ -76,6 +72,44 @@ public class MailService implements MailApi {
                     .i8nArguments(failedEmails)
                     .httpStatus(HttpStatus.BAD_REQUEST)
                     .build();
+        }
+    }
+
+    @Override
+    public void sendDocumentAssignedEmail(final DocumentMetadata documentMetadata, final List<User> users) {
+        final List<String> failedEmails = new ArrayList<>();
+
+        final String translatedSubject = i18nService.translate("email.documentAssigned.subject");
+        final String documentAssignedTemplate = getDocumentAssignedTemplate();
+        users.forEach(user ->
+                buildAndSendEmail(translatedSubject, documentAssignedTemplate, getDocumentAssignedModel(documentMetadata, user), user.getEmail())
+                    .ifPresent(failedEmails::add)
+        );
+
+        if (!failedEmails.isEmpty()) {
+            throw LegalValidationException.builder()
+                    .i18nKey("user.Email.send.failed")
+                    .i8nArguments(failedEmails)
+                    .httpStatus(HttpStatus.BAD_REQUEST)
+                    .build();
+        }
+    }
+
+    private Optional<String> buildAndSendEmail(String subject, String templateName, Map<String, String> model, String userEmail) {
+        try {
+            final MimeMessage message = mailSender.createMimeMessage();
+            final MimeMessageHelper helper = new MimeMessageHelper(message);
+            //TODO: add From here from previous #121 issue
+            helper.setTo(userEmail);
+            helper.setSubject(subject);
+            final Template template = freemarkerConfig.getTemplate(templateName);
+            final String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+            helper.setText(content, true);
+            mailSender.send(message);
+            return Optional.empty();
+        } catch (final Exception e) {
+            log.error("Problem preparing or sending email to user with address {}", userEmail, e);
+            return Optional.of(userEmail);
         }
     }
 
@@ -100,4 +134,20 @@ public class MailService implements MailApi {
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.joining(USERNAME_SEPARATOR));
     }
+
+    private String getDocumentAssignedTemplate() {
+        return "document-assigned-email-" + configuredLocale + ".ftl";
+    }
+
+    private Map<String, String> getDocumentAssignedModel(final DocumentMetadata documentMetadata, final User user) {
+        return Map.of(
+                "username", getUserName(user),
+                "documenturl", getDocumentUrl(documentMetadata)
+        );
+    }
+
+    private String getDocumentUrl(DocumentMetadata documentMetadata) {
+        return documentUrl + "/" + documentMetadata.getId();
+    }
+
 }
