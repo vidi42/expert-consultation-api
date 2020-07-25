@@ -1,5 +1,7 @@
 package com.code4ro.legalconsultation.controller;
 
+import com.code4ro.legalconsultation.common.security.CurrentUser;
+import com.code4ro.legalconsultation.converters.CurrentUserMapper;
 import com.code4ro.legalconsultation.converters.UserMapper;
 import com.code4ro.legalconsultation.model.dto.PageDto;
 import com.code4ro.legalconsultation.model.dto.UserDto;
@@ -24,6 +26,8 @@ public class UserController {
 
     private final UserService userService;
     private final UserMapper userMapper;
+    private final CurrentUserService currentUserService;
+    private final CurrentUserMapper currentUserMapper;
 
     @ApiOperation(value = "Save a new user in the platform",
             response = UserDto.class,
@@ -100,5 +104,14 @@ public class UserController {
     public List<UserDto> searchByTerm(@ApiParam("String of the input searching term")
                                       @RequestParam("searchTerm") final String searchTerm) {
         return userMapper.map(userService.searchByTerm(searchTerm));
+    }
+
+    @ApiOperation(value = "Get current user information",
+            response = CurrentUserDto.class,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/currentUser")
+    public CurrentUserDto currentUser() {
+        CurrentUser currentUser = currentUserService.getCurrentUser();
+        return currentUser != null ? currentUserMapper.map(currentUser) : null;
     }
 }

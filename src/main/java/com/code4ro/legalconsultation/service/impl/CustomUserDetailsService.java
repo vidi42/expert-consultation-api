@@ -1,6 +1,6 @@
 package com.code4ro.legalconsultation.service.impl;
 
-import com.code4ro.legalconsultation.common.security.UserPrincipal;
+import com.code4ro.legalconsultation.common.security.CurrentUser;
 import com.code4ro.legalconsultation.model.persistence.ApplicationUser;
 import com.code4ro.legalconsultation.repository.ApplicationUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                         new UsernameNotFoundException("ApplicationUser not found with username or email : " + usernameOrEmail)
                 );
 
-        return UserPrincipal.create(applicationUser);
+        return CurrentUser.create(applicationUser);
     }
 
     // used by JWTAuthenticationFilter
@@ -43,6 +43,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                 () -> new UsernameNotFoundException("ApplicationUser not found with id : " + id)
         );
 
-        return UserPrincipal.create(applicationUser);
+        return CurrentUser.create(applicationUser);
     }
 }
