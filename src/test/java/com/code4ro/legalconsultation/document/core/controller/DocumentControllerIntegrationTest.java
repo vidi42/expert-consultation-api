@@ -1,6 +1,7 @@
 package com.code4ro.legalconsultation.document.core.controller;
 
 import com.amazonaws.util.json.Jackson;
+import com.code4ro.legalconsultation.comment.model.dto.CommentDetailDto;
 import com.code4ro.legalconsultation.core.controller.AbstractControllerIntegrationTest;
 import com.code4ro.legalconsultation.comment.factory.CommentFactory;
 import com.code4ro.legalconsultation.document.node.factory.DocumentNodeFactory;
@@ -253,12 +254,17 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
     public void getDocumentCommentsNumber() throws Exception {
         persistMockedUser();
         DocumentConsolidated consolidated = saveSingleConsolidated();
-        commentFactory.save(consolidated.getDocumentNode().getId());
-        commentFactory.save(consolidated.getDocumentNode().getId());
+
+        CommentDetailDto comment1 = commentFactory.save(consolidated.getDocumentNode().getId());
+        CommentDetailDto comment2 = commentFactory.save(consolidated.getDocumentNode().getId());
+
+        commentFactory.saveReply(comment1.getId());
+        commentFactory.saveReply(comment1.getId());
+        commentFactory.saveReply(comment2.getId());
 
         mvc.perform(get(endpoint("/api/documents/", consolidated.getDocumentMetadata().getId(), "/consolidated"))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.documentNode.numberOfComments").value("2"))
+                .andExpect(jsonPath("$.documentNode.numberOfComments").value("5"))
                 .andExpect(status().isOk())
                 .andReturn();
     }
