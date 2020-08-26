@@ -134,7 +134,8 @@ public class CommentServiceTest {
         Comment comment1 = new Comment();
         comment1.setText(text);
 
-        when(commentRepository.findByDocumentNodeId(nodeId, pageable)).thenReturn(new PageImpl<>(List.of(comment1)));
+        when(commentRepository.findByDocumentNodeIdAndParentIsNull(nodeId, pageable))
+                .thenReturn(new PageImpl<>(List.of(comment1)));
 
         //when
         Page<Comment> all = commentService.findAll(nodeId, pageable);

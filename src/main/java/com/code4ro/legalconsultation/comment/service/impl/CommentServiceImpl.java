@@ -80,6 +80,7 @@ public class CommentServiceImpl implements CommentService {
         reply.setParent(parent);
         reply.setOwner(currentUser);
         reply.setLastEditDateTime(new Date());
+        reply.setDocumentNode(parent.getDocumentNode());
 
         reply = commentRepository.save(reply);
 
@@ -98,7 +99,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(readOnly = true)
     @Override
     public Page<Comment> findAll(final UUID documentNodeId, final Pageable pageable) {
-        return commentRepository.findByDocumentNodeId(documentNodeId, pageable);
+        return commentRepository.findByDocumentNodeIdAndParentIsNull(documentNodeId, pageable);
     }
 
     @Transactional(readOnly = true)
