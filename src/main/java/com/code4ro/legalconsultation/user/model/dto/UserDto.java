@@ -3,6 +3,7 @@ package com.code4ro.legalconsultation.user.model.dto;
 import com.code4ro.legalconsultation.core.model.dto.BaseEntityDto;
 import com.code4ro.legalconsultation.core.model.dto.validator.UniqueUserEmailConstraint;
 import com.code4ro.legalconsultation.user.model.persistence.UserRole;
+import com.code4ro.legalconsultation.user.model.persistence.UserSpecialization;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -31,6 +32,8 @@ public class UserDto extends BaseEntityDto {
     private String district;
     @Size(max = 100, message = "user.save.organisation.tooLong")
     private String organisation;
+    @NotNull(message = "user.save.specialization.null")
+    private UserSpecialization specialization;
     @NotNull(message = "user.save.role.null")
     private UserRole role;
 }

@@ -43,6 +43,10 @@ public class User extends BaseEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    private UserSpecialization specialization;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
     private UserRole role;
 
     public User() {
