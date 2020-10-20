@@ -32,8 +32,10 @@ public class UserDto extends BaseEntityDto {
     private String district;
     @Size(max = 100, message = "user.save.organisation.tooLong")
     private String organisation;
+    // added default value to prevent breaking when adding a user from the frontend,
+    // where the specialization can't yet be selected
     @NotNull(message = "user.save.specialization.null")
-    private UserSpecialization specialization;
+    private UserSpecialization specialization = UserSpecialization.ARCHITECT;
     @NotNull(message = "user.save.role.null")
     private UserRole role;
 }

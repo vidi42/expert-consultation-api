@@ -1,10 +1,11 @@
 package com.code4ro.legalconsultation.document.core.service;
 
 import com.code4ro.legalconsultation.document.consolidated.model.dto.DocumentConsolidatedDto;
-import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentViewDto;
-import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentMetadataDto;
+import com.code4ro.legalconsultation.document.consolidated.model.dto.DocumentConsultationDataDto;
 import com.code4ro.legalconsultation.document.consolidated.model.persistence.DocumentConsolidated;
 import com.code4ro.legalconsultation.document.export.model.DocumentExportFormat;
+import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentMetadataDto;
+import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.document.metadata.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.pdf.model.dto.PdfHandleDto;
 import com.code4ro.legalconsultation.user.model.dto.UserDto;
@@ -53,4 +54,9 @@ public interface DocumentService {
     PdfHandleDto addPdf(final UUID id, final String state, final MultipartFile file);
 
     byte[] export(final UUID id, final DocumentExportFormat type);
+
+    void addConsultationData(final UUID id, final DocumentConsultationDataDto consultationDataDto);
+
+    DocumentConsultationDataDto getConsultationData(final UUID id);
+
 }

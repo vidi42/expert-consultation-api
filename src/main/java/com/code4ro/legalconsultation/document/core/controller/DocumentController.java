@@ -2,13 +2,14 @@ package com.code4ro.legalconsultation.document.core.controller;
 
 import com.code4ro.legalconsultation.core.model.dto.PageDto;
 import com.code4ro.legalconsultation.document.consolidated.model.dto.DocumentConsolidatedDto;
-import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentViewDto;
-import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentMetadataDto;
+import com.code4ro.legalconsultation.document.consolidated.model.dto.DocumentConsultationDataDto;
 import com.code4ro.legalconsultation.document.consolidated.model.dto.DocumentUserAssignmentDto;
 import com.code4ro.legalconsultation.document.consolidated.model.persistence.DocumentConsolidated;
-import com.code4ro.legalconsultation.document.export.model.DocumentExportFormat;
-import com.code4ro.legalconsultation.document.metadata.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.document.core.service.DocumentService;
+import com.code4ro.legalconsultation.document.export.model.DocumentExportFormat;
+import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentMetadataDto;
+import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentViewDto;
+import com.code4ro.legalconsultation.document.metadata.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.pdf.model.dto.PdfHandleDto;
 import com.code4ro.legalconsultation.user.model.dto.UserDto;
 import io.swagger.annotations.ApiOperation;
@@ -99,15 +100,17 @@ public class DocumentController {
 
     @ApiOperation("Assign users to a document")
     @PostMapping("/{id}/users")
-    public ResponseEntity<Void> assignUsers(@ApiParam(value = "Id of the document being modified") @PathVariable("id") UUID id,
-                                            @Valid @RequestBody DocumentUserAssignmentDto documentUserAssignmentDto) {
+    public ResponseEntity<Void> assignUsers(
+            @ApiParam(value = "Id of the document being modified") @PathVariable("id") UUID id,
+            @Valid @RequestBody DocumentUserAssignmentDto documentUserAssignmentDto) {
         documentService.assignUsers(id, documentUserAssignmentDto.getUserIds());
         return ResponseEntity.ok().build();
     }
 
     @ApiOperation("Get assigned users of a document")
     @GetMapping("{id}/users")
-    public ResponseEntity<List<UserDto>> getAssignedUsers(@ApiParam(value = "Id of the document") @PathVariable("id") UUID id) {
+    public ResponseEntity<List<UserDto>> getAssignedUsers(
+            @ApiParam(value = "Id of the document") @PathVariable("id") UUID id) {
         final List<UserDto> assignedUsers = documentService.getAssignedUsers(id);
         return ResponseEntity.ok(assignedUsers);
     }
@@ -134,5 +137,22 @@ public class DocumentController {
                 .contentLength(pdfContent.length)
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(new ByteArrayResource(pdfContent));
+    }
+
+    @ApiOperation("Add consultation data to a document")
+    @PostMapping("/{id}/consultation")
+    public ResponseEntity<Void> addConsultationData(
+            @ApiParam(value = "Id of the document being modified") @PathVariable("id") UUID id,
+            @Valid @RequestBody DocumentConsultationDataDto documentConsultationDataDto) {
+        documentService.addConsultationData(id, documentConsultationDataDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @ApiOperation("Get consultation data of a document")
+    @GetMapping("{id}/consultation")
+    public ResponseEntity<DocumentConsultationDataDto> getConsultationData(
+            @ApiParam(value = "Id of the document") @PathVariable("id") UUID id) {
+        final DocumentConsultationDataDto consultationData = documentService.getConsultationData(id);
+        return ResponseEntity.ok(consultationData);
     }
 }

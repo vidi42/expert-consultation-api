@@ -1,31 +1,32 @@
 package com.code4ro.legalconsultation.document.core.service.impl;
 
-import com.code4ro.legalconsultation.document.consolidated.mapper.DocumentConsolidatedMapper;
-import com.code4ro.legalconsultation.pdf.mapper.PdfHandleMapper;
 import com.code4ro.legalconsultation.document.configuration.model.persistence.DocumentConfiguration;
+import com.code4ro.legalconsultation.document.consolidated.mapper.DocumentConsolidatedMapper;
 import com.code4ro.legalconsultation.document.consolidated.model.dto.DocumentConsolidatedDto;
-import com.code4ro.legalconsultation.document.consolidated.service.DocumentConsolidatedService;
-import com.code4ro.legalconsultation.document.export.model.DocumentExportFormat;
-import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentViewDto;
+import com.code4ro.legalconsultation.document.consolidated.model.dto.DocumentConsultationDataDto;
 import com.code4ro.legalconsultation.document.consolidated.model.persistence.DocumentConsolidated;
+import com.code4ro.legalconsultation.document.consolidated.service.DocumentConsolidatedService;
+import com.code4ro.legalconsultation.document.core.service.DocumentService;
+import com.code4ro.legalconsultation.document.export.model.DocumentExportFormat;
+import com.code4ro.legalconsultation.document.export.service.DocumentExporter;
+import com.code4ro.legalconsultation.document.export.service.DocumentExporterFactory;
 import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentMetadataDto;
+import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.document.metadata.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.document.metadata.service.DocumentMetadataService;
 import com.code4ro.legalconsultation.document.node.model.persistence.DocumentNode;
+import com.code4ro.legalconsultation.document.node.service.DocumentNodeService;
 import com.code4ro.legalconsultation.mail.service.MailApi;
+import com.code4ro.legalconsultation.pdf.mapper.PdfHandleMapper;
 import com.code4ro.legalconsultation.pdf.model.dto.PdfHandleDto;
+import com.code4ro.legalconsultation.pdf.service.PDFService;
+import com.code4ro.legalconsultation.storage.service.StorageApi;
 import com.code4ro.legalconsultation.user.mapper.UserMapper;
 import com.code4ro.legalconsultation.user.model.dto.UserDto;
 import com.code4ro.legalconsultation.user.model.persistence.User;
 import com.code4ro.legalconsultation.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.code4ro.legalconsultation.document.node.service.DocumentNodeService;
-import com.code4ro.legalconsultation.document.core.service.DocumentService;
-import com.code4ro.legalconsultation.pdf.service.PDFService;
-import com.code4ro.legalconsultation.storage.service.StorageApi;
-import com.code4ro.legalconsultation.document.export.service.DocumentExporter;
-import com.code4ro.legalconsultation.document.export.service.DocumentExporterFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,8 +41,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DocumentServiceImpl.class);
 
     private final DocumentConsolidatedService documentConsolidatedService;
     private final DocumentMetadataService documentMetadataService;
@@ -181,5 +180,21 @@ public class DocumentServiceImpl implements DocumentService {
         final DocumentExporter exporter = documentExporterFactory.getExporter(type);
         final DocumentConsolidated documentConsolidated = documentConsolidatedService.getEntity(id);
         return exporter.export(documentConsolidated);
+    }
+
+    @Override
+    public void addConsultationData(final UUID id, final DocumentConsultationDataDto consultationDataDto) {
+        final DocumentConsolidated documentConsolidated = documentConsolidatedService.getByDocumentMetadataId(id);
+        documentConsolidated.setStartDate(consultationDataDto.getStartDate());
+        documentConsolidated.setConsultationDeadline(consultationDataDto.getConsultationDeadline());
+        documentConsolidated.setExcludedFromConsultation(consultationDataDto.getExcludedFromConsultation());
+        documentConsolidatedService.saveOne(documentConsolidated);
+    }
+
+    @Override
+    public DocumentConsultationDataDto getConsultationData(final UUID id) {
+        final DocumentConsolidated documentConsolidated = documentConsolidatedService.getByDocumentMetadataId(id);
+        return new DocumentConsultationDataDto(documentConsolidated.getStartDate(),
+                documentConsolidated.getConsultationDeadline(), documentConsolidated.getExcludedFromConsultation());
     }
 }

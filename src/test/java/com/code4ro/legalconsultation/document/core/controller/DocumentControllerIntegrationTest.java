@@ -1,20 +1,21 @@
 package com.code4ro.legalconsultation.document.core.controller;
 
 import com.amazonaws.util.json.Jackson;
+import com.code4ro.legalconsultation.comment.factory.CommentFactory;
 import com.code4ro.legalconsultation.comment.model.dto.CommentDetailDto;
 import com.code4ro.legalconsultation.core.controller.AbstractControllerIntegrationTest;
-import com.code4ro.legalconsultation.comment.factory.CommentFactory;
-import com.code4ro.legalconsultation.document.node.factory.DocumentNodeFactory;
-import com.code4ro.legalconsultation.pdf.factory.PdfFileFactory;
 import com.code4ro.legalconsultation.core.factory.RandomObjectFiller;
-import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentViewDto;
 import com.code4ro.legalconsultation.document.configuration.model.persistence.DocumentConfiguration;
+import com.code4ro.legalconsultation.document.consolidated.model.dto.DocumentConsultationDataDto;
 import com.code4ro.legalconsultation.document.consolidated.model.persistence.DocumentConsolidated;
-import com.code4ro.legalconsultation.document.metadata.model.persistence.DocumentMetadata;
-import com.code4ro.legalconsultation.document.node.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.document.consolidated.repository.DocumentConsolidatedRepository;
+import com.code4ro.legalconsultation.document.metadata.model.dto.DocumentViewDto;
+import com.code4ro.legalconsultation.document.metadata.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.document.metadata.repository.DocumentMetadataRepository;
+import com.code4ro.legalconsultation.document.node.factory.DocumentNodeFactory;
+import com.code4ro.legalconsultation.document.node.model.persistence.DocumentNode;
 import com.code4ro.legalconsultation.document.node.repository.DocumentNodeRepository;
+import com.code4ro.legalconsultation.pdf.factory.PdfFileFactory;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -426,8 +428,8 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertThat(documentMetadataRepository.count()).isEqualTo(0);
-        assertThat(documentConsolidatedRepository.count()).isEqualTo(0);
+        assertThat(documentMetadataRepository.count()).isZero();
+        assertThat(documentConsolidatedRepository.count()).isZero();
     }
 
     @Test
@@ -500,11 +502,43 @@ public class DocumentControllerIntegrationTest extends AbstractControllerIntegra
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @WithMockUser
+    @Transactional
+    public void addConsultationData() throws Exception {
+        DocumentConsolidated consolidated = saveSingleConsolidated();
+
+        Date startDate = new Date();
+        Date consultationDeadline = new Date();
+
+        final DocumentConsultationDataDto documentConsultationDataDto = new DocumentConsultationDataDto(
+                startDate, consultationDeadline, true);
+
+
+        mvc.perform(
+                multipart("/api/documents/" + consolidated.getDocumentMetadata().getId().toString() + "/consultation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(Jackson.toJsonString(documentConsultationDataDto))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        mvc.perform(get("/api/documents/" + consolidated.getDocumentMetadata().getId().toString() + "/consultation")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.startDate").isNotEmpty())
+                .andExpect(jsonPath("$.consultationDeadline").isNotEmpty())
+                .andExpect(jsonPath("$.excludedFromConsultation").value(true));
+    }
+
+
     private DocumentConsolidated saveSingleConsolidated() {
         final DocumentNode documentNode = documentNodeFactory.save();
         final DocumentMetadata documentMetadata = RandomObjectFiller.createAndFill(DocumentMetadata.class);
-        final DocumentConfiguration documentConfiguration = RandomObjectFiller.createAndFill(DocumentConfiguration.class);
-        DocumentConsolidated consolidated = new DocumentConsolidated(documentMetadata, documentNode, documentConfiguration);
+        final DocumentConfiguration documentConfiguration =
+                RandomObjectFiller.createAndFill(DocumentConfiguration.class);
+        DocumentConsolidated consolidated =
+                new DocumentConsolidated(documentMetadata, documentNode, documentConfiguration);
         return documentConsolidatedRepository.save(consolidated);
     }
 }

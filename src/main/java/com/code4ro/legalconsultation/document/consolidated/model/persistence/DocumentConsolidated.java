@@ -1,15 +1,16 @@
 package com.code4ro.legalconsultation.document.consolidated.model.persistence;
 
+import com.code4ro.legalconsultation.core.model.persistence.BaseEntity;
 import com.code4ro.legalconsultation.document.configuration.model.persistence.DocumentConfiguration;
 import com.code4ro.legalconsultation.document.metadata.model.persistence.DocumentMetadata;
 import com.code4ro.legalconsultation.document.node.model.persistence.DocumentNode;
-import com.code4ro.legalconsultation.core.model.persistence.BaseEntity;
 import com.code4ro.legalconsultation.user.model.persistence.User;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Date;
 
 @Entity
 @Table(name = "consolidated_document")
@@ -35,6 +36,17 @@ public class DocumentConsolidated extends BaseEntity {
             joinColumns = @JoinColumn(name = "document_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> assignedUsers;
+
+    @Column(name = "start_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startDate;
+
+    @Column(name = "consultation_deadline")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date consultationDeadline;
+
+    @Column(name = "is_excluded_from_consultation")
+    private Boolean excludedFromConsultation;
 
     public DocumentConsolidated(final DocumentMetadata documentMetadata,
                                 final DocumentNode documentNode,
