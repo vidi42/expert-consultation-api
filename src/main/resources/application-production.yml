@@ -22,7 +22,7 @@ spring:
     locale: ro
   mail:
     host: email-smtp.eu-west-1.amazonaws.com
-    port: 25 #  25, 465 or 587
+    port: 587 #  25, 465 or 587
     # This is Different from AWS_ACCESS_ID and AWS_SECRET_KEY.  Required to generate AWS SES production credentials: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/smtp-credentials.html
     username: ${AWS_SES_USERNAME}
     password:  ${AWS_SES_PASSWORD}
