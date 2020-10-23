@@ -101,6 +101,7 @@ public class MailService implements MailApi {
             final MimeMessage message = mailSender.createMimeMessage();
             final MimeMessageHelper helper = new MimeMessageHelper(message);
             //TODO: add From here from previous #121 issue
+            helper.setFrom(from);
             helper.setTo(userEmail);
             helper.setSubject(subject);
             final Template template = freemarkerConfig.getTemplate(templateName);
